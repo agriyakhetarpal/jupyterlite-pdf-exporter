@@ -23,11 +23,19 @@ on:
         description: "Use PRs with activity since the last stable git tag"
         required: false
         type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   prep_release:
+    name: Prepare Release
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # needed by the releaser action
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
 
@@ -45,4 +53,6 @@ jobs:
 
       - name: "** Next Step **"
         run: |
-          echo "Optional): Review Draft Release: ${{ steps.prep-release.outputs.release_url }}"
+          echo "Optional): Review Draft Release: ${STEPS_PREP_RELEASE_OUTPUTS_RELEASE_URL}"
+        env:
+          STEPS_PREP_RELEASE_OUTPUTS_RELEASE_URL: ${{ steps.prep-release.outputs.release_url }}

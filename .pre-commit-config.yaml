@@ -1,0 +1,36 @@
+ci:
+  autoupdate_schedule: monthly
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 3e8a8703264a2f4a69428a0aa4dcb512790b2c8c  # frozen: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: requirements-txt-fixer
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: check-builtin-literals
+      - id: trailing-whitespace
+  - repo: local
+    hooks:
+      - id: prettier
+        name: prettier
+        entry: 'npm run prettier'
+        language: node
+        types_or: [json, ts, tsx, javascript, jsx, css]
+        exclude: \.ipynb$
+      - id: eslint
+        name: eslint
+        entry: 'npm run eslint'
+        language: node
+        types_or: [ts, tsx, javascript, jsx]
+  - repo: https://github.com/zizmorcore/zizmor-pre-commit
+    rev: ea2eb407b4cbce87cf0d502f36578950494f5ac9  # frozen: v1.23.1
+    hooks:
+      - id: zizmor
+        args: ['--pedantic', '--fix=all']

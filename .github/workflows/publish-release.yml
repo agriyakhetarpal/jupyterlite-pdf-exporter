@@ -12,12 +12,19 @@ on:
         description: "Comma separated list of steps to skip"
         required: false
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.run_id }}
+  cancel-in-progress: true
+
+permissions: {}
+
 jobs:
   publish_release:
+    name: Publish Release
     runs-on: ubuntu-latest
     environment: release
     permissions:
-      id-token: write
+      id-token: write # for releasing
     steps:
       - uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
 
@@ -49,10 +56,14 @@ jobs:
         if: ${{ success() }}
         run: |
           echo "Verify the final release"
-          echo ${{ steps.finalize-release.outputs.release_url }}
+          echo ${STEPS_FINALIZE_RELEASE_OUTPUTS_RELEASE_URL}
+        env:
+          STEPS_FINALIZE_RELEASE_OUTPUTS_RELEASE_URL: ${{ steps.finalize-release.outputs.release_url }}
 
       - name: "** Failure Message **"
         if: ${{ failure() }}
         run: |
           echo "Failed to Publish the Draft Release Url:"
-          echo ${{ steps.populate-release.outputs.release_url }}
+          echo ${STEPS_POPULATE_RELEASE_OUTPUTS_RELEASE_URL}
+        env:
+          STEPS_POPULATE_RELEASE_OUTPUTS_RELEASE_URL: ${{ steps.populate-release.outputs.release_url }}
