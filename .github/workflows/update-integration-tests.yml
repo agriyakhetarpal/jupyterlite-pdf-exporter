@@ -78,7 +78,7 @@ jobs:
           fi
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
 
       - name: Install dependencies
         run: python -m pip install -U "jupyterlab>=4.0.0,<5"
@@ -89,7 +89,7 @@ jobs:
           jlpm
           python -m pip install .
 
-      - uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Playwright knows how to start JupyterLab server

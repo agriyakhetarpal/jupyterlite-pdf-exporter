@@ -33,4 +33,4 @@ repos:
     rev: ea2eb407b4cbce87cf0d502f36578950494f5ac9  # frozen: v1.23.1
     hooks:
       - id: zizmor
-        args: ['--pedantic', '--fix=all']
+        args: ['--pedantic', '--fix=safe']

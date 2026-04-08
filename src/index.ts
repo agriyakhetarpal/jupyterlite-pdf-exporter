@@ -16,7 +16,7 @@ import { statusBarPlugin } from './status';
  * menu and subsequently in the "File" menu > "Save and Export Notebook As" dropdown.
  */
 const exporterPlugin: ServiceManagerPlugin<void> = {
-  id: 'jupyterlite-pandoc-pdf-exporter:plugin',
+  id: 'jupyterlite-pdf-exporter:plugin',
   description:
     'A PDF exporter for JupyterLite based on WebAssembly distributions of Pandoc and Typst',
   autoStart: true,

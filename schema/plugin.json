@@ -1,7 +1,7 @@
 {
   "jupyter.lab.shortcuts": [],
-  "title": "jupyterlite-pandoc-pdf-exporter",
-  "description": "jupyterlite-pandoc-pdf-exporter settings.",
+  "title": "jupyterlite-pdf-exporter",
+  "description": "jupyterlite-pdf-exporter settings.",
   "type": "object",
   "properties": {},
   "additionalProperties": false
