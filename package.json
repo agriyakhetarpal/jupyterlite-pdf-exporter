@@ -55,16 +55,16 @@
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
-        "@jupyterlab/application": "^4.5.4",
-        "@jupyterlab/services": "^7.5.4",
-        "@jupyterlab/statusbar": "^4.5.4",
-        "@jupyterlite/services": "^0.7.1",
+        "@jupyterlab/application": "^4.5.6",
+        "@jupyterlab/services": "^7.5.6",
+        "@jupyterlab/statusbar": "^4.5.6",
+        "@jupyterlite/services": "^0.7.4",
         "@myriaddreamin/typst-all-in-one.ts": "0.7.0-rc2",
         "pandoc-wasm": "1.0.1"
     },
     "devDependencies": {
-        "@jupyterlab/builder": "^4.5.4",
-        "@jupyterlab/testutils": "^4.5.4",
+        "@jupyterlab/builder": "^4.5.6",
+        "@jupyterlab/testutils": "^4.5.6",
         "@types/emscripten": "^1.41.5",
         "@types/jest": "^30.0.0",
         "@types/json-schema": "^7.0.15",
@@ -86,7 +86,15 @@
         "yjs": "^13.5.0"
     },
     "resolutions": {
-        "lib0": "0.2.111"
+        "lib0": "0.2.111",
+        "picomatch@^4.0.2": "4.0.4",
+        "picomatch@^4.0.3": "4.0.4",
+        "ajv@^8.0.0": "8.18.0",
+        "ajv@^8.8.2": "8.18.0",
+        "ajv@^8.9.0": "8.18.0",
+        "ajv@^8.12.0": "8.18.0",
+        "serialize-javascript@^6.0.2": "7.0.5",
+        "minimatch@^10.1.2": "10.2.3"
     },
     "sideEffects": [
         "style/*.css",
