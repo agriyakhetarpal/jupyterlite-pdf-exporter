@@ -37,7 +37,7 @@ fields = ["description", "authors", "urls", "keywords"]
 
 [tool.hatch.build.targets.sdist]
 artifacts = ["jupyterlite_pandoc_pdf_exporter/labextension"]
-exclude = [".github", "binder"]
+exclude = [".github", "binder", "venv", "node_modules"]
 
 [tool.hatch.build.targets.wheel.shared-data]
 "jupyterlite_pandoc_pdf_exporter/labextension" = "share/jupyter/labextensions/jupyterlite-pandoc-pdf-exporter"
