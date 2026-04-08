@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterlite_pandoc_pdf_exporter"
+name = "jupyterlite-pandoc-pdf-exporter"
 readme = "README.md"
 license = "GPL-2.0-or-later"
 license-files = ["LICENSE.txt", "LICENSE-PANDOC.txt", "LICENSE-TYPST.txt"]
