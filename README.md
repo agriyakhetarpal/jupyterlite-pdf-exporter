@@ -3,7 +3,7 @@
 [![Github Actions build status](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/workflows/Build/badge.svg)](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/actions/workflows/build.yml)
 [![Try PDF exporter in JupyterLite](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://agriyakhetarp.al/jupyterlite-pdf-exporter/)
 
-A serverless PDF exporter for JupyterLite based on WebAssembly distributions of Pandoc and Typst. This JupyterLite extension registers a
+A serverless PDF exporter for JupyterLite based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/). This JupyterLite extension registers a
 PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
 
 ## Usage
@@ -41,9 +41,9 @@ and rebuild your JupyterLite distribution.
 
 The source code of this JupyterLite extension is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE) file for details).
 
-The distributions of this JupyterLite extension on the `npm` and `PyPI` package registries are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [LICENSE.pandoc](LICENSE.pandoc) file for details.
+The distributions of this JupyterLite extension on the `npm` and `PyPI` package registries are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [LICENSE.pandoc](LICENSE-PANDOC.txt) file for details.
 
-The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [LICENSE.typst](LICENSE.typst) file for details.
+The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [LICENSE.typst](LICENSE-TYPST.txt) file for details.
 
 ### Why?
 
