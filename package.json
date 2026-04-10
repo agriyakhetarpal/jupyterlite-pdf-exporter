@@ -1,17 +1,17 @@
 {
-    "name": "jupyterlite-pandoc-pdf-exporter",
-    "version": "0.0.1",
+    "name": "jupyterlite-pdf-exporter",
+    "version": "0.1.0",
     "description": "A PDF exporter for JupyterLite based on a WebAssembly distribution of Pandoc",
     "keywords": [
         "jupyter",
         "jupyterlab",
         "jupyterlab-extension"
     ],
-    "homepage": "https://github.com/agriyakhetarpal/jupyterlite-pandoc-pdf-exporter",
+    "homepage": "https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter",
     "bugs": {
-        "url": "https://github.com/agriyakhetarpal/jupyterlite-pandoc-pdf-exporter/issues"
+        "url": "https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues"
     },
-    "license": "BSD-3-Clause",
+    "license": "GPL-2.0-or-later",
     "author": {
         "name": "Agriya Khetarpal",
         "email": "agriyakhetarpal@outlook.com"
@@ -20,14 +20,16 @@
         "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
         "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
         "src/**/*.{ts,tsx}",
-        "schema/*.json"
+        "schema/*.json",
+        "LICENSE-PANDOC.txt",
+        "LICENSE-TYPST.txt"
     ],
     "main": "lib/index.js",
     "types": "lib/index.d.ts",
     "style": "style/index.css",
     "repository": {
         "type": "git",
-        "url": "https://github.com/agriyakhetarpal/jupyterlite-pandoc-pdf-exporter.git"
+        "url": "https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter.git"
     },
     "scripts": {
         "build": "jlpm build:lib && jlpm build:labextension:dev",
@@ -39,7 +41,7 @@
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
         "clean:lintcache": "rimraf .eslintcache",
-        "clean:labextension": "rimraf jupyterlite_pandoc_pdf_exporter/labextension jupyterlite_pandoc_pdf_exporter/_version.py",
+        "clean:labextension": "rimraf jupyterlite_pdf_exporter/labextension jupyterlite_pdf_exporter/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache --ext .ts,.tsx",
@@ -55,16 +57,16 @@
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
-        "@jupyterlab/application": "^4.5.4",
-        "@jupyterlab/services": "^7.5.4",
-        "@jupyterlab/statusbar": "^4.5.4",
-        "@jupyterlite/services": "^0.7.1",
+        "@jupyterlab/application": "^4.5.6",
+        "@jupyterlab/services": "^7.5.6",
+        "@jupyterlab/statusbar": "^4.5.6",
+        "@jupyterlite/services": "^0.7.4",
         "@myriaddreamin/typst-all-in-one.ts": "0.7.0-rc2",
         "pandoc-wasm": "1.0.1"
     },
     "devDependencies": {
-        "@jupyterlab/builder": "^4.5.4",
-        "@jupyterlab/testutils": "^4.5.4",
+        "@jupyterlab/builder": "^4.5.6",
+        "@jupyterlab/testutils": "^4.5.6",
         "@types/emscripten": "^1.41.5",
         "@types/jest": "^30.0.0",
         "@types/json-schema": "^7.0.15",
@@ -86,7 +88,17 @@
         "yjs": "^13.5.0"
     },
     "resolutions": {
-        "lib0": "0.2.111"
+        "lib0": "0.2.111",
+        "picomatch@^4.0.2": "4.0.4",
+        "picomatch@^4.0.3": "4.0.4",
+        "ajv@^8.0.0": "8.18.0",
+        "ajv@^8.8.2": "8.18.0",
+        "ajv@^8.9.0": "8.18.0",
+        "ajv@^8.12.0": "8.18.0",
+        "serialize-javascript@^6.0.2": "7.0.5",
+        "minimatch@^10.1.2": "10.2.3",
+        "minimatch@^9.0.4": "9.0.7",
+        "@tootallnate/once@2": "3.0.1"
     },
     "sideEffects": [
         "style/*.css",
@@ -98,7 +110,7 @@
     },
     "jupyterlab": {
         "extension": true,
-        "outputDir": "jupyterlite_pandoc_pdf_exporter/labextension",
+        "outputDir": "jupyterlite_pdf_exporter/labextension",
         "webpackConfig": "./webpack.config.js",
         "sharedPackages": {
             "@jupyterlite/services": {
@@ -114,7 +126,9 @@
         "**/*.d.ts",
         "tests",
         "**/__tests__",
-        "ui-tests"
+        "ui-tests",
+        "**/*.config.js",
+        "style"
     ],
     "eslintConfig": {
         "extends": [

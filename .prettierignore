@@ -3,7 +3,7 @@ node_modules
 **/lib
 **/package.json
 !/package.json
-jupyterlite_pandoc_pdf_exporter
+jupyterlite_pdf_exporter
 venv
 .venv
 env

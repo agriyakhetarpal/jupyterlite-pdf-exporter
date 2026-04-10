@@ -10,16 +10,21 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   build:
+    name: Build extension
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
 
       - name: Install dependencies
         run: python -m pip install -U "jupyterlab>=4.0.0,<5"
@@ -41,7 +46,7 @@ jobs:
           python -m pip install .[test]
 
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pandoc-pdf-exporter.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
 
       - name: Package the extension
         run: |
@@ -49,16 +54,17 @@ jobs:
 
           pip install build
           python -m build
-          pip uninstall -y "jupyterlite_pandoc_pdf_exporter" jupyterlab
+          pip uninstall -y "jupyterlite-pdf-exporter" jupyterlab
 
       - name: Upload extension packages
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: extension-artifacts
-          path: dist/jupyterlite_pandoc_pdf_exporter*
+          path: dist/jupyterlite_pdf_exporter*
           if-no-files-found: error
 
   test_isolated:
+    name: Test extension in isolation
     needs: build
     runs-on: ubuntu-latest
 
@@ -68,33 +74,36 @@ jobs:
         with:
           python-version: '3.10'
           architecture: 'x64'
-      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: extension-artifacts
       - name: Install and Test
         run: |
           set -eux
-          # Remove NodeJS, twice to take care of system and locally installed node versions.
+          # Remove Node.js, twice to take care of system and locally installed node versions.
           sudo rm -rf $(which node)
           sudo rm -rf $(which node)
 
-          pip install "jupyterlab>=4.0.0,<5" jupyterlite_pandoc_pdf_exporter*.whl
+          pip install "jupyterlab>=4.0.0,<5" jupyterlite_pdf_exporter*.whl
 
 
           jupyter labextension list
-          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pandoc-pdf-exporter.*OK"
+          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
           python -m jupyterlab.browser_check --no-browser-test
 
   build_jupyterlite:
+    name: Build JupyterLite distribution
     runs-on: ubuntu-latest
     needs: build
     steps:
       - name: Checkout
 
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
 
       - name: Build wheel
         run: |
@@ -113,18 +122,21 @@ jobs:
           jupyter lite build --lite-dir=lite --contents=notebooks --output-dir=dist
 
       - name: Upload JupyterLite distribution
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: jupyterlite-distribution-${{ github.run_number }}
           path: dist/*
 
   publish_jupyterlite:
+    name: Publish JupyterLite distribution to GitHub Pages
     needs: build_jupyterlite
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: write # to publish to GitHub Pages
     steps:
       - name: Download JupyterLite distribution
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: jupyterlite-distribution-${{ github.run_number }}
           path: dist
@@ -151,17 +163,17 @@ jobs:
   #     uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
   #   - name: Base Setup
-  #     uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+  #     uses: jupyterlab/maintainer-tools/.github/actions/base-setup@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
 
   #   - name: Download extension package
-  #     uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+  #     uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
   #     with:
   #       name: extension-artifacts
 
   #   - name: Install the extension
   #     run: |
   #       set -eux
-  #       python -m pip install "jupyterlab>=4.0.0,<5" jupyterlite_pandoc_pdf_exporter*.whl
+  #       python -m pip install "jupyterlab>=4.0.0,<5" jupyterlite_pdf_exporter*.whl
 
   #   - name: Install dependencies
   #     working-directory: ui-tests
@@ -171,7 +183,7 @@ jobs:
   #     run: jlpm install
 
   #   - name: Set up browser cache
-  #     uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+  #     uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
   #     with:
   #       path: |
   #         ${{ github.workspace }}/pw-browsers
@@ -191,9 +203,9 @@ jobs:
 
   #   - name: Upload Playwright Test report
   #     if: always()
-  #     uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+  #     uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
   #     with:
-  #       name: jupyterlite_pandoc_pdf_exporter-playwright-tests
+  #       name: jupyterlite_pdf_exporter-playwright-tests
   #       path: |
   #         ui-tests/test-results
   #         ui-tests/playwright-report

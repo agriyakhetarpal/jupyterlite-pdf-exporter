@@ -7,9 +7,9 @@ has_ai_rules: false
 has_binder: false
 has_settings: true
 kind: frontend
-labextension_name: jupyterlite-pandoc-pdf-exporter
+labextension_name: jupyterlite-pdf-exporter
 project_short_description: A PDF exporter for JupyterLite based on a WebAssembly distribution
     of Pandoc
-python_name: jupyterlite_pandoc_pdf_exporter
-repository: https://github.com/agriyakhetarpal/jupyterlite-pandoc-pdf-exporter
+python_name: jupyterlite_pdf_exporter
+repository: https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter
 test: true

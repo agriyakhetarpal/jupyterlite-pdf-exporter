@@ -41,7 +41,7 @@ class PdfExportStatusWidget extends Widget {
  * for PDF export progress.
  */
 export const statusBarPlugin: JupyterFrontEndPlugin<void> = {
-  id: 'jupyterlite-pandoc-pdf-exporter:status-bar',
+  id: 'jupyterlite-pdf-exporter:status-bar',
   description: 'A status bar progress indicator for PDF export',
   autoStart: true,
   optional: [IStatusBar],
@@ -52,7 +52,7 @@ export const statusBarPlugin: JupyterFrontEndPlugin<void> = {
 
     const widget = new PdfExportStatusWidget();
 
-    statusBar.registerStatusItem('jupyterlite-pandoc-pdf-exporter:status-bar', {
+    statusBar.registerStatusItem('jupyterlite-pdf-exporter:status-bar', {
       item: widget,
       align: 'middle',
       isActive: () => pdfExportProgress.isActive,

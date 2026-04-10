@@ -17,9 +17,7 @@ test('should emit an activation console message', async ({ page }) => {
 
   expect(
     logs.filter(
-      s =>
-        s ===
-        'JupyterLab extension jupyterlite-pandoc-pdf-exporter is activated!'
+      s => s === 'JupyterLab extension jupyterlite-pdf-exporter is activated!'
     )
   ).toHaveLength(1);
 });

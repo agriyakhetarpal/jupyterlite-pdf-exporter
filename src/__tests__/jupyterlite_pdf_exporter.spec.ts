@@ -2,7 +2,7 @@
  * Example of [Jest](https://jestjs.io/docs/getting-started) unit tests
  */
 
-describe('jupyterlite-pandoc-pdf-exporter', () => {
+describe('jupyterlite-pdf-exporter', () => {
   it('should be tested', () => {
     expect(1 + 1).toEqual(2);
   });

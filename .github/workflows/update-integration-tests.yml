@@ -4,12 +4,15 @@ on:
   issue_comment:
     types: [created, edited]
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.issue.number }}
+  cancel-in-progress: true
 
 jobs:
   update-snapshots:
+    name: Update snapshots
     if: >
       (
         github.event.issue.author_association == 'OWNER' ||
@@ -20,18 +23,23 @@ jobs:
         github.event.comment.author_association == 'MEMBER'
       ) && github.event.issue.pull_request && contains(github.event.comment.body, 'please update snapshots')
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write # needed to push the branch with updated snapshots
+      pull-requests: write # to react to the triggering comment
     steps:
       - name: React to the triggering comment
         run: |
-          gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions --raw-field 'content=+1'
+          gh api repos/$GITHUB_REPOSITORY/issues/comments/$GITHUB_EVENT_COMMENT_ID/reactions --raw-field 'content=+1'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_COMMENT_ID: ${{ github.event.comment.id }}
 
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: false
 
       - name: Get PR Info
         id: pr
@@ -55,7 +63,8 @@ jobs:
       - name: Checkout the branch from the PR that triggered the job
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr checkout ${{ github.event.issue.number }}
+          GITHUB_EVENT_ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: gh pr checkout $GITHUB_EVENT_ISSUE_NUMBER
 
       - name: Validate the fetched branch HEAD revision
         env:
@@ -69,7 +78,7 @@ jobs:
           fi
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
 
       - name: Install dependencies
         run: python -m pip install -U "jupyterlab>=4.0.0,<5"
@@ -80,7 +89,7 @@ jobs:
           jlpm
           python -m pip install .
 
-      - uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@93556350e3433849ea434d68e8b8f7d9e9a402a4 # v1
+      - uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@f5d710df1483f19b666dd96aeabbe949a53642c2 # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Playwright knows how to start JupyterLab server

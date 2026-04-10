@@ -3,7 +3,7 @@ requires = ["hatchling>=1.5.0", "jupyterlab>=4.0.0,<5", "hatch-nodejs-version>=0
 build-backend = "hatchling.build"
 
 [project]
-name = "jupyterlite_pandoc_pdf_exporter"
+name = "jupyterlite-pdf-exporter"
 readme = "README.md"
 license = "GPL-2.0-or-later"
 license-files = ["LICENSE.txt", "LICENSE-PANDOC.txt", "LICENSE-TYPST.txt"]
@@ -36,24 +36,24 @@ source = "nodejs"
 fields = ["description", "authors", "urls", "keywords"]
 
 [tool.hatch.build.targets.sdist]
-artifacts = ["jupyterlite_pandoc_pdf_exporter/labextension"]
-exclude = [".github", "binder"]
+artifacts = ["jupyterlite_pdf_exporter/labextension"]
+exclude = [".github", "binder", "venv", "node_modules"]
 
 [tool.hatch.build.targets.wheel.shared-data]
-"jupyterlite_pandoc_pdf_exporter/labextension" = "share/jupyter/labextensions/jupyterlite-pandoc-pdf-exporter"
-"install.json" = "share/jupyter/labextensions/jupyterlite-pandoc-pdf-exporter/install.json"
+"jupyterlite_pdf_exporter/labextension" = "share/jupyter/labextensions/jupyterlite-pdf-exporter"
+"install.json" = "share/jupyter/labextensions/jupyterlite-pdf-exporter/install.json"
 
 [tool.hatch.build.hooks.version]
-path = "jupyterlite_pandoc_pdf_exporter/_version.py"
+path = "jupyterlite_pdf_exporter/_version.py"
 
 [tool.hatch.build.hooks.jupyter-builder]
 dependencies = ["hatch-jupyter-builder>=0.5"]
 build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
-    "jupyterlite_pandoc_pdf_exporter/labextension/static/style.js",
-    "jupyterlite_pandoc_pdf_exporter/labextension/package.json",
+    "jupyterlite_pdf_exporter/labextension/static/style.js",
+    "jupyterlite_pdf_exporter/labextension/package.json",
 ]
-skip-if-exists = ["jupyterlite_pandoc_pdf_exporter/labextension/static/style.js"]
+skip-if-exists = ["jupyterlite_pdf_exporter/labextension/static/style.js"]
 
 [tool.hatch.build.hooks.jupyter-builder.build-kwargs]
 build_cmd = "build:prod"
@@ -63,7 +63,7 @@ npm = ["jlpm"]
 build_cmd = "install:extension"
 npm = ["jlpm"]
 source_dir = "src"
-build_dir = "jupyterlite_pandoc_pdf_exporter/labextension"
+build_dir = "jupyterlite_pdf_exporter/labextension"
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"
