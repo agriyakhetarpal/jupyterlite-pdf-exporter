@@ -39,9 +39,10 @@ and rebuild your JupyterLite distribution.
 
 ## License
 
-The source code of this JupyterLite extension is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE) file for details).
+The source code of this JupyterLite extension is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE.txt) file for details).
 
-The distributions of this JupyterLite extension on the `npm` and `PyPI` package registries are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt)for details.
+> [!IMPORTANT]
+> However, the source distribution and wheel for this JupyterLite extension on PyPI are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt) for details.
 
 The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [Typst license file](LICENSE-TYPST.txt) for details.
 
