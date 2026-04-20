@@ -190,7 +190,7 @@ async function loadTypst(): Promise<void> {
 
 type IpynbOutput = {
   output_type: string;
-  data?: Record<string, string | string[]>;
+  data?: Record<string, string | string[] | Record<string, unknown>>;
   [key: string]: unknown;
 };
 
@@ -238,15 +238,31 @@ function preprocessNotebook(
       }
 
       const data = output.data;
+
+      // Pandoc's ipynb reader expects every MIME-bundle value to be a string
+      // or array of strings. Some MIME types (e.g. application/geo+json) store
+      // their payload as a nested JSON object, which makes Pandoc bail out with
+      // a confusing "expected nbformat <= 3" decoding error. Serialise any such
+      // values to a JSON string so Pandoc can parse the notebook safely.
+      if (data) {
+        for (const mimeType of Object.keys(data)) {
+          const value = data[mimeType];
+          if (
+            value !== null &&
+            typeof value === 'object' &&
+            !Array.isArray(value)
+          ) {
+            data[mimeType] = JSON.stringify(value);
+          }
+        }
+      }
+
       if (data?.['text/latex'] === undefined) {
         continue;
       }
 
-      const raw = (
-        Array.isArray(data['text/latex'])
-          ? data['text/latex'].join('')
-          : data['text/latex']
-      ).trim();
+      const latex = data['text/latex'] as string | string[];
+      const raw = (Array.isArray(latex) ? latex.join('') : latex).trim();
 
       // IPython.display.Math wraps content in "$\displaystyle …$" (single-dollar,
       // inline delimiters). Strip the wrapper so we have the bare LaTeX expression.
