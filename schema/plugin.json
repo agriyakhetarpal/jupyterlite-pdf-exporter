@@ -1,8 +1,81 @@
 {
   "jupyter.lab.shortcuts": [],
-  "title": "jupyterlite-pdf-exporter",
-  "description": "jupyterlite-pdf-exporter settings.",
+  "jupyter.lab.setting-icon": "ui-components:pdf",
+  "jupyter.lab.setting-icon-label": "JupyterLite PDF Exporter",
+  "title": "JupyterLite PDF Exporter",
+  "description": "Settings for the JupyterLite PDF exporter. These control the look and feel of the exported PDFs via Pandoc template variable mappings.",
   "type": "object",
-  "properties": {},
+  "properties": {
+    "pageSize": {
+      "title": "Page size",
+      "description": "The paper size of the exported PDF.",
+      "type": "string",
+      "enum": ["a4", "us-letter", "a3", "a5"],
+      "default": "a4"
+    },
+    "fontSize": {
+      "title": "Font size",
+      "description": "The base text size. Include the unit, for example \"10pt\" or \"12pt\". Leave empty to use the default.",
+      "type": "string",
+      "default": "10pt"
+    },
+    "margin": {
+      "title": "Margins",
+      "description": "The space around the page edges. Include the unit, for example \"2cm\". Leave a field empty to use the default for that side.",
+      "type": "object",
+      "properties": {
+        "top": { "title": "Top", "type": "string", "default": "2.5cm" },
+        "bottom": { "title": "Bottom", "type": "string", "default": "2.5cm" },
+        "left": { "title": "Left", "type": "string", "default": "2cm" },
+        "right": { "title": "Right", "type": "string", "default": "2cm" }
+      },
+      "additionalProperties": false,
+      "default": {
+        "top": "2.5cm",
+        "bottom": "2.5cm",
+        "left": "2cm",
+        "right": "2cm"
+      }
+    },
+    "mainFont": {
+      "title": "Main font",
+      "description": "The body font. Only fonts bundled with the Typst compiler are available.",
+      "type": "string",
+      "enum": ["Libertinus Serif", "New Computer Modern", "DejaVu Sans Mono"],
+      "default": "Libertinus Serif"
+    },
+    "pageNumbers": {
+      "title": "Page numbers",
+      "description": "Whether to print page numbers in the footer.",
+      "type": "boolean",
+      "default": true
+    },
+    "tableOfContents": {
+      "title": "Table of contents",
+      "description": "Add a table of contents at the start of the document.",
+      "type": "boolean",
+      "default": false
+    },
+    "numberSections": {
+      "title": "Number sections",
+      "description": "Add numbers to section headings.",
+      "type": "boolean",
+      "default": false
+    },
+    "lineSpacing": {
+      "title": "Line spacing",
+      "description": "The spacing between lines, as a multiple of the normal spacing.",
+      "type": "number",
+      "minimum": 0.5,
+      "default": 1
+    },
+    "linkColor": {
+      "title": "Link color",
+      "description": "The color used for links, shown as a color picker. In a configuration file, you can write a HEX value like \"#1a73e8\". Defaults to the classic link blue (#0000ee).",
+      "type": "string",
+      "format": "color",
+      "default": "#0000ee"
+    }
+  },
   "additionalProperties": false
 }

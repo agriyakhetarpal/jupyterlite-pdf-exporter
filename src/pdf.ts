@@ -7,6 +7,8 @@ import { BaseExporter } from '@jupyterlite/services';
 
 import { pdfExportProgress } from './progress';
 
+import { buildPandocConfig, pdfExportSettings } from './settings';
+
 // Typst compiler creates a global $typst
 declare const $typst: {
   resetShadow: () => void;
@@ -63,13 +65,19 @@ export class PdfExporter extends BaseExporter {
         'notebook.ipynb': notebookJson
       };
 
+      const { options, variables } = buildPandocConfig(
+        pdfExportSettings.current
+      );
+
       const result = await pandocConvert!(
         {
           from: 'ipynb',
           to: 'typst',
           standalone: true,
           'extract-media': '.',
-          'input-files': ['notebook.ipynb']
+          'input-files': ['notebook.ipynb'],
+          ...options,
+          variables
         },
         null,
         files
