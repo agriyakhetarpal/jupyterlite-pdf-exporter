@@ -9,6 +9,8 @@ import { PdfExporter } from './pdf';
 
 import { statusBarPlugin } from './status';
 
+import { settingsPlugin } from './settings';
+
 /**
  * A ServiceManagerPlugin for JupyterLite that registers a PDF exporter based
  * on WebAssembly distributions of Pandoc and Typst. This uses the INbConvertExporters
@@ -26,4 +28,4 @@ const exporterPlugin: ServiceManagerPlugin<void> = {
   }
 };
 
-export default [exporterPlugin, statusBarPlugin];
+export default [exporterPlugin, statusBarPlugin, settingsPlugin];
