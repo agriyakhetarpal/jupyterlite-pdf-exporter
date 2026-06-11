@@ -85,7 +85,7 @@ export interface IPandocConfig {
 
 /**
  * Translate the user settings into Pandoc options and Typst template variables.
- * TODO: add tests.
+ *
  * This is a pure function so it can be unit tested without the browser. The
  * general rule is to omit any unset or empty value so that Pandoc keeps its
  * default output. The only special case I noticed is page numbering, which
