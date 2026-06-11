@@ -120,6 +120,10 @@ describe('buildPandocConfig', () => {
 });
 
 describe('pdfExportSettings', () => {
+  beforeEach(() => {
+    pdfExportSettings.update(undefined);
+  });
+
   it('falls back to defaults for missing keys', () => {
     pdfExportSettings.update({ pageSize: 'a3' });
     expect(pdfExportSettings.current.pageSize).toBe('a3');
