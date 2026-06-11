@@ -44,7 +44,8 @@ export const settingsPlugin: JupyterFrontEndPlugin<void> = {
         settings.changed.connect(load);
       })
       .catch(reason => {
-        const message = reason instanceof Error ? reason.message : String(reason);
+        const message =
+          reason instanceof Error ? reason.message : String(reason);
         console.error(
           `Failed to load settings for ${PLUGIN_ID}: ${message}. ` +
             'Falling back to the default PDF export settings.'
