@@ -121,6 +121,7 @@
     "jupyterlab": {
         "extension": true,
         "outputDir": "jupyterlite_pdf_exporter/labextension",
+        "schemaDir": "schema",
         "webpackConfig": "./webpack.config.js",
         "sharedPackages": {
             "@jupyterlite/services": {
