@@ -105,7 +105,8 @@ export function buildPandocConfig(settings: IPdfExportSettings): IPandocConfig {
     variables.mainfont = settings.mainFont;
   }
   if (settings.linkColor) {
-    variables.linkcolor = settings.linkColor;
+    // Strip leading "#" from colour value
+    variables.linkcolor = settings.linkColor.trim().replace(/^#/, '');
   }
   if (settings.lineSpacing && settings.lineSpacing !== 1) {
     variables.linestretch = settings.lineSpacing;
