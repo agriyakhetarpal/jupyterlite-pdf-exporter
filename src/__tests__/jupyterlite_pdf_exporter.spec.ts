@@ -86,6 +86,22 @@ describe('buildPandocConfig', () => {
     expect(variables.linkcolor).toBeUndefined();
   });
 
+  it('strips a leading "#" from a hex link color', () => {
+    const { variables } = buildPandocConfig({
+      ...baseSettings,
+      linkColor: '#1a73e8'
+    });
+    expect(variables.linkcolor).toBe('1a73e8');
+  });
+
+  it('accepts a hex link color without a leading "#"', () => {
+    const { variables } = buildPandocConfig({
+      ...baseSettings,
+      linkColor: 'ff0000'
+    });
+    expect(variables.linkcolor).toBe('ff0000');
+  });
+
   it('sets table of contents and number sections as top-level options', () => {
     const { options } = buildPandocConfig({
       ...baseSettings,
