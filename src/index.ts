@@ -9,7 +9,7 @@ import { PdfExporter } from './pdf';
 
 import { statusBarPlugin } from './status';
 
-import { settingsPlugin } from './settings';
+import { settingsPlugin } from './settings-plugin';
 
 /**
  * A ServiceManagerPlugin for JupyterLite that registers a PDF exporter based
