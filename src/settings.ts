@@ -44,7 +44,7 @@ const DEFAULT_SETTINGS: IPdfExportSettings = {
   tableOfContents: false,
   numberSections: false,
   lineSpacing: 1,
-  linkColor: ''
+  linkColor: '#0000ee'
 };
 
 /**
