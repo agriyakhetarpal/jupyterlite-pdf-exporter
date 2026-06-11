@@ -48,7 +48,7 @@ If you build a JupyterLite site for other people, you can set the defaults for e
 
 Only the fonts that come bundled with the Typst compiler are available.
 
-Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Pandoc mapping" column shows where the value ends up. a "variable" is passed as a [Pandoc template variable](https://pandoc.org/MANUAL.html#variables) and an "option" is a top-level [Pandoc option](https://pandoc.org/MANUAL.html#general-options). You do not need to know these to use the settings, but they are handy if you want to read the Pandoc and Typst docs.
+Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Pandoc mapping" column shows where the value ends up. A "variable" is passed as a [Pandoc template variable](https://pandoc.org/MANUAL.html#variables) and an "option" is a top-level [Pandoc option](https://pandoc.org/MANUAL.html#general-options). You do not need to know these to use the settings, but they are handy if you want to read the Pandoc and Typst docs.
 
 | Setting           | Key               | What it does                               | Pandoc mapping             | Example value(s)     |
 | ----------------- | ----------------- | ------------------------------------------ | -------------------------- | -------------------- |
