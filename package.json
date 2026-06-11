@@ -64,17 +64,17 @@
         "watch:labextension": "jupyter labextension watch ."
     },
     "dependencies": {
-        "@jupyterlab/application": "^4.5.6",
-        "@jupyterlab/services": "^7.5.6",
-        "@jupyterlab/settingregistry": "^4.5.6",
-        "@jupyterlab/statusbar": "^4.5.6",
-        "@jupyterlite/services": "^0.7.4",
+        "@jupyterlab/application": "^4.5.8",
+        "@jupyterlab/services": "^7.5.8",
+        "@jupyterlab/settingregistry": "^4.5.8",
+        "@jupyterlab/statusbar": "^4.5.8",
+        "@jupyterlite/services": "^0.7.6",
         "@myriaddreamin/typst-all-in-one.ts": "0.7.0-rc2",
         "pandoc-wasm": "1.0.1"
     },
     "devDependencies": {
-        "@jupyterlab/builder": "^4.5.6",
-        "@jupyterlab/testutils": "^4.5.6",
+        "@jupyterlab/builder": "^4.5.8",
+        "@jupyterlab/testutils": "^4.5.8",
         "@types/emscripten": "^1.41.5",
         "@types/jest": "^30.0.0",
         "@types/json-schema": "^7.0.15",
