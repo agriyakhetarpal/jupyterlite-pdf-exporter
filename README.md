@@ -1,7 +1,8 @@
-# `jupyterlite-pdf-exporter`, version 0.1.0
+# `jupyterlite-pdf-exporter`
 
 [![Github Actions build status](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/workflows/Build/badge.svg)](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/actions/workflows/build.yml)
 [![Try PDF exporter in JupyterLite](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://agriyakhetarp.al/jupyterlite-pdf-exporter/)
+[![PyPI version](https://badge.fury.io/py/jupyterlite-pdf-exporter.svg)](https://pypi.org/project/jupyterlite-pdf-exporter/)
 
 A serverless PDF exporter for JupyterLite based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/). This JupyterLite extension registers a
 PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
