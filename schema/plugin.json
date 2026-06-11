@@ -69,9 +69,10 @@
     },
     "linkColor": {
       "title": "Link color",
-      "description": "The color used for links, for example \"blue\" or \"#1a73e8\". Leave empty to use the default.",
+      "description": "The color used for links, shown as a color picker. In a configuration file, you can write a HEX value like \"#1a73e8\". Defaults to the classic link blue (#0000ee).",
       "type": "string",
-      "default": ""
+      "format": "color",
+      "default": "#0000ee"
     }
   },
   "additionalProperties": false
