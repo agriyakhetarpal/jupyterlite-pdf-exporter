@@ -14,6 +14,14 @@ A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, bas
 
 It runs fully in the browser in a serverless fashion, so it works the same way across all three. It does not require a LaTeX distribution or a server, and it works in environments where you cannot install software, such as on a Chromebook or in a locked-down corporate environment. The PDF is downloaded to your machine at a location of your choice.
 
+## Why?
+
+The usual way to convert a notebook into a PDF is `nbconvert` driving a LaTeX distribution such as TeX Live or MiKTeX, or a headless browser via Playwright (WebPDF). These typically run on a server, and often need administrator rights to install. On a Chromebook, a managed corporate laptop, or any machine where you cannot install software easily, setting them up is frequently not an option. In JupyterLite, there is no server at all, so that route does not exist and notebooks could not be exported to PDF this way.
+
+This extension provides a different mechanism to export notebooks to PDF that runs entirely in your browser:
+
+1. [Pandoc](https://pandoc.org/), compiled to WebAssembly, converts the notebook to a [Typst](https://typst.org/) markup IR (intermediate representation).
+2. The Typst compiler, a modern typesetting system that stands in for LaTeX and is also compiled to WebAssembly, renders that IR into a PDF.
 
 ## Installation
 
