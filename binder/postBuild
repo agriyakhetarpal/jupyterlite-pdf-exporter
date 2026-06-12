@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Build and install the extension into the Binder image. "pip install ."
+# runs the hatch-jupyter-builder hook, which calls jlpm and build:prod, so the
+# prebuilt labextension is built from the current branch and then installed.
+set -eux
+
+python -m pip install .
+
+# Sanity check that JupyterLab sees the extension as enabled and OK.
+jupyter labextension list
