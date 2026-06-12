@@ -6,6 +6,7 @@
 [![Github Actions build status](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/workflows/Build/badge.svg)](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/actions/workflows/build.yml)
 [![Try PDF exporter in JupyterLite](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://agriyakhetarp.al/jupyterlite-pdf-exporter/)
 [![Try PDF exporter in JupyterLab on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/agriyakhetarpal/jupyterlite-pdf-exporter/HEAD?urlpath=lab)
+[![Try PDF exporter on notebook.link](https://img.shields.io/badge/notebook-link-e2d610?logo=jupyter&logoColor=white)](https://notebook.link/github/agriyakhetarpal/jupyterlite-pdf-exporter/)
 [![PyPI version](https://badge.fury.io/py/jupyterlite-pdf-exporter.svg)](https://pypi.org/project/jupyterlite-pdf-exporter/)
 
 A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).

@@ -1,0 +1,10 @@
+# Environment for trying the extension live on Notebook.link.
+# https://notebook.link/docs/user-guide/enable-your-github-repository/
+name: jupyterlite-pdf-exporter-demo
+channels:
+  - https://prefix.dev/emscripten-forge-4x
+  - https://prefix.dev/conda-forge
+dependencies:
+  - xeus-python
+  - pip:
+      - jupyterlite-pdf-exporter
