@@ -41,6 +41,13 @@ let typstLoadingPromise: Promise<void> | null = null;
  * The pipeline is as follows:
  * Notebook JSON ➡️ pandoc (ipynb ➡️ typst) ➡️ Typst markup ➡️ typst-ts ➡️ PDF
  *
+ * This function should remain free of any JupyterLab or JupyterLite dependency. It
+ * takes the notebook content directly so it can be called from both the JupyterLite
+ * exporter adapter and the JupyterLab command.
+ * Note to self: preprocessNotebook edits the notebook object in place, so callers
+ * should pass a copy they own (for example the result of model.toJSON()), rather
+ * than a live model object.
+ *
  * @param notebook The notebook content (nbformat JSON) to export
  * @param path The path to the notebook, used to name the downloaded file
  */
