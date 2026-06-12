@@ -39,12 +39,11 @@ const EXPORT_SUBMENU_ID = 'jp-mainmenu-file-notebookexport';
  * Find the "Save and Export Notebook As" submenu in JupyterLab's main menu.
  */
 function findExportSubmenu(mainMenu: IMainMenu): Menu | null {
-  for (const item of mainMenu.fileMenu.items) {
-    if (item.type === 'submenu' && item.submenu?.id === EXPORT_SUBMENU_ID) {
-      return item.submenu;
-    }
-  }
-  return null;
+  return (
+    mainMenu.fileMenu.items.find(
+      item => item.type === 'submenu' && item.submenu?.id === EXPORT_SUBMENU_ID
+    )?.submenu ?? null
+  );
 }
 
 /**
