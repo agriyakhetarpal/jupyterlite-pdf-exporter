@@ -43,10 +43,8 @@ let typstLoadingPromise: Promise<void> | null = null;
  *
  * This function should remain free of any JupyterLab or JupyterLite dependency. It
  * takes the notebook content directly so it can be called from both the JupyterLite
- * exporter adapter and the JupyterLab command.
- * Note to self: preprocessNotebook edits the notebook object in place, so callers
- * should pass a copy they own (for example the result of model.toJSON()), rather
- * than a live model object.
+ * exporter adapter and the JupyterLab command
+ *
  *
  * @param notebook The notebook content (nbformat JSON) to export
  * @param path The path to the notebook, used to name the downloaded file
@@ -62,8 +60,11 @@ export async function exportNotebookToPdf(
 
     // step 2: preprocess and convert notebook to Typst via pandoc-wasm
     pdfExportProgress.update('Converting notebook…');
-    const mathMap = preprocessNotebook(notebook);
-    const notebookJson = JSON.stringify(notebook);
+    // Note to self: preprocessNotebook rewrites outputs in place, so
+    // we work  on a copy to leave the caller's notebook untouched.
+    const working = structuredClone(notebook);
+    const mathMap = preprocessNotebook(working);
+    const notebookJson = JSON.stringify(working);
     const files: Record<string, string | Blob> = {
       'notebook.ipynb': notebookJson
     };
