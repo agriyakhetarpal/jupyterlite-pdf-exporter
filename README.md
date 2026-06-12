@@ -142,6 +142,8 @@ For an overview of the licenses of all the JavaScript dependencies of this exten
 This project would not have been possible without the following open source projects:
 
 - [JupyterLite](https://jupyterlite.rtfd.io/en/latest/): A JupyterLab distribution that runs entirely in the web browser, powered by WebAssembly and Web Workers.
+- [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/): The next-generation web-based user interface for Project Jupyter, with a rich ecosystem of extensions.
+- [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/): The original web-based interactive computing environment for Jupyter, which continues to be widely used and developed in its own right.
 - [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
 - [Typst](https://typst.app/): A modern typesetting system that provides high-quality PDF output and a user-friendly syntax for document design.
 - [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.
