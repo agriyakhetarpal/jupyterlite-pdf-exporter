@@ -5,8 +5,11 @@
     "keywords": [
         "jupyter",
         "jupyterlab",
+        "jupyterlab-extension",
         "jupyterlite",
         "jupyterlite-extension",
+        "notebook",
+        "jupyter-notebook",
         "pdf",
         "exporter",
         "pandoc",
@@ -65,6 +68,10 @@
     },
     "dependencies": {
         "@jupyterlab/application": "^4.5.8",
+        "@jupyterlab/apputils": "^4.6.8",
+        "@jupyterlab/mainmenu": "^4.5.8",
+        "@jupyterlab/nbformat": "^4.5.8",
+        "@jupyterlab/notebook": "^4.5.8",
         "@jupyterlab/services": "^7.5.8",
         "@jupyterlab/settingregistry": "^4.5.8",
         "@jupyterlab/statusbar": "^4.5.8",
@@ -125,8 +132,10 @@
         "webpackConfig": "./webpack.config.js",
         "sharedPackages": {
             "@jupyterlite/services": {
-                "bundled": false,
-                "singleton": true
+                "bundled": true,
+                "singleton": true,
+                "version": "0.0.0",
+                "requiredVersion": false
             }
         }
     },

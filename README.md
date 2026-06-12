@@ -1,21 +1,39 @@
 # `jupyterlite-pdf-exporter`
 
+> [!TIP]
+> While this extension was originally designed for JupyterLite in mind and was thus named `jupyterlite-pdf-exporter`, it is agnostic to the Jupyter environment and also works in JupyterLab 4.x, and Jupyter Notebook 7, all from a single installation. You do not need a LaTeX distribution set up or a server to export your notebooks to PDF.
+
 [![Github Actions build status](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/workflows/Build/badge.svg)](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/actions/workflows/build.yml)
 [![Try PDF exporter in JupyterLite](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://agriyakhetarp.al/jupyterlite-pdf-exporter/)
+[![Try PDF exporter in JupyterLab on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/agriyakhetarpal/jupyterlite-pdf-exporter/HEAD?urlpath=lab)
 [![PyPI version](https://badge.fury.io/py/jupyterlite-pdf-exporter.svg)](https://pypi.org/project/jupyterlite-pdf-exporter/)
 
-A serverless PDF exporter for JupyterLite based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/). This JupyterLite extension registers a
-PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
+A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).
+
+- This Jupyter extension registers a PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
+- In JupyterLab and Jupyter Notebook, it adds an "Export Notebook to PDF" command to the File menu and the command palette.
+
+It runs fully in the browser in a serverless fashion, so it works the same way across all three. It does not require a LaTeX distribution or a server, and it works in environments where you cannot install software, such as on a Chromebook or in a locked-down corporate environment. The PDF is downloaded to your machine at a location of your choice.
+
+## Why?
+
+The usual way to convert a notebook into a PDF is `nbconvert` driving a LaTeX distribution such as TeX Live or MiKTeX, or a headless browser via Playwright (WebPDF). These typically run on a server, and often need administrator rights to install. On a Chromebook, a managed corporate laptop, or any machine where you cannot install software easily, setting them up is frequently not an option. In JupyterLite, there is no server at all, so that route does not exist and notebooks could not be exported to PDF this way.
+
+This extension provides a different mechanism to export notebooks to PDF that runs entirely in your browser:
+
+1. [Pandoc](https://pandoc.org/), compiled to WebAssembly, converts the notebook to a [Typst](https://typst.org/) markup IR (intermediate representation).
+2. The Typst compiler, a modern typesetting system that stands in for LaTeX and is also compiled to WebAssembly, renders that IR into a PDF.
 
 ## Installation
 
-To install the extension into your JupyterLite deployment, execute:
+To install the extension into your Jupyter deployment, execute:
 
 ```bash
 pip install jupyterlite-pdf-exporter
 ```
 
-and rebuild your JupyterLite distribution.
+- For JupyterLite, rebuild your JupyterLite distribution after installing, so the extension is bundled into your site.
+- For JupyterLab or Jupyter Notebook, that is all you need. Start (or restart) the app and you should see "PDF (via jupyterlite-pdf-exporter)" in the "Save and Export Notebook As" section under the "File" menu.
 
 ## Uninstalling the extension
 
@@ -29,22 +47,34 @@ and rebuild your JupyterLite distribution.
 
 ## Usage
 
-- Install this extension in your JupyterLite deployment via `pip install jupyterlite-pdf-exporter` and rebuild your JupyterLite distribution.
-- Open a notebook in JupyterLite, click on the "File" menu, and select "Save and Export Notebook As" > "PDF". The PDF file will be downloaded to your local machine at a location of your choice.
+In both JupyterLab and JupyterLite environments, the entry point to usage lives in the same place, under "File" > "Save and Export Notebook As". The exported PDF is downloaded to your machine at a location of your choice.
 
 ### Requirements
 
-- JupyterLite 0.7.0 and later
+- JupyterLite 0.7.0 and later, or JupyterLab 4.x, or Jupyter Notebook 7
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
 - The extension relies on WebAssembly distributions of Pandoc and Typst. These distributions are quite large (over 50 MiB) and may take some time to download and initialise when the extension is first used. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
+
+### JupyterLite
+
+- Install this extension in your JupyterLite deployment via `pip install jupyterlite-pdf-exporter` and rebuild your JupyterLite distribution.
+- Open a notebook in JupyterLite, click on the "File" menu, and select "Save and Export Notebook As" > "PDF".
+  - You may also run "Save and Export Notebook: PDF" via the command palette.
+
+### In JupyterLab or Jupyter Notebook
+
+- Install this extension in your environment and open JupyterLab/Jupyter Notebook.
+- Open a notebook, then pick "File" > "Save and Export Notebook As" > "PDF (via jupyterlite-pdf-exporter)".
+  - You may also run "Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)" via the command palette.
 
 ### Customising the PDFs
 
 It is also possible to change the look and feel of the exported PDF(s) through the settings.
 
-To change the settings for yourself, open the "Settings Editor" in JupyterLite from the "Settings" menu and pick "JupyterLite PDF Exporter". The form lets you set the page size, font, margins, and more. The new settings apply the next time you export a notebook. Choosing the settings per-notebook is currently not implemented.
+To change the settings for yourself, open the "Settings Editor" from the "Settings" menu in JupyterLite, JupyterLab, or Notebook 7, and pick "JupyterLite PDF Exporter". The form lets you set the page size, font, margins, and more. The new settings apply the next time you export a notebook. Choosing the settings per-notebook is currently not implemented.
 
-If you build a JupyterLite site for other people, you can set the defaults for everyone. For this, you may add an entry for `jupyterlite-pdf-exporter:plugin` to an `overrides.json` file in your build, or to the `settingsOverrides` field in your `jupyter-lite.json` file. Those values become the starting point for every user, who can still change them in their own Settings Editor.
+- If you build a JupyterLite site for other people, you can set the defaults for everyone. For JupyterLite, you may add an entry for `jupyterlite-pdf-exporter:plugin` to an `overrides.json` file in your build, or to the `settingsOverrides` field in your `jupyter-lite.json` file.
+- On JupyterLab and Jupyter Notebook, add the same `jupyterlite-pdf-exporter:plugin` entry to an `overrides.json` in your app settings directory. Those values become the starting point for every user, who can still change them in their own Settings Editor.
 
 Only the fonts that come bundled with the Typst compiler are available.
 
@@ -111,12 +141,34 @@ For further reference, navigate to the following resources:
 1. [JupyterLite documentation on configuration files](https://jupyterlite.readthedocs.io/en/stable/howto/configure/config_files.html)
 2. [JupyterLite documentation on settings overrides](https://jupyterlite.readthedocs.io/en/stable/howto/configure/settings.html)
 
+## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup. To try your local changes in JupyterLab or Jupyter Notebook, build the extension and link it into your environment:
+
+```bash
+jlpm install
+jlpm build
+jupyter labextension develop --overwrite .
+```
+
+Then start JupyterLab with `jupyter lab` or Jupyter Notebook with `jupyter notebook`. After a code change, run `jlpm build` again and refresh the browser.
+
+To try your local changes in JupyterLite, build the extension and link it into your JupyterLite build:
+
+```bash
+jlpm install
+jlpm build
+jupyter labextension develop --overwrite .
+```
+
+Then rebuild your JupyterLite distribution and open it in the browser via `jupyter lite build` and `jupyter lite serve` (or your usual JupyterLite build and serve commands). After a code change, run `jlpm build` again, rebuild your JupyterLite distribution, and refresh the browser.
+
 ## License
 
-The source code of this JupyterLite extension is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE.txt) file for details).
+The source code is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE.txt) file for details).
 
 > [!IMPORTANT]
-> However, the source distribution and wheel for this JupyterLite extension on PyPI are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt) for details.
+> However, the source distribution and wheel for this extension on PyPI are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt) for details.
 
 The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [Typst license file](LICENSE-TYPST.txt) for details.
 
@@ -133,6 +185,8 @@ For an overview of the licenses of all the JavaScript dependencies of this exten
 This project would not have been possible without the following open source projects:
 
 - [JupyterLite](https://jupyterlite.rtfd.io/en/latest/): A JupyterLab distribution that runs entirely in the web browser, powered by WebAssembly and Web Workers.
+- [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/): The next-generation web-based user interface for Project Jupyter, with a rich ecosystem of extensions.
+- [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/): The original web-based interactive computing environment for Jupyter, which continues to be widely used and developed in its own right.
 - [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
 - [Typst](https://typst.app/): A modern typesetting system that provides high-quality PDF output and a user-friendly syntax for document design.
 - [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.
