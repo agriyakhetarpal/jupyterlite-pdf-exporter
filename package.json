@@ -132,8 +132,10 @@
         "webpackConfig": "./webpack.config.js",
         "sharedPackages": {
             "@jupyterlite/services": {
-                "bundled": false,
-                "singleton": true
+                "bundled": true,
+                "singleton": true,
+                "version": "0.0.0",
+                "requiredVersion": false
             }
         }
     },
