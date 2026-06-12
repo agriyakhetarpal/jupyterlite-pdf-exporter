@@ -128,7 +128,7 @@
         "webpackConfig": "./webpack.config.js",
         "sharedPackages": {
             "@jupyterlite/services": {
-                "bundled": false,
+                "bundled": true,
                 "singleton": true
             }
         }
