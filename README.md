@@ -46,22 +46,34 @@ and rebuild your JupyterLite distribution.
 
 ## Usage
 
-- Install this extension in your JupyterLite deployment via `pip install jupyterlite-pdf-exporter` and rebuild your JupyterLite distribution.
-- Open a notebook in JupyterLite, click on the "File" menu, and select "Save and Export Notebook As" > "PDF". The PDF file will be downloaded to your local machine at a location of your choice.
+In both JupyterLab and JupyterLite environments, the entry point to usage lives in the same place, under "File" > "Save and Export Notebook As". The exported PDF is downloaded to your machine at a location of your choice.
 
 ### Requirements
 
-- JupyterLite 0.7.0 and later
+- JupyterLite 0.7.0 and later, or JupyterLab 4.x, or Jupyter Notebook 7
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
 - The extension relies on WebAssembly distributions of Pandoc and Typst. These distributions are quite large (over 50 MiB) and may take some time to download and initialise when the extension is first used. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
+
+### JupyterLite
+
+- Install this extension in your JupyterLite deployment via `pip install jupyterlite-pdf-exporter` and rebuild your JupyterLite distribution.
+- Open a notebook in JupyterLite, click on the "File" menu, and select "Save and Export Notebook As" > "PDF".
+  - You may also run "Save and Export Notebook: PDF" via the command palette.
+
+### In JupyterLab or Jupyter Notebook
+
+- Install this extension in your environment and open JupyterLab/Jupyter Notebook.
+- Open a notebook, then pick "File" > "Save and Export Notebook As" > "PDF (via jupyterlite-pdf-exporter)".
+  - You may also run "Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)" via the command palette.
 
 ### Customising the PDFs
 
 It is also possible to change the look and feel of the exported PDF(s) through the settings.
 
-To change the settings for yourself, open the "Settings Editor" in JupyterLite from the "Settings" menu and pick "JupyterLite PDF Exporter". The form lets you set the page size, font, margins, and more. The new settings apply the next time you export a notebook. Choosing the settings per-notebook is currently not implemented.
+To change the settings for yourself, open the "Settings Editor" from the "Settings" menu in JupyterLite, JupyterLab, or Notebook 7, and pick "JupyterLite PDF Exporter". The form lets you set the page size, font, margins, and more. The new settings apply the next time you export a notebook. Choosing the settings per-notebook is currently not implemented.
 
-If you build a JupyterLite site for other people, you can set the defaults for everyone. For this, you may add an entry for `jupyterlite-pdf-exporter:plugin` to an `overrides.json` file in your build, or to the `settingsOverrides` field in your `jupyter-lite.json` file. Those values become the starting point for every user, who can still change them in their own Settings Editor.
+- If you build a JupyterLite site for other people, you can set the defaults for everyone. For JupyterLite, you may add an entry for `jupyterlite-pdf-exporter:plugin` to an `overrides.json` file in your build, or to the `settingsOverrides` field in your `jupyter-lite.json` file.
+- On JupyterLab and Jupyter Notebook, add the same `jupyterlite-pdf-exporter:plugin` entry to an `overrides.json` in your app settings directory. Those values become the starting point for every user, who can still change them in their own Settings Editor.
 
 Only the fonts that come bundled with the Typst compiler are available.
 
@@ -127,6 +139,28 @@ For further reference, navigate to the following resources:
 
 1. [JupyterLite documentation on configuration files](https://jupyterlite.readthedocs.io/en/stable/howto/configure/config_files.html)
 2. [JupyterLite documentation on settings overrides](https://jupyterlite.readthedocs.io/en/stable/howto/configure/settings.html)
+
+## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup. To try your local changes in JupyterLab or Jupyter Notebook, build the extension and link it into your environment:
+
+```bash
+jlpm install
+jlpm build
+jupyter labextension develop --overwrite .
+```
+
+Then start JupyterLab with `jupyter lab` or Jupyter Notebook with `jupyter notebook`. After a code change, run `jlpm build` again and refresh the browser.
+
+To try your local changes in JupyterLite, build the extension and link it into your JupyterLite build:
+
+```bash
+jlpm install
+jlpm build
+jupyter labextension develop --overwrite .
+```
+
+Then rebuild your JupyterLite distribution and open it in the browser via `jupyter lite build` and `jupyter lite serve` (or your usual JupyterLite build and serve commands). After a code change, run `jlpm build` again, rebuild your JupyterLite distribution, and refresh the browser.
 
 ## License
 
