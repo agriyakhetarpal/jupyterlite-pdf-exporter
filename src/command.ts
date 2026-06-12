@@ -81,7 +81,7 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
       label: args =>
         args.fromExportMenu
           ? 'PDF (via jupyterlite-pdf-exporter)'
-          : 'Export Notebook to PDF (via jupyterlite-pdf-exporter)',
+          : 'Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)',
       caption:
         'Export the current notebook to a PDF in the browser using Pandoc and Typst, with neither a LaTeX distribution nor a server needed',
       isEnabled: () => tracker.currentWidget !== null,
