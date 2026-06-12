@@ -8,8 +8,6 @@
 [![Try PDF exporter in JupyterLab on Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/agriyakhetarpal/jupyterlite-pdf-exporter/HEAD?urlpath=lab)
 [![PyPI version](https://badge.fury.io/py/jupyterlite-pdf-exporter.svg)](https://pypi.org/project/jupyterlite-pdf-exporter/)
 
-
-
 A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).
 
 - This Jupyter extension registers a PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
