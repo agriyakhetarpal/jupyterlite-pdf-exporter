@@ -77,7 +77,7 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
     app.commands.addCommand(CommandIDs.exportPdf, {
       // Inside the export submenu, we sit next to a server-side "PDF" entry,
       // so we name ourselves so the two are easy to tell apart. Elsewhere,
-      // such as the command palette, we can. use the full label.
+      // such as the command palette, we can use the full label.
       label: args =>
         args.fromExportMenu
           ? 'PDF (via jupyterlite-pdf-exporter)'
