@@ -4,8 +4,16 @@
 [![Try PDF exporter in JupyterLite](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://agriyakhetarp.al/jupyterlite-pdf-exporter/)
 [![PyPI version](https://badge.fury.io/py/jupyterlite-pdf-exporter.svg)](https://pypi.org/project/jupyterlite-pdf-exporter/)
 
-A serverless PDF exporter for JupyterLite based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/). This JupyterLite extension registers a
-PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
+> [!TIP]
+> While this extension was originally designed for JupyterLite in mind and is named `jupyterlite-pdf-exporter`, it is agnostic to the Jupyter environment and also works in JupyterLab 4.x, and Jupyter Notebook 7, all from a single installation. You do not need a LaTeX distribution set up or a server to export your notebooks to PDF.
+
+A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).
+
+- This Jupyter extension registers a PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
+- In JupyterLab and Jupyter Notebook, it adds an "Export Notebook to PDF" command to the File menu and the command palette.
+
+It runs fully in the browser in a serverless fashion, so it works the same way across all three. It does not require a LaTeX distribution or a server, and it works in environments where you cannot install software, such as on a Chromebook or in a locked-down corporate environment. The PDF is downloaded to your machine at a location of your choice.
+
 
 ## Installation
 
