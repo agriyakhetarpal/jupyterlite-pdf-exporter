@@ -1,6 +1,14 @@
 // Copyright (c) Agriya Khetarpal
 // SPDX-License-Identifier: BSD-3-Clause
 
+import { isCode } from '@jupyterlab/nbformat';
+
+import type {
+  IBaseOutput,
+  IMimeBundle,
+  INotebookContent
+} from '@jupyterlab/nbformat';
+
 import { pdfExportProgress } from './progress';
 
 import { buildPandocConfig, pdfExportSettings } from './settings';
@@ -37,7 +45,7 @@ let typstLoadingPromise: Promise<void> | null = null;
  * @param path The path to the notebook, used to name the downloaded file
  */
 export async function exportNotebookToPdf(
-  notebook: Record<string, unknown>,
+  notebook: INotebookContent,
   path: string
 ): Promise<void> {
   try {
@@ -181,11 +189,17 @@ async function loadTypst(): Promise<void> {
   return typstLoadingPromise;
 }
 
-type IpynbOutput = {
-  output_type: string;
-  data?: Record<string, string | string[]>;
-  [key: string]: unknown;
-};
+/**
+ * A code cell output we can rewrite in place. The nbformat IOutput union pins
+ * output_type to fixed literals on each member, which blocks reassigning it, and
+ * only some members expose data. We build on IBaseOutput (whose output_type is a
+ * plain string) and add an optional data bundle, so we can both read and rewrite
+ * output_type and data. Every nbformat IOutput is assignable to this shape, so we
+ * can safely view the outputs through it.
+ */
+interface IMutableOutput extends IBaseOutput {
+  data?: IMimeBundle;
+}
 
 /**
  * This function pre-processes a notebook object in-place before passing it to
@@ -212,34 +226,38 @@ type IpynbOutput = {
  * since the nbformat spec does not include update_display_data as a
  * stored output type and Pandoc seems to ignore it?
  */
-function preprocessNotebook(
-  notebook: Record<string, unknown>
-): Map<string, string> {
+function preprocessNotebook(notebook: INotebookContent): Map<string, string> {
   const mathMap = new Map<string, string>();
-  const cells = notebook.cells as Array<Record<string, unknown>>;
   let counter = 0;
 
-  for (const cell of cells) {
-    if (!Array.isArray(cell.outputs)) {
+  for (const cell of notebook.cells) {
+    // Only code cells carry outputs. The Array.isArray check also guards
+    // malformed code cells. I don't think this should ever happen, but
+    // Copilot was suggesting it for type safety, so here we are.
+    if (!isCode(cell) || !Array.isArray(cell.outputs)) {
       continue;
     }
 
-    for (const output of cell.outputs as IpynbOutput[]) {
-      // Defensive fix: update_display_data → display_data
+    // View the outputs through IMutableOutput, so we can rewrite output_type and
+    // the data bundle. Every nbformat IOutput is assignable to this shape.
+    for (const output of cell.outputs as IMutableOutput[]) {
       if (output.output_type === 'update_display_data') {
         output.output_type = 'display_data';
       }
 
       const data = output.data;
-      if (data?.['text/latex'] === undefined) {
+      const latex = data?.['text/latex'];
+      if (data === undefined || latex === undefined) {
         continue;
       }
 
-      const raw = (
-        Array.isArray(data['text/latex'])
-          ? data['text/latex'].join('')
-          : data['text/latex']
-      ).trim();
+      // text/latex is stored as a string or a list of strings. Anything
+      // else is not something we can turn into math, so we skip it.
+      const latexString = Array.isArray(latex) ? latex.join('') : latex;
+      if (typeof latexString !== 'string') {
+        continue;
+      }
+      const raw = latexString.trim();
 
       // IPython.display.Math wraps content in "$\displaystyle …$" (single-dollar,
       // inline delimiters). Strip the wrapper so we have the bare LaTeX expression.

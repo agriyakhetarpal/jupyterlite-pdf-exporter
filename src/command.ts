@@ -10,6 +10,8 @@ import { ICommandPalette } from '@jupyterlab/apputils';
 
 import { IMainMenu } from '@jupyterlab/mainmenu';
 
+import type { INotebookContent } from '@jupyterlab/nbformat';
+
 import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { INbConvertExporters } from '@jupyterlite/services';
@@ -61,10 +63,7 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
         if (!panel || !panel.model) {
           return;
         }
-        const notebook = panel.model.toJSON() as unknown as Record<
-          string,
-          unknown
-        >;
+        const notebook = panel.model.toJSON() as INotebookContent;
         await exportNotebookToPdf(notebook, panel.context.path);
       }
     });

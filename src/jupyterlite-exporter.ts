@@ -1,6 +1,8 @@
 // Copyright (c) Agriya Khetarpal
 // SPDX-License-Identifier: BSD-3-Clause
 
+import type { INotebookContent } from '@jupyterlab/nbformat';
+
 import type { Contents } from '@jupyterlab/services';
 
 import { BaseExporter } from '@jupyterlite/services';
@@ -28,6 +30,6 @@ export class PdfExporter extends BaseExporter {
    * @param path The path to the notebook
    */
   async export(model: Contents.IModel, path: string): Promise<void> {
-    await exportNotebookToPdf(model.content as Record<string, unknown>, path);
+    await exportNotebookToPdf(model.content as INotebookContent, path);
   }
 }
