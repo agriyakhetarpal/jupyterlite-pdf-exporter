@@ -17,13 +17,14 @@ It runs fully in the browser in a serverless fashion, so it works the same way a
 
 ## Installation
 
-To install the extension into your JupyterLite deployment, execute:
+To install the extension into your Jupyter deployment, execute:
 
 ```bash
 pip install jupyterlite-pdf-exporter
 ```
 
-and rebuild your JupyterLite distribution.
+- For JupyterLite, rebuild your JupyterLite distribution after installing, so the extension is bundled into your site.
+- For JupyterLab or Jupyter Notebook, that is all you need. Start (or restart) the app and you should see "PDF (via jupyterlite-pdf-exporter)" in the "Save and Export Notebook As" section under the "File" menu.
 
 ## Uninstalling the extension
 
