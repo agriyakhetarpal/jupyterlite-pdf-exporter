@@ -1,10 +1,6 @@
 // Copyright (c) Agriya Khetarpal
 // SPDX-License-Identifier: BSD-3-Clause
 
-import type { Contents } from '@jupyterlab/services';
-
-import { BaseExporter } from '@jupyterlite/services';
-
 import { pdfExportProgress } from './progress';
 
 import { buildPandocConfig, pdfExportSettings } from './settings';
@@ -32,111 +28,100 @@ let typstLoaded = false;
 let typstLoadingPromise: Promise<void> | null = null;
 
 /**
- * A PDF exporter for JupyterLite notebooks using pandoc-wasm and Typst.
+ * Export a notebook to a PDF using pandoc-wasm and Typst.
  *
  * The pipeline is as follows:
  * Notebook JSON ➡️ pandoc (ipynb ➡️ typst) ➡️ Typst markup ➡️ typst-ts ➡️ PDF
+ *
+ * @param notebook The notebook content (nbformat JSON) to export
+ * @param path The path to the notebook, used to name the downloaded file
  */
-export class PdfExporter extends BaseExporter {
-  /**
-   * The MIME type of the exported format.
-   */
-  readonly mimeType = 'application/pdf';
+export async function exportNotebookToPdf(
+  notebook: Record<string, unknown>,
+  path: string
+): Promise<void> {
+  try {
+    // step 1: load both pandoc and typst in parallel on first use
+    pdfExportProgress.start('Preparing PDF export…');
+    await Promise.all([loadPandoc(), loadTypst()]);
 
-  /**
-   * Export a notebook to PDF format.
-   *
-   * @param model The notebook model to export
-   * @param path The path to the notebook
-   */
-  async export(model: Contents.IModel, path: string): Promise<void> {
-    const notebook = model.content;
+    // step 2: preprocess and convert notebook to Typst via pandoc-wasm
+    pdfExportProgress.update('Converting notebook…');
+    const mathMap = preprocessNotebook(notebook);
+    const notebookJson = JSON.stringify(notebook);
+    const files: Record<string, string | Blob> = {
+      'notebook.ipynb': notebookJson
+    };
 
-    try {
-      // step 1: load both pandoc and typst in parallel on first use
-      pdfExportProgress.start('Preparing PDF export…');
-      await Promise.all([loadPandoc(), loadTypst()]);
+    const { options, variables } = buildPandocConfig(pdfExportSettings.current);
 
-      // step 2: preprocess and convert notebook to Typst via pandoc-wasm
-      pdfExportProgress.update('Converting notebook…');
-      const mathMap = preprocessNotebook(notebook as Record<string, unknown>);
-      const notebookJson = JSON.stringify(notebook);
-      const files: Record<string, string | Blob> = {
-        'notebook.ipynb': notebookJson
-      };
+    const result = await pandocConvert!(
+      {
+        from: 'ipynb',
+        to: 'typst',
+        standalone: true,
+        'extract-media': '.',
+        'input-files': ['notebook.ipynb'],
+        ...options,
+        variables
+      },
+      null,
+      files
+    );
 
-      const { options, variables } = buildPandocConfig(
-        pdfExportSettings.current
-      );
-
-      const result = await pandocConvert!(
-        {
-          from: 'ipynb',
-          to: 'typst',
-          standalone: true,
-          'extract-media': '.',
-          'input-files': ['notebook.ipynb'],
-          ...options,
-          variables
-        },
-        null,
-        files
-      );
-
-      if (result.stderr && result.stderr.includes('ERROR')) {
-        throw new Error(`Pandoc conversion failed: ${result.stderr}`);
-      }
-
-      // step 3: splice converted Typst math back into the Typst source
-      const typstContent =
-        mathMap.size > 0
-          ? await postprocessTypst(result.stdout, mathMap)
-          : result.stdout;
-
-      // step 4: compile the Typst to a PDF
-      pdfExportProgress.update('Generating PDF…');
-      $typst.resetShadow();
-      const typstBytes = new TextEncoder().encode(typstContent);
-      $typst.mapShadow('/main.typ', typstBytes);
-
-      // We also need to map extracted media files (e.g., matplotlib plots) into Typst's filesystem
-      // TODO investigate if there's a more efficient way to pass these through without needing to go
-      // through JS memory, especially for large files
-      // TODO investigate if ipywidgets and other sorts of media work or if we need special handling for them
-      if (result.mediaFiles) {
-        for (const [filename, content] of Object.entries(result.mediaFiles)) {
-          let bytes: Uint8Array;
-          if (content instanceof Blob) {
-            bytes = new Uint8Array(await content.arrayBuffer());
-          } else if (typeof content === 'string') {
-            bytes = new TextEncoder().encode(content);
-          } else {
-            continue;
-          }
-          $typst.mapShadow('/' + filename, bytes);
-        }
-      }
-
-      const pdfData = await $typst.pdf({ mainFilePath: '/main.typ' });
-
-      // This should not really happen since we'll at least have the PDF header
-      // and at least one cell in the notebook (even if it's empty)
-      if (!pdfData || pdfData.length === 0) {
-        throw new Error('Typst produced empty PDF output');
-      }
-
-      // step 5: download the PDF in the browser
-      const pdfBlob = new Blob([pdfData.buffer as ArrayBuffer], {
-        type: 'application/pdf'
-      });
-      const filename = path.replace(/\.ipynb$/, '.pdf');
-      triggerBlobDownload(pdfBlob, filename);
-
-      pdfExportProgress.finish('PDF exported successfully');
-    } catch (error) {
-      pdfExportProgress.finish('PDF export failed');
-      throw error;
+    if (result.stderr && result.stderr.includes('ERROR')) {
+      throw new Error(`Pandoc conversion failed: ${result.stderr}`);
     }
+
+    // step 3: splice converted Typst math back into the Typst source
+    const typstContent =
+      mathMap.size > 0
+        ? await postprocessTypst(result.stdout, mathMap)
+        : result.stdout;
+
+    // step 4: compile the Typst to a PDF
+    pdfExportProgress.update('Generating PDF…');
+    $typst.resetShadow();
+    const typstBytes = new TextEncoder().encode(typstContent);
+    $typst.mapShadow('/main.typ', typstBytes);
+
+    // We also need to map extracted media files (e.g., matplotlib plots) into Typst's filesystem
+    // TODO investigate if there's a more efficient way to pass these through without needing to go
+    // through JS memory, especially for large files
+    // TODO investigate if ipywidgets and other sorts of media work or if we need special handling for them
+    if (result.mediaFiles) {
+      for (const [filename, content] of Object.entries(result.mediaFiles)) {
+        let bytes: Uint8Array;
+        if (content instanceof Blob) {
+          bytes = new Uint8Array(await content.arrayBuffer());
+        } else if (typeof content === 'string') {
+          bytes = new TextEncoder().encode(content);
+        } else {
+          continue;
+        }
+        $typst.mapShadow('/' + filename, bytes);
+      }
+    }
+
+    const pdfData = await $typst.pdf({ mainFilePath: '/main.typ' });
+
+    // This should not really happen since we'll at least have the PDF header
+    // and at least one cell in the notebook (even if it's empty)
+    if (!pdfData || pdfData.length === 0) {
+      throw new Error('Typst produced empty PDF output');
+    }
+
+    // step 5: download the PDF in the browser
+    const pdfBlob = new Blob([pdfData.buffer as ArrayBuffer], {
+      type: 'application/pdf'
+    });
+    const filename = path.replace(/\.ipynb$/, '.pdf');
+    triggerBlobDownload(pdfBlob, filename);
+
+    pdfExportProgress.finish('PDF exported successfully');
+  } catch (error) {
+    pdfExportProgress.finish('PDF export failed');
+    throw error;
   }
 }
 
