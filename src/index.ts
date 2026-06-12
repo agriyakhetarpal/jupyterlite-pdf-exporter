@@ -22,8 +22,16 @@ const exporterPlugin: ServiceManagerPlugin<void> = {
   description:
     'A PDF exporter for JupyterLite based on WebAssembly distributions of Pandoc and Typst',
   autoStart: true,
-  requires: [INbConvertExporters],
-  activate: async (_: null, exporters: INbConvertExporters): Promise<void> => {
+  optional: [INbConvertExporters],
+  activate: async (
+    _: null,
+    exporters: INbConvertExporters | null
+  ): Promise<void> => {
+    // INbConvertExporters is only provided in JupyterLite. In JupyterLab and Jupyter
+    // Notebook it resolves to null, so there is nothing to register here.
+    if (!exporters) {
+      return;
+    }
     const { PdfExporter } = await import('./jupyterlite-exporter');
     exporters.register('PDF', new PdfExporter());
   }
