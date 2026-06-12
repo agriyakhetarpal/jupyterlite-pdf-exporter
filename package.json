@@ -5,8 +5,11 @@
     "keywords": [
         "jupyter",
         "jupyterlab",
+        "jupyterlab-extension",
         "jupyterlite",
         "jupyterlite-extension",
+        "notebook",
+        "jupyter-notebook",
         "pdf",
         "exporter",
         "pandoc",
