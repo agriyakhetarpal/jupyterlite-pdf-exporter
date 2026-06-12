@@ -2430,6 +2430,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jupyterlab/mainmenu@npm:^4.5.8":
+  version: 4.5.8
+  resolution: "@jupyterlab/mainmenu@npm:4.5.8"
+  dependencies:
+    "@jupyterlab/apputils": ^4.6.8
+    "@jupyterlab/translation": ^4.5.8
+    "@jupyterlab/ui-components": ^4.5.8
+    "@lumino/algorithm": ^2.0.4
+    "@lumino/commands": ^2.3.3
+    "@lumino/coreutils": ^2.2.2
+    "@lumino/widgets": ^2.7.5
+  checksum: 0d45578e08da1fed322aba33c3408e73460bd12f382624041a6babdb9f8926d1a138edf7eca36eba5d3a242abc5e9b43e33edb7ede5f4df1cf80d1698722ae45
+  languageName: node
+  linkType: hard
+
 "@jupyterlab/markedparser-extension@npm:^4.5.8":
   version: 4.5.8
   resolution: "@jupyterlab/markedparser-extension@npm:4.5.8"
@@ -7659,7 +7674,11 @@ __metadata:
   resolution: "jupyterlite-pdf-exporter@workspace:."
   dependencies:
     "@jupyterlab/application": ^4.5.8
+    "@jupyterlab/apputils": ^4.6.8
     "@jupyterlab/builder": ^4.5.8
+    "@jupyterlab/mainmenu": ^4.5.8
+    "@jupyterlab/nbformat": ^4.5.8
+    "@jupyterlab/notebook": ^4.5.8
     "@jupyterlab/services": ^7.5.8
     "@jupyterlab/settingregistry": ^4.5.8
     "@jupyterlab/statusbar": ^4.5.8
