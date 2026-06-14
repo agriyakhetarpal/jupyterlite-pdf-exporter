@@ -5,9 +5,11 @@ import { ServiceManagerPlugin } from '@jupyterlab/services';
 
 import { INbConvertExporters } from '@jupyterlite/services';
 
-import { PdfExporter } from './pdf';
+import { commandPlugin } from './command';
 
 import { statusBarPlugin } from './status';
+
+import { settingsPlugin } from './settings-plugin';
 
 /**
  * A ServiceManagerPlugin for JupyterLite that registers a PDF exporter based
@@ -20,10 +22,19 @@ const exporterPlugin: ServiceManagerPlugin<void> = {
   description:
     'A PDF exporter for JupyterLite based on WebAssembly distributions of Pandoc and Typst',
   autoStart: true,
-  requires: [INbConvertExporters],
-  activate: (_: null, exporters: INbConvertExporters): void => {
+  optional: [INbConvertExporters],
+  activate: async (
+    _: null,
+    exporters: INbConvertExporters | null
+  ): Promise<void> => {
+    // INbConvertExporters is only provided in JupyterLite. In JupyterLab and Jupyter
+    // Notebook it resolves to null, so there is nothing to register here.
+    if (!exporters) {
+      return;
+    }
+    const { PdfExporter } = await import('./jupyterlite-exporter');
     exporters.register('PDF', new PdfExporter());
   }
 };
 
-export default [exporterPlugin, statusBarPlugin];
+export default [exporterPlugin, commandPlugin, statusBarPlugin, settingsPlugin];

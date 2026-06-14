@@ -1,0 +1,15 @@
+# Binder environment for trying the extension live in JupyterLab and Notebook 7.
+# JupyterLite is covered by the GitHub Pages demo, so this image targets the two
+# server based apps where the new "Export Notebook to PDF" command lives.
+#
+# nodejs is here so that "pip install ." can build the prebuilt labextension
+# during the Binder image build (see binder/postBuild).
+name: jupyterlite-pdf-exporter-demo
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.10
+  - nodejs >=20
+  - pip
+  - jupyterlab >=4.0.0,<5
+  - notebook >=7

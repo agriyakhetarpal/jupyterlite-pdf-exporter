@@ -1,5 +1,4 @@
-jupyterlite==0.7.1
-jupyterlab~=4.5.1
+jupyterlite==0.7.6
 jupyterlite-pyodide-kernel==0.7.0
 
 # JupyterLab FASTA and GeoJSON file renderers, for renderers.ipynb
