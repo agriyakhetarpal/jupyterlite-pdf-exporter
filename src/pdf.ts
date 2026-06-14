@@ -254,6 +254,25 @@ function preprocessNotebook(notebook: INotebookContent): Map<string, string> {
       }
 
       const data = output.data;
+
+      // Pandoc's IPyNB reader expects every MIME-bundle value to be a string
+      // or array of strings. Some MIME types (application/geo+json) store
+      // their payload as a nested JSON object, which makes Pandoc bail out
+      // with a confusing "expected nbformat <= 3" decoding error. Serialise
+      // any such values to a JSON string to parse the notebook safely.
+      if (data) {
+        for (const mimeType of Object.keys(data)) {
+          const value = data[mimeType];
+          if (
+            value !== null &&
+            typeof value === 'object' &&
+            !Array.isArray(value)
+          ) {
+            data[mimeType] = JSON.stringify(value);
+          }
+        }
+      }
+
       const latex = data?.['text/latex'];
       if (data === undefined || latex === undefined) {
         continue;
