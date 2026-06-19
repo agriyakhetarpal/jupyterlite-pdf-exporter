@@ -89,7 +89,7 @@
         "pandoc-wasm": "1.0.1"
     },
     "devDependencies": {
-        "@jupyterlab/builder": "^4.5.8",
+        "@jupyter/builder": "^1.0.0",
         "@jupyterlab/testutils": "^4.5.8",
         "@types/emscripten": "^1.41.5",
         "@types/jest": "^30.0.0",
