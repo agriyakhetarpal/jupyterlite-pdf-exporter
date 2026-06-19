@@ -1,7 +1,7 @@
 {
     "name": "jupyterlite-pdf-exporter",
     "version": "0.3.0",
-    "description": "A serverless PDF exporter for JupyterLite, JupyterLab, Jupyter Notebook, and JupyterHub based on WebAssembly distributions of Pandoc and Typst.",
+    "description": "A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook (including JupyterHub deployments), based on WebAssembly distributions of Pandoc and Typst.",
     "keywords": [
         "jupyter",
         "jupyterlab",
@@ -15,7 +15,16 @@
         "pandoc",
         "typst",
         "wasm",
-        "webassembly"
+        "webassembly",
+        "jupyterhub",
+        "pdf-export",
+        "pdf-generation",
+        "serverless-pdf",
+        "typst-pdf",
+        "pandoc-pdf",
+        "notebook-to-pdf",
+        "nbconvert",
+        "frontend-extension"
     ],
     "homepage": "https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter",
     "bugs": {
