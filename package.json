@@ -1,7 +1,7 @@
 {
     "name": "jupyterlite-pdf-exporter",
     "version": "0.3.0",
-    "description": "A PDF exporter for JupyterLite based on WebAssembly distributions of Pandoc and Typst.",
+    "description": "A serverless PDF exporter for JupyterLite, JupyterLab, Jupyter Notebook, and JupyterHub based on WebAssembly distributions of Pandoc and Typst.",
     "keywords": [
         "jupyter",
         "jupyterlab",
