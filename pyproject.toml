@@ -75,16 +75,5 @@ npm = ["jlpm"]
 source_dir = "src"
 build_dir = "jupyterlite_pdf_exporter/labextension"
 
-[tool.jupyter-releaser.options]
-version_cmd = "hatch version"
-
-[tool.jupyter-releaser.hooks]
-before-build-npm = [
-    "python -m pip install 'jupyterlab>=4.0.0,<5'",
-    "jlpm",
-    "jlpm build:prod"
-]
-before-build-python = ["jlpm clean:all"]
-
 [tool.check-wheel-contents]
 ignore = ["W002"]
