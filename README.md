@@ -150,7 +150,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full setup. To try your local cha
 ```bash
 jlpm install
 jlpm build
-jupyter labextension develop --overwrite .
+jupyter-builder develop --overwrite .
 ```
 
 Then start JupyterLab with `jupyter lab` or Jupyter Notebook with `jupyter notebook`. After a code change, run `jlpm build` again and refresh the browser.
@@ -160,7 +160,7 @@ To try your local changes in JupyterLite, build the extension and link it into y
 ```bash
 jlpm install
 jlpm build
-jupyter labextension develop --overwrite .
+jupyter-builder develop --overwrite .
 ```
 
 Then rebuild your JupyterLite distribution and open it in the browser via `jupyter lite build` and `jupyter lite serve` (or your usual JupyterLite build and serve commands). After a code change, run `jlpm build` again, rebuild your JupyterLite distribution, and refresh the browser.
