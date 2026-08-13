@@ -13,6 +13,16 @@ concurrency:
 
 permissions: {}
 
+  # A range of JupyterLite and JupyterLab versions. These are to be kept in sync
+  # with the "Requirements" section of README.md and with the --core-version pin
+  # in package.json.
+  # TODO: Add JupyterLite 0.9.0 when its stable release is out
+env:
+  MINIMUM_JUPYTERLITE_VERSION: jupyterlite-core==0.7.0
+  MAXIMUM_JUPYTERLITE_VERSION: jupyterlite-core<0.9.0
+  MINIMUM_JUPYTERLAB_VERSION: jupyterlab==4.5.0
+  MAXIMUM_JUPYTERLAB_VERSION: jupyterlab>=4.6.0,<5
+
 jobs:
   build:
     name: Build extension
@@ -91,6 +101,60 @@ jobs:
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
           python -m jupyterlab.browser_check --no-browser-test
+
+  test_compatibility:
+    name: ${{ matrix.host }} ${{ matrix.version }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [jupyterlite, jupyterlab]
+        version: [minimum, maximum]
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.10'
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: extension-artifacts
+
+      - name: Pin the host JupyterLab and install it
+        run: |
+          set -eux
+          if [ "${{ matrix.host }}" = "jupyterlite" ]; then
+            if [ "${{ matrix.version }}" = "minimum" ]; then
+              python -m pip install "${MINIMUM_JUPYTERLITE_VERSION}"
+            else
+              python -m pip install "${MAXIMUM_JUPYTERLITE_VERSION}"
+            fi
+            python -m pip install "jupyterlite-core[lab]"
+          elif [ "${{ matrix.version }}" = "minimum" ]; then
+            python -m pip install "${MINIMUM_JUPYTERLAB_VERSION}"
+          else
+            python -m pip install "${MAXIMUM_JUPYTERLAB_VERSION}"
+          fi
+
+      - name: Install the extension
+        run: python -m pip install jupyterlite_pdf_exporter*.whl
+
+      - name: Show resolved package versions in environment
+        run: python -m pip list
+
+      - name: Check that the extension is enabled and compatible
+        run: |
+          set -eux
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
+
+      - name: Build a JupyterLite site
+        if: matrix.host == 'jupyterlite'
+        run: |
+          set -eux
+          jupyter lite build --output-dir dist-check
+          test -d dist-check/extensions/jupyterlite-pdf-exporter
 
   build_jupyterlite:
     name: Build JupyterLite distribution
