@@ -3318,10 +3318,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myriaddreamin/typst-all-in-one.ts@npm:0.7.0-rc2":
-  version: 0.7.0-rc2
-  resolution: "@myriaddreamin/typst-all-in-one.ts@npm:0.7.0-rc2"
-  checksum: 103acb1bb9b3fab5d86bae1352e98c3d25626c078b96b3d5961038ea5c6e2be3a0551872772efc77f6e57c6b1037fd424d75ed8b71678cb479e806bf4944f97a
+"@myriaddreamin/typst-all-in-one.ts@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@myriaddreamin/typst-all-in-one.ts@npm:0.7.0"
+  checksum: c1686dbf4402880b16e19d80b8b251328c288ee15337d986e075a60d2e49487315033077404346c9aeeab5347feb03e563f423f1e70496134b3f4ba67ea3e294
   languageName: node
   linkType: hard
 
@@ -7828,7 +7828,7 @@ __metadata:
     "@jupyterlab/statusbar": ^4.5.8
     "@jupyterlab/testutils": ^4.5.8
     "@jupyterlite/services": ^0.7.6
-    "@myriaddreamin/typst-all-in-one.ts": 0.7.0-rc2
+    "@myriaddreamin/typst-all-in-one.ts": 0.7.0
     "@types/emscripten": ^1.41.5
     "@types/jest": ^30.0.0
     "@types/json-schema": ^7.0.15
@@ -7842,7 +7842,7 @@ __metadata:
     eslint-plugin-prettier: ^5.0.0
     jest: ^29.2.0
     npm-run-all2: ^8.0.4
-    pandoc-wasm: 1.0.1
+    pandoc-wasm: 1.1.0
     prettier: ^3.8.1
     rimraf: ^6.1.2
     source-map-loader: ^1.0.2
@@ -8694,12 +8694,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pandoc-wasm@npm:1.0.1":
-  version: 1.0.1
-  resolution: "pandoc-wasm@npm:1.0.1"
+"pandoc-wasm@npm:1.1.0":
+  version: 1.1.0
+  resolution: "pandoc-wasm@npm:1.1.0"
   dependencies:
     "@bjorn3/browser_wasi_shim": ^0.4.2
-  checksum: 1a7e401bc5ff2d2321aa025d7175a9ecdf1e242808177198e652d2bbaa31bf275024f2e4a3be240df82c172840f278c84d9d565caa9133c43b8889b2f14e6ad5
+  checksum: acee4f1b8b7826729cb4b0325c186382144715d46cb41d125b19bd59de3a162c0a4dd66b91bd4da041a0f0871377a9fa184544101639121d9e97aedd0b45ac44
   languageName: node
   linkType: hard
 
