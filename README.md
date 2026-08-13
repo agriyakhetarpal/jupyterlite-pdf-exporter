@@ -53,7 +53,11 @@ In both JupyterLab and JupyterLite environments, the entry point to usage lives 
 
 ### Requirements
 
-- JupyterLite 0.7.0 and later, or JupyterLab 4.x, or Jupyter Notebook 7
+- Either:
+  - JupyterLite >=0.7.0,<0.9, or
+  - JupyterLab >= 4.5.0
+  - Jupyter Notebook >=7.5
+  This extension does not depend on or enforce a particular version of JupyterLite or JupyterLab, but please note that cutting-edge versions of JupyterLite, JupyterLab, and Jupyter Notebook may introduce breaking changes. If you face any troubles, please [file an issue](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues/new/choose)!
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
 - The extension relies on WebAssembly distributions of Pandoc and Typst. These distributions are quite large (over 50 MiB) and may take some time to download and initialise when the extension is first used. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
 
