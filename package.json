@@ -51,6 +51,8 @@
         "url": "https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter.git"
     },
     "scripts": {
+        "audit": "jlpm npm audit --all --recursive",
+        "audit:prod": "jlpm npm audit --all --recursive --environment production",
         "build": "jlpm build:lib && jlpm build:labextension:dev",
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
         "build:labextension": "jupyter labextension build .",
