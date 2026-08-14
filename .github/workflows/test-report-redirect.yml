@@ -1,0 +1,28 @@
+name: View HTML test report of PDF exports here
+
+on: # zizmor: ignore[dangerous-triggers]
+  workflow_run:
+    # Note that this must match the build workflow's `name:` exactly
+    workflows: ['Build']
+    types: [requested, in_progress, completed]
+
+permissions: {}
+
+jobs:
+  pdf_report_redirector:
+    name: Link to the PDF export report
+    runs-on: ubuntu-latest
+    permissions:
+      statuses: write
+      actions: read
+    steps:
+      - uses: agriyakhetarpal/github-actions-artifacts-redirector-action@3514efb6f242bd9c0a28ea93564c19a2ad7367d2 # v1.0.2
+        id: redirect
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          # Keep in sync with the HTML report artifact name in build.yml
+          artifact-name: report
+          job-title: View the HTML test report of PDF exports here
+
+      - name: Show the URL
+        run: echo "${{ steps.redirect.outputs.url }}"

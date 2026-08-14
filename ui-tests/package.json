@@ -6,10 +6,14 @@
   "scripts": {
     "start": "jupyter lab --config jupyter_server_test_config.py",
     "test": "jlpm playwright test",
-    "test:update": "jlpm playwright test --update-snapshots"
+    "report": "python3 scripts/build_report.py",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
     "@jupyterlab/galata": "^5.0.5",
-    "@playwright/test": "^1.37.0"
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^22.0.0",
+    "pdfjs-dist": "^6.2.108",
+    "typescript": "~5.5.4"
   }
 }

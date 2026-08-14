@@ -129,3 +129,7 @@ dmypy.json
 
 # JupyterLite files
 .jupyterlite.doit.db
+
+# Playwright PDF export outputs and the generated report
+ui-tests/pdf-output/
+ui-tests/report.html
