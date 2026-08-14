@@ -3,6 +3,7 @@ lib/
 node_modules/
 *.log
 .eslintcache
+.stylelintcache
 *.egg-info/
 .ipynb_checkpoints
 *.tsbuildinfo
