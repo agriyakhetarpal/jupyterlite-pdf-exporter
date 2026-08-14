@@ -6,18 +6,25 @@ import { expect, test } from '@jupyterlab/galata';
  */
 test.use({ autoGoto: false });
 
-test('should emit an activation console message', async ({ page }) => {
-  const logs: string[] = [];
-
-  page.on('console', message => {
-    logs.push(message.text());
+test('should register the PDF export command', async ({ page }) => {
+  await page.goto();
+  const hasCommand = await page.evaluate(async () => {
+    const app = (window as any).jupyterapp;
+    return app.commands.hasCommand('jupyterlite-pdf-exporter:export-pdf');
   });
 
+  expect(hasCommand).toBe(true);
+});
+
+test('should list the PDF exporter in the command palette', async ({
+  page
+}) => {
   await page.goto();
 
-  expect(
-    logs.filter(
-      s => s === 'JupyterLab extension jupyterlite-pdf-exporter is activated!'
-    )
-  ).toHaveLength(1);
+  const label = await page.evaluate(async () => {
+    const app = (window as any).jupyterapp;
+    return app.commands.label('jupyterlite-pdf-exporter:export-pdf', {});
+  });
+
+  expect(label).toContain('PDF');
 });
