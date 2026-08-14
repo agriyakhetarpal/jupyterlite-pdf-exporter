@@ -10,7 +10,12 @@
       "title": "Page size",
       "description": "The paper size of the exported PDF.",
       "type": "string",
-      "enum": ["a4", "us-letter", "a3", "a5"],
+      "oneOf": [
+        { "const": "a4", "title": "A4" },
+        { "const": "us-letter", "title": "US Letter" },
+        { "const": "a3", "title": "A3" },
+        { "const": "a5", "title": "A5" }
+      ],
       "default": "a4"
     },
     "fontSize": {
@@ -41,7 +46,11 @@
       "title": "Main font",
       "description": "The body font. Only fonts bundled with the Typst compiler are available.",
       "type": "string",
-      "enum": ["Libertinus Serif", "New Computer Modern", "DejaVu Sans Mono"],
+      "oneOf": [
+        { "const": "Libertinus Serif", "title": "Libertinus Serif" },
+        { "const": "New Computer Modern", "title": "New Computer Modern" },
+        { "const": "DejaVu Sans Mono", "title": "DejaVu Sans Mono" }
+      ],
       "default": "Libertinus Serif"
     },
     "pageNumbers": {

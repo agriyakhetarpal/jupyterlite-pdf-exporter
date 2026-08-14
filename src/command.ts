@@ -16,6 +16,8 @@ import { INotebookTracker } from '@jupyterlab/notebook';
 
 import { INbConvertExporters } from '@jupyterlite/services';
 
+import { ITranslator, nullTranslator } from '@jupyterlab/translation';
+
 import { Menu } from '@lumino/widgets';
 
 import { exportNotebookToPdf } from './pdf';
@@ -61,18 +63,23 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
   description: 'Adds an "Export Notebook to PDF" command',
   autoStart: true,
   requires: [INotebookTracker],
-  optional: [ICommandPalette, IMainMenu, INbConvertExporters],
+  optional: [ICommandPalette, IMainMenu, INbConvertExporters, ITranslator],
   activate: (
     app: JupyterFrontEnd,
     tracker: INotebookTracker,
     palette: ICommandPalette | null,
     mainMenu: IMainMenu | null,
-    nbConvertExporters: INbConvertExporters | null
+    nbConvertExporters: INbConvertExporters | null,
+    translator: ITranslator | null
   ): void => {
     // JupyterLite
     if (nbConvertExporters) {
       return;
     }
+
+    const trans = (translator ?? nullTranslator).load(
+      'jupyterlite-pdf-exporter'
+    );
 
     app.commands.addCommand(CommandIDs.exportPdf, {
       // Inside the export submenu, we sit next to a server-side "PDF" entry,
@@ -80,10 +87,26 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
       // such as the command palette, we can use the full label.
       label: args =>
         args.fromExportMenu
-          ? 'PDF (via jupyterlite-pdf-exporter)'
-          : 'Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)',
-      caption:
-        'Export the current notebook to a PDF in the browser using Pandoc and Typst, with neither a LaTeX distribution nor a server needed',
+          ? trans.__('PDF (via jupyterlite-pdf-exporter)')
+          : trans.__(
+              'Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)'
+            ),
+      caption: trans.__(
+        'Export the current notebook to a PDF in the browser using Pandoc and Typst, with neither a LaTeX distribution nor a server needed'
+      ),
+      describedBy: {
+        args: {
+          type: 'object',
+          properties: {
+            fromExportMenu: {
+              type: 'boolean',
+              description:
+                'Whether the command was invoked from the "Save and Export Notebook As" submenu, which shortens the label'
+            }
+          },
+          additionalProperties: false
+        }
+      },
       isEnabled: () => tracker.currentWidget !== null,
       execute: async () => {
         const panel = tracker.currentWidget;
@@ -98,7 +121,7 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
     if (palette) {
       palette.addItem({
         command: CommandIDs.exportPdf,
-        category: 'Notebook Operations'
+        category: trans.__('Notebook Operations')
       });
     }
 
