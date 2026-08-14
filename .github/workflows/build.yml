@@ -236,7 +236,7 @@ jobs:
       - name: Install the extension
         run: |
           set -eux
-          python -m pip install "${MAX_LAB_VERSION}" jupyterlite_pdf_exporter*.whl
+          python -m pip install "${MAXIMUM_JUPYTERLAB_VERSION}" jupyterlite_pdf_exporter*.whl
 
       - name: Install dependencies
         working-directory: ui-tests
