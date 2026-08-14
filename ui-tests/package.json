@@ -12,6 +12,7 @@
   "devDependencies": {
     "@jupyterlab/galata": "^5.0.5",
     "@playwright/test": "^1.62.1",
+    "@types/node": "^22.0.0",
     "pdfjs-dist": "^6.2.108",
     "typescript": "~5.5.4"
   }

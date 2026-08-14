@@ -2310,6 +2310,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^22.0.0":
+  version: 22.20.1
+  resolution: "@types/node@npm:22.20.1"
+  dependencies:
+    undici-types: ~6.21.0
+  checksum: 03cc6d9941229b13fa9ab4e477d6550e85ed3e3d5f85734c03c84e0c18346d8a7c9f22b93570bb9cb4a44ffa176279f8a7ab3cd328fbdcf5d4e6ec541ce03f21
+  languageName: node
+  linkType: hard
+
 "@types/prop-types@npm:*":
   version: 15.7.15
   resolution: "@types/prop-types@npm:15.7.15"
@@ -3334,6 +3343,7 @@ __metadata:
   dependencies:
     "@jupyterlab/galata": ^5.0.5
     "@playwright/test": ^1.62.1
+    "@types/node": ^22.0.0
     pdfjs-dist: ^6.2.108
     typescript: ~5.5.4
   languageName: unknown
@@ -4064,6 +4074,13 @@ __metadata:
     csstype: 3.0.10
     free-style: 3.1.0
   checksum: 8b4f02c24f67b594f98507b15a753dabd4db5eb0af007e1d310527c64030e11e9464b25b5a6bc65fb5eec9a4459a8336050121ecc29063ac87b8b47a6d698893
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.21.0":
+  version: 6.21.0
+  resolution: "undici-types@npm:6.21.0"
+  checksum: 46331c7d6016bf85b3e8f20c159d62f5ae471aba1eb3dc52fff35a0259d58dcc7d592d4cc4f00c5f9243fa738a11cfa48bd20203040d4a9e6bc25e807fab7ab3
   languageName: node
   linkType: hard
 
