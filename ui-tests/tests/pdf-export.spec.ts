@@ -5,33 +5,62 @@ import { expect, galata, test } from '@jupyterlab/galata';
 
 import * as path from 'path';
 
-import { exportNotebook } from '../helpers/export';
+import { exportNotebook, IExport } from '../helpers/export';
+
+/**
+ * Check if a PDF embeds at least one raster image.
+ * @param pdf The PDF buffer to check.
+ * @returns True if the PDF contains an image.
+ */
+const hasImage = (pdf: Buffer) =>
+  pdf.toString('latin1').includes('/Subtype /Image');
+
+/**
+ * Check if a PDF embeds at least one image with alt text.
+ * @param pdf The PDF buffer to check.
+ * @returns True if the PDF contains an image with an /Alt tag.
+ */
+const hasAltText = (pdf: Buffer) => pdf.toString('latin1').includes('/Alt');
 
 /** Avoid needing a kernel and make exports repeatable. */
-const FIXTURES = [
+const FIXTURES: {
+  file: string;
+  title: string;
+  check: (result: IExport) => void;
+}[] = [
   {
     file: 'simple.ipynb',
-    heading: 'Simple export',
     title: 'Markdown and text output',
-    expected: ['Simple export', 'Hello from the PDF exporter']
+    check: r => {
+      expect(r.text).toContain('Hello from the PDF exporter');
+      expect(hasImage(r.pdf)).toBe(false);
+    }
   },
   {
     file: 'plot.ipynb',
-    heading: 'Plot output',
     title: 'Embedded PNG output',
-    expected: ['Plot output']
+    check: r => {
+      expect(hasImage(r.pdf)).toBe(true);
+    }
   },
   {
     file: 'image-attachment.ipynb',
-    heading: 'Markdown image',
     title: 'Markdown image attachment',
-    expected: ['Markdown image']
+    check: r => {
+      expect(hasImage(r.pdf)).toBe(true);
+      expect(hasAltText(r.pdf)).toBe(true);
+    }
   },
   {
     file: 'math.ipynb',
-    heading: 'Electromagnetism',
     title: 'LaTeX math output',
-    expected: ['Electromagnetism', "Maxwell's equations"]
+    check: r => {
+      // Typst emits glyphs, with Greek as mathematical italic codepoints
+      for (const symbol of ['∇', '𝜕', '𝜀', '𝜇', 'ℏ', 'Ψ', '∮', '∬']) {
+        expect(r.text).toContain(symbol);
+      }
+      expect(r.text).not.toContain('\\nabla');
+    }
   }
 ];
 
@@ -56,47 +85,22 @@ for (const fixture of FIXTURES) {
   test(`Exports ${fixture.file} to a PDF`, async ({ page, tmpPath }) => {
     test.setTimeout(240_000);
 
-    const analysis = await exportNotebook(
+    const result = await exportNotebook(
       page,
       `${tmpPath}/${fixture.file}`,
-      fixture.heading,
       slug,
       { title: fixture.title, notebook: fixture.file, group: 'Content' }
     );
 
-    expect(analysis.pageCount).toBeGreaterThanOrEqual(1);
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
 
-    for (const needle of fixture.expected) {
-      expect(analysis.text).toContain(needle);
-    }
+    // Guard against exporting a notebook that has not loaded
+    expect(result.text.replace(/\s+/g, '').length).toBeGreaterThan(20);
 
     // This leftover placeholder means postprocessTypst did not
     // splice the math, so something is wrong with our pipeline
-    expect(analysis.text).not.toContain('PDFEXPORTER_MATH_');
+    expect(result.text).not.toContain('PDFEXPORTER_MATH_');
+
+    fixture.check(result);
   });
 }
-
-test('Renders every equation in the math notebook', async ({
-  page,
-  tmpPath
-}) => {
-  test.setTimeout(240_000);
-
-  const analysis = await exportNotebook(
-    page,
-    `${tmpPath}/math.ipynb`,
-    'Electromagnetism',
-    'math-equations',
-    {
-      title: 'Every equation renders',
-      notebook: 'math.ipynb',
-      group: 'Content'
-    }
-  );
-
-  for (const symbol of ['∇', '𝜕', '𝜀', '𝜇', 'ℏ', 'Ψ', '∮', '∬']) {
-    expect(analysis.text).toContain(symbol);
-  }
-  expect(analysis.text).not.toContain('PDFEXPORTER_MATH_');
-  expect(analysis.text).not.toContain('\\nabla');
-});

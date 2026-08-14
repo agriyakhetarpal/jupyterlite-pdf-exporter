@@ -38,7 +38,11 @@
         padding: 2rem 1.25rem;
         background: var(--bg);
         color: var(--fg);
-        font: 15px/1.55 system-ui, -apple-system, 'Segoe UI', sans-serif;
+        font:
+          15px/1.55 system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
       }
       .wrap {
         max-width: 1200px;
@@ -148,20 +152,13 @@
         color: var(--muted);
         font-style: italic;
       }
-      footer {
-        color: var(--muted);
-        font-size: 0.8rem;
-        margin-top: 2.5rem;
-      }
     </style>
   </head>
   <body>
     <div class="wrap">
       <h1>PDF export report</h1>
       <p class="sub">$subtitle</p>
-      $banner
-      $groups
-      <footer>$footer</footer>
+      $banner $groups
     </div>
   </body>
 </html>

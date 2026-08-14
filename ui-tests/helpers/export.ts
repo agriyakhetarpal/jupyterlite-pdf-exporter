@@ -8,6 +8,8 @@ import * as path from 'path';
 
 import { analysePdf, IPdfAnalysis } from './pdf';
 
+export type IExport = IPdfAnalysis & { pdf: Buffer };
+
 export const OUTPUT_DIR = path.resolve(__dirname, '..', 'pdf-output');
 
 export const COMMAND_ID = 'jupyterlite-pdf-exporter:export-pdf';
@@ -37,20 +39,17 @@ export async function writeSettings(
 export async function exportNotebook(
   page: any,
   notebookPath: string,
-  heading: string,
   slug: string,
   meta: Record<string, unknown> = {}
-): Promise<IPdfAnalysis> {
+): Promise<IExport> {
   await page.goto();
   await page.notebook.openByPath(notebookPath);
   await page.notebook.activate(notebookPath);
 
-  // Wait for the first heading to appear in the notebook model before
-  // exporting to avoid races and to ensure it's non-empty
-  await page
-    .getByRole('heading', { name: heading })
-    .first()
-    .waitFor({ timeout: 30_000 });
+  await page.evaluate(async () => {
+    const widget = (window as any).jupyterapp.shell.currentWidget;
+    await widget?.context?.ready;
+  });
 
   // Download to disk
   const downloadPromise = page.waitForEvent('download', { timeout: 200_000 });
@@ -89,5 +88,5 @@ export async function exportNotebook(
     )
   );
 
-  return analysis;
+  return { ...analysis, pdf };
 }

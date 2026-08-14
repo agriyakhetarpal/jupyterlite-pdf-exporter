@@ -188,7 +188,6 @@ def main() -> int:
         ),
         banner=banner,
         groups=groups_html,
-        footer="Page images are the first page of each PDF, rendered with pdf.js.",
     )
     REPORT.write_text(page)
     print(f"Wrote {REPORT} ({len(slugs)} export(s), {len(page) / 1024:.1f} KiB)")
