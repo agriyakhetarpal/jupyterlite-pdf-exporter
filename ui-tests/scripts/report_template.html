@@ -4,161 +4,74 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PDF export report</title>
-    <style>
-      :root {
-        color-scheme: light dark;
-        --bg: #fff;
-        --fg: #1c1c1e;
-        --muted: #6b7280;
-        --card: #f7f7f8;
-        --border: #e3e3e6;
-        --pass: #15803d;
-        --pass-bg: #dcfce7;
-        --fail: #b91c1c;
-        --fail-bg: #fee2e2;
-      }
-      @media (prefers-color-scheme: dark) {
-        :root {
-          --bg: #16161a;
-          --fg: #ececf1;
-          --muted: #9ca3af;
-          --card: #1f1f25;
-          --border: #33333b;
-          --pass: #4ade80;
-          --pass-bg: #14311f;
-          --fail: #fca5a5;
-          --fail-bg: #3b1618;
+    <script>
+      (function () {
+        var theme;
+        try {
+          theme = window.localStorage.getItem('theme');
+        } catch (e) {
+          theme = null;
         }
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 2rem 1.25rem;
-        background: var(--bg);
-        color: var(--fg);
-        font:
-          15px/1.55 system-ui,
-          -apple-system,
-          'Segoe UI',
-          sans-serif;
-      }
-      .wrap {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-      h1 {
-        font-size: 1.5rem;
-        margin: 0 0 0.35rem;
-      }
-      h2.group {
-        font-size: 1.1rem;
-        margin: 2.25rem 0 0.9rem;
-        padding-bottom: 0.35rem;
-        border-bottom: 1px solid var(--border);
-      }
-      .sub {
-        color: var(--muted);
-        margin: 0;
-      }
-      .banner {
-        margin: 1.25rem 0 0;
-        padding: 0.8rem 1rem;
-        border-radius: 8px;
-        font-weight: 600;
-      }
-      .banner.pass {
-        background: var(--pass-bg);
-        color: var(--pass);
-      }
-      .banner.fail {
-        background: var(--fail-bg);
-        color: var(--fail);
-      }
-      .banner ul {
-        margin: 0.5rem 0 0;
-        padding-left: 1.2rem;
-        font-weight: 400;
-      }
-      .grid {
-        display: grid;
-        gap: 1.25rem;
-        grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-      }
-      .card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 1rem;
-      }
-      .card.failed {
-        border-color: var(--fail);
-      }
-      .card h3 {
-        font-size: 1rem;
-        margin: 0 0 0.2rem;
-      }
-      .badge {
-        display: inline-block;
-        border-radius: 999px;
-        padding: 0.1rem 0.5rem;
-        font-size: 0.72rem;
-        font-weight: 600;
-        vertical-align: 0.1em;
-      }
-      .badge.pass {
-        background: var(--pass-bg);
-        color: var(--pass);
-      }
-      .badge.fail {
-        background: var(--fail-bg);
-        color: var(--fail);
-      }
-      .meta {
-        color: var(--muted);
-        font-size: 0.8rem;
-        margin: 0 0 0.85rem;
-      }
-      .preview img {
-        width: 100%;
-        height: auto;
-        display: block;
-        background: #fff;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-      }
-      details {
-        margin-top: 0.85rem;
-      }
-      summary {
-        cursor: pointer;
-        font-size: 0.85rem;
-        color: var(--muted);
-      }
-      pre {
-        white-space: pre-wrap;
-        word-break: break-word;
-        font-size: 0.78rem;
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 0.6rem;
-        margin: 0.5rem 0 0;
-        max-height: 260px;
-        overflow: auto;
-      }
-      .missing {
-        color: var(--muted);
-        font-style: italic;
-      }
+        if (theme !== 'dark-mode' && theme !== 'light-mode')
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark-mode'
+            : 'light-mode';
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
+    <style>
+      $styles
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <h1>PDF export report</h1>
-      <p class="sub">$subtitle</p>
-      $banner $groups
+    <div id="root">
+      <div class="htmlreport vbox px-4 pb-4">
+        <main>
+          <div class="pt-3">
+            <div class="header-view-status-container ml-2 pl-2 d-flex">
+              $nav
+            </div>
+            <form class="subnav-search" id="search-form">
+              $search_icon
+              <input
+                name="q"
+                id="search-input"
+                spellcheck="false"
+                class="form-control subnav-search-input input-contrast"
+                aria-label="Search tests"
+                placeholder="Search tests"
+              />
+            </form>
+          </div>
+          <div class="header-view">
+            <div class="hbox header-superheader">
+              <div class="test-file-header-info">
+                <div id="filtered-stats" hidden></div>
+                $notice
+              </div>
+              <div style="flex: auto"></div>
+              <div id="started-at" style="margin-right: 10px" data-iso="$started_at_iso">
+                $started_at
+              </div>
+              <div>Total time: $total_time</div>
+            </div>
+          </div>
+          $content
+        </main>
+      </div>
     </div>
+    <dialog id="settings-dialog">
+      <label class="header-setting-theme">
+        Theme:
+        <select id="theme-select">
+          <option value="dark-mode">Dark mode</option>
+          <option value="light-mode">Light mode</option>
+          <option value="system">System</option>
+        </select>
+      </label>
+    </dialog>
+    <script>
+      $script
+    </script>
   </body>
 </html>
