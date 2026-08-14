@@ -1,5 +1,7 @@
 node_modules
 **/node_modules
+# Copied verbatim from Playwright
+ui-tests/scripts/vendor
 **/lib
 **/package.json
 !/package.json
