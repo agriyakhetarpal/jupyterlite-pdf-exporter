@@ -6,11 +6,13 @@
   "scripts": {
     "start": "jupyter lab --config jupyter_server_test_config.py",
     "test": "jlpm playwright test",
-    "report": "python3 scripts/build_report.py"
+    "report": "python3 scripts/build_report.py",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
     "@jupyterlab/galata": "^5.0.5",
     "@playwright/test": "^1.62.1",
-    "pdfjs-dist": "^6.2.108"
+    "pdfjs-dist": "^6.2.108",
+    "typescript": "~5.5.4"
   }
 }

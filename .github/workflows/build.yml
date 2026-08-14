@@ -259,6 +259,10 @@ jobs:
           jlpm playwright install-deps
           jlpm playwright install chromium
 
+      - name: Type-check the tests
+        working-directory: ui-tests
+        run: jlpm typecheck
+
       - name: Execute integration tests
         working-directory: ui-tests
         run: jlpm playwright test

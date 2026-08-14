@@ -9,7 +9,7 @@ test.use({ autoGoto: false });
 test('should register the PDF export command', async ({ page }) => {
   await page.goto();
   const hasCommand = await page.evaluate(async () => {
-    const app = (window as any).jupyterapp;
+    const app = window.jupyterapp;
     return app.commands.hasCommand('jupyterlite-pdf-exporter:export-pdf');
   });
 
@@ -22,7 +22,7 @@ test('should list the PDF exporter in the command palette', async ({
   await page.goto();
 
   const label = await page.evaluate(async () => {
-    const app = (window as any).jupyterapp;
+    const app = window.jupyterapp;
     return app.commands.label('jupyterlite-pdf-exporter:export-pdf', {});
   });
 

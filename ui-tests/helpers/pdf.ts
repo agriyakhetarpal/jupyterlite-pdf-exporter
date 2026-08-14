@@ -61,7 +61,9 @@ export async function analysePdf(
             new Blob([source], { type: 'application/javascript' })
           );
 
-        const pdfjsLib: any = await import(toUrl(libSource));
+        const pdfjsLib = (await import(
+          /* webpackIgnore: true */ toUrl(libSource)
+        )) as typeof import('pdfjs-dist');
         // N.B. Must point somewhere, or PDFWorker.create throws on an opaque
         // origin. Spawning then fails and pdf.js parses on the main thread
         pdfjsLib.GlobalWorkerOptions.workerSrc = toUrl(workerSource);
@@ -81,7 +83,7 @@ export async function analysePdf(
           const content = await pdfPage.getTextContent();
           texts.push(
             content.items
-              .map((item: any) => item.str)
+              .map(item => ('str' in item ? item.str : ''))
               .join(' ')
               .replace(/\s+/g, ' ')
               .trim()
@@ -97,11 +99,11 @@ export async function analysePdf(
           const canvas = document.createElement('canvas');
           canvas.width = Math.ceil(viewport.width);
           canvas.height = Math.ceil(viewport.height);
-          await pdfPage.render({
-            canvasContext: canvas.getContext('2d'),
-            canvas,
-            viewport
-          }).promise;
+          const canvasContext = canvas.getContext('2d');
+          if (!canvasContext) {
+            throw new Error('Could not get a 2d canvas context');
+          }
+          await pdfPage.render({ canvasContext, canvas, viewport }).promise;
           pages.push(canvas.toDataURL('image/png').split(',')[1]);
         }
 

@@ -2,6 +2,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 import { expect, test } from '@jupyterlab/galata';
+import type { IJupyterLabPageFixture } from '@jupyterlab/galata';
+
+import type { DocumentWidget } from '@jupyterlab/docregistry';
+
+import type { APIRequestContext } from '@playwright/test';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -20,7 +25,7 @@ export const SETTINGS_ID = 'jupyterlite-pdf-exporter:plugin';
  * Save settings to the server. Callers must run this serially.
  */
 export async function writeSettings(
-  request: any,
+  request: APIRequestContext,
   overrides: Record<string, unknown>
 ): Promise<void> {
   const url = `/lab/api/settings/${SETTINGS_ID}`;
@@ -37,7 +42,7 @@ export async function writeSettings(
  * Open a notebook, write into it, and export the PDF.
  */
 export async function exportNotebook(
-  page: any,
+  page: IJupyterLabPageFixture,
   notebookPath: string,
   slug: string,
   meta: Record<string, unknown> = {}
@@ -47,14 +52,15 @@ export async function exportNotebook(
   await page.notebook.activate(notebookPath);
 
   await page.evaluate(async () => {
-    const widget = (window as any).jupyterapp.shell.currentWidget;
+    const widget = window.jupyterapp.shell
+      .currentWidget as DocumentWidget | null;
     await widget?.context?.ready;
   });
 
   // Download to disk
   const downloadPromise = page.waitForEvent('download', { timeout: 200_000 });
   await page.evaluate(async (id: string) => {
-    await (window as any).jupyterapp.commands.execute(id);
+    await window.jupyterapp.commands.execute(id);
   }, COMMAND_ID);
   const download = await downloadPromise;
 
