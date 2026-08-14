@@ -13,6 +13,16 @@ concurrency:
 
 permissions: {}
 
+  # A range of JupyterLite and JupyterLab versions. These are to be kept in sync
+  # with the "Requirements" section of README.md and with the --core-version pin
+  # in package.json.
+  # TODO: Add JupyterLite 0.9.0 when its stable release is out
+env:
+  MINIMUM_JUPYTERLITE_VERSION: jupyterlite-core==0.7.0
+  MAXIMUM_JUPYTERLITE_VERSION: jupyterlite-core<0.9.0
+  MINIMUM_JUPYTERLAB_VERSION: jupyterlab==4.5.0
+  MAXIMUM_JUPYTERLAB_VERSION: jupyterlab>=4.6.0,<5
+
 jobs:
   build:
     name: Build extension
@@ -92,6 +102,60 @@ jobs:
           jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
           python -m jupyterlab.browser_check --no-browser-test
 
+  test_compatibility:
+    name: ${{ matrix.host }} ${{ matrix.version }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [jupyterlite, jupyterlab]
+        version: [minimum, maximum]
+    steps:
+      - name: Install Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.10'
+
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: extension-artifacts
+
+      - name: Pin the host JupyterLab and install it
+        run: |
+          set -eux
+          if [ "${{ matrix.host }}" = "jupyterlite" ]; then
+            if [ "${{ matrix.version }}" = "minimum" ]; then
+              python -m pip install "${MINIMUM_JUPYTERLITE_VERSION}"
+            else
+              python -m pip install "${MAXIMUM_JUPYTERLITE_VERSION}"
+            fi
+            python -m pip install "jupyterlite-core[lab]"
+          elif [ "${{ matrix.version }}" = "minimum" ]; then
+            python -m pip install "${MINIMUM_JUPYTERLAB_VERSION}"
+          else
+            python -m pip install "${MAXIMUM_JUPYTERLAB_VERSION}"
+          fi
+
+      - name: Install the extension
+        run: python -m pip install jupyterlite_pdf_exporter*.whl
+
+      - name: Show resolved package versions in environment
+        run: python -m pip list
+
+      - name: Check that the extension is enabled and compatible
+        run: |
+          set -eux
+          jupyter labextension list
+          jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
+
+      - name: Build a JupyterLite site
+        if: matrix.host == 'jupyterlite'
+        run: |
+          set -eux
+          jupyter lite build --output-dir dist-check
+          test -d dist-check/extensions/jupyterlite-pdf-exporter
+
   build_jupyterlite:
     name: Build JupyterLite distribution
     runs-on: ubuntu-latest
@@ -151,62 +215,84 @@ jobs:
           commit_message: 'Publish JupyterLite distribution for commit ${{ github.event.head_commit.message }}'
           force_orphan: true
 
-  # integration-tests:
-  #   name: Integration tests
-  #   needs: build
-  #   runs-on: ubuntu-latest
+  integration-tests:
+    name: Integration tests
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
-  #   env:
-  #     PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/pw-browsers
+      - name: Base Setup
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@94b14ddfbdd1ed651e9f9343ae2409ab5c73a6a8 # v1
 
-  #   steps:
-  #   - name: Checkout
-  #     uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Download extension package
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: extension-artifacts
 
-  #   - name: Base Setup
-  #     uses: jupyterlab/maintainer-tools/.github/actions/base-setup@94b14ddfbdd1ed651e9f9343ae2409ab5c73a6a8 # v1
+      - name: Install the extension
+        run: |
+          set -eux
+          python -m pip install "${MAXIMUM_JUPYTERLAB_VERSION}" jupyterlite_pdf_exporter*.whl
 
-  #   - name: Download extension package
-  #     uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-  #     with:
-  #       name: extension-artifacts
+      - name: Install dependencies
+        working-directory: ui-tests
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: 0
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+        run: jlpm install
 
-  #   - name: Install the extension
-  #     run: |
-  #       set -eux
-  #       python -m pip install "jupyterlab>=4.0.0,<5" jupyterlite_pdf_exporter*.whl
+      - name: Set up browser cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ${{ github.workspace }}/pw-browsers
+          key: ${{ runner.os }}-${{ hashFiles('ui-tests/yarn.lock') }}
 
-  #   - name: Install dependencies
-  #     working-directory: ui-tests
-  #     env:
-  #       YARN_ENABLE_IMMUTABLE_INSTALLS: 0
-  #       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
-  #     run: jlpm install
+      - name: Install a browser
+        working-directory: ui-tests
+        run: |
+          set -eux
+          jlpm playwright install-deps
+          jlpm playwright install chromium
 
-  #   - name: Set up browser cache
-  #     uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
-  #     with:
-  #       path: |
-  #         ${{ github.workspace }}/pw-browsers
-  #       key: ${{ runner.os }}-${{ hashFiles('ui-tests/yarn.lock') }}
+      - name: Type-check the tests
+        working-directory: ui-tests
+        run: jlpm typecheck
 
-  #   - name: Install browser
-  #     run: |
-  #       set -eux
-  #       jlpm playwright install-deps
-  #       jlpm playwright install chromium
-  #     working-directory: ui-tests
+      - name: Execute integration tests
+        working-directory: ui-tests
+        run: jlpm playwright test
 
-  #   - name: Execute integration tests
-  #     working-directory: ui-tests
-  #     run: |
-  #       jlpm playwright test
+      - name: Set up Python for building the HTML test report
+        if: always()
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14'
 
-  #   - name: Upload Playwright Test report
-  #     if: always()
-  #     uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-  #     with:
-  #       name: jupyterlite_pdf_exporter-playwright-tests
-  #       path: |
-  #         ui-tests/test-results
-  #         ui-tests/playwright-report
+      - name: Build the HTML test report
+        if: always()
+        continue-on-error: true
+        working-directory: ui-tests
+        run: python3 scripts/build_report.py
+
+      - name: Upload the HTML test report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          # Keep in sync with the path in the redirect step in test-report-redirect.yml
+          path: ui-tests/report.html
+          archive: false
+          if-no-files-found: warn
+
+      - name: Upload Playwright Test report
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: jupyterlite-pdf-exporter-playwright-tests
+          path: |
+            ui-tests/test-results
+            ui-tests/playwright-report
