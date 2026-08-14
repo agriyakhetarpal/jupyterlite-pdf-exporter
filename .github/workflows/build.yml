@@ -54,7 +54,7 @@ jobs:
       - name: Build the extension
         run: |
           set -eux
-          python -m pip install .[test]
+          python -m pip install . --group dev
 
           jupyter labextension list
           jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"

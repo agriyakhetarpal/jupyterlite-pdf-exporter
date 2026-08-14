@@ -55,27 +55,29 @@
         "audit:prod": "jlpm npm audit --all --recursive --environment production",
         "build": "jlpm build:lib && jlpm build:labextension:dev",
         "build:prod": "jlpm clean && jlpm build:lib:prod && jlpm build:labextension",
-        "build:labextension": "jupyter labextension build --core-version v4.5.0 .",
-        "build:labextension:dev": "jupyter labextension build --core-version v4.5.0 --development True .",
+        "build:labextension": "jupyter-builder build --core-version v4.5.0 .",
+        "build:labextension:dev": "jupyter-builder build --core-version v4.5.0 --development True .",
         "build:lib": "tsc --sourceMap",
         "build:lib:prod": "tsc",
         "clean": "jlpm clean:lib",
         "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
-        "clean:lintcache": "rimraf .eslintcache",
+        "clean:lintcache": "rimraf .eslintcache .stylelintcache",
         "clean:labextension": "rimraf jupyterlite_pdf_exporter/labextension jupyterlite_pdf_exporter/_version.py",
         "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
         "eslint": "jlpm eslint:check --fix",
         "eslint:check": "eslint . --cache",
         "install:extension": "jlpm build",
-        "lint": "jlpm prettier && jlpm eslint",
-        "lint:check": "jlpm prettier:check && jlpm eslint:check",
+        "lint": "jlpm stylelint && jlpm prettier && jlpm eslint",
+        "lint:check": "jlpm stylelint:check && jlpm prettier:check && jlpm eslint:check",
         "prettier": "jlpm prettier:base --write --list-different",
         "prettier:base": "prettier \"**/*{.ts,.tsx,.js,.jsx,.mjs,.css,.json,.md}\"",
         "prettier:check": "jlpm prettier:base --check",
+        "stylelint": "jlpm stylelint:check --fix",
+        "stylelint:check": "stylelint --cache \"style/**/*.css\"",
         "test": "jest --coverage",
         "watch": "run-p watch:src watch:labextension",
         "watch:src": "tsc -w --sourceMap",
-        "watch:labextension": "jupyter labextension watch --core-version v4.5.0 ."
+        "watch:labextension": "jupyter-builder watch --core-version v4.5.0 ."
     },
     "dependencies": {
         "@jupyterlab/application": "^4.5.8",
@@ -93,8 +95,8 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
+        "@jupyter/builder": "^1.2.2",
         "@jupyter/eslint-plugin": "^1.1.0",
-        "@jupyterlab/builder": "^4.5.8",
         "@jupyterlab/testutils": "^4.5.8",
         "@types/emscripten": "^1.41.5",
         "@types/jest": "^30.0.0",
@@ -112,6 +114,11 @@
         "rimraf": "^6.1.2",
         "source-map-loader": "^1.0.2",
         "style-loader": "^3.3.1",
+        "stylelint": "^17.14.1",
+        "stylelint-config-recommended": "^18.0.0",
+        "stylelint-config-standard": "^40.0.0",
+        "stylelint-csstree-validator": "^4.0.0",
+        "stylelint-prettier": "^5.0.3",
         "typescript": "~5.5.4",
         "typescript-eslint": "^8.67.0",
         "yjs": "^13.5.0"
@@ -167,5 +174,22 @@
                 }
             }
         ]
+    },
+    "stylelint": {
+        "extends": [
+            "stylelint-config-recommended",
+            "stylelint-config-standard",
+            "stylelint-prettier/recommended"
+        ],
+        "plugins": [
+            "stylelint-csstree-validator"
+        ],
+        "rules": {
+            "csstree/validator": true,
+            "property-no-vendor-prefix": null,
+            "selector-class-pattern": "^([a-z][A-z\\d]*)(-[A-z\\d]+)*$",
+            "selector-no-vendor-prefix": null,
+            "value-no-vendor-prefix": null
+        }
     }
 }
