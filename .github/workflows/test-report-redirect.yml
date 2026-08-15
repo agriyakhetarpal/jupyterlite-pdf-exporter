@@ -8,13 +8,19 @@ on: # zizmor: ignore[dangerous-triggers]
 
 permissions: {}
 
+# Group per commit, such that a newer event for the same commit (requested ->
+# in_progress -> completed) supersedes the status set by an older one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: true
+
 jobs:
   pdf_report_redirector:
     name: Link to the PDF export report
     runs-on: ubuntu-latest
     permissions:
-      statuses: write
-      actions: read
+      statuses: write # to attach the commit status that links to the report
+      actions: read # to look up the build workflow run and its uploaded artifact
     steps:
       - uses: agriyakhetarpal/github-actions-artifacts-redirector-action@3514efb6f242bd9c0a28ea93564c19a2ad7367d2 # v1.0.2
         id: redirect
@@ -25,4 +31,6 @@ jobs:
           job-title: View the HTML test report of PDF exports here
 
       - name: Show the URL
-        run: echo "${{ steps.redirect.outputs.url }}"
+        env:
+          REPORT_URL: ${{ steps.redirect.outputs.url }}
+        run: echo "${REPORT_URL}"

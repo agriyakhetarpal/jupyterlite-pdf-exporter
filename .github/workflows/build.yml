@@ -122,16 +122,19 @@ jobs:
           name: extension-artifacts
 
       - name: Pin the host JupyterLab and install it
+        env:
+          MATRIX_HOST: ${{ matrix.host }}
+          MATRIX_VERSION: ${{ matrix.version }}
         run: |
           set -eux
-          if [ "${{ matrix.host }}" = "jupyterlite" ]; then
-            if [ "${{ matrix.version }}" = "minimum" ]; then
+          if [ "${MATRIX_HOST}" = "jupyterlite" ]; then
+            if [ "${MATRIX_VERSION}" = "minimum" ]; then
               python -m pip install "${MINIMUM_JUPYTERLITE_VERSION}"
             else
               python -m pip install "${MAXIMUM_JUPYTERLITE_VERSION}"
             fi
             python -m pip install "jupyterlite-core[lab]"
-          elif [ "${{ matrix.version }}" = "minimum" ]; then
+          elif [ "${MATRIX_VERSION}" = "minimum" ]; then
             python -m pip install "${MINIMUM_JUPYTERLAB_VERSION}"
           else
             python -m pip install "${MAXIMUM_JUPYTERLAB_VERSION}"

@@ -1,5 +1,5 @@
 ci:
-  autoupdate_schedule: monthly
+  autoupdate_schedule: weekly
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -29,7 +29,7 @@ repos:
         language: node
         types_or: [ts, tsx, javascript, jsx]
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: ea2eb407b4cbce87cf0d502f36578950494f5ac9  # frozen: v1.23.1
+    rev: 451b56af716f9f0d0c2b816503a3fd0cf8b036fa  # frozen: v1.29.0
     hooks:
       - id: zizmor
         args: ['--pedantic', '--fix=safe']
