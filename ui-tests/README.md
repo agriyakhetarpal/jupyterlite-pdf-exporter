@@ -50,42 +50,35 @@ will be opened in your browser at the end of the tests execution; see
 [Playwright documentation](https://playwright.dev/docs/test-reporters#html-reporter)
 for configuring that behavior.
 
-## Update the tests snapshots
+## Test report
 
-> All commands are assumed to be executed from the root directory
-
-If you are comparing snapshots to validate your tests, you may need to update
-the reference snapshots stored in the repository. To do that, you need to:
-
-1. Compile the extension:
+The export tests write the PDFs they produce into `pdf-output/`, along with a
+render of the first page and the text extracted from it. We use [scripts/build_report.py](./scripts/build_report.py)
+to turn that folder into a single self-contained `report.html`.
 
 ```sh
-jlpm install
-jlpm build:prod
-```
+# 1. Install the extension in development mode, from the root directory
+python -m venv .venv
+source .venv/bin/activate
+pip install --editable "." --group dev
+jupyter-builder develop . --overwrite
+jlpm install && jlpm build
 
-> Check the extension is installed in JupyterLab.
-
-2. Install test dependencies (needed only once):
-
-```sh
-cd ./ui-tests
+# 2. Install the test dependencies and a browser (needed only once)
+cd ui-tests
 jlpm install
 jlpm playwright install
-cd ..
+
+# 3. Run the tests, which writes pdf-output/ and test-results/results.json
+jlpm test
+
+# 4. Assemble the report and open it
+jlpm report
+open report.html  # or xdg-open on Linux
 ```
 
-3. Execute the [Playwright](https://playwright.dev/docs/intro) command:
-
-```sh
-cd ./ui-tests
-jlpm playwright test -u
-```
-
-> Some discrepancy may occurs between the snapshots generated on your computer and
-> the one generated on the CI. To ease updating the snapshots on a PR, you can
-> type `please update playwright snapshots` to trigger the update by a bot on the CI.
-> Once the bot has computed new snapshots, it will commit them to the PR branch.
+In CI, we upload the report as an artifact, and [test-report-redirect.yml](../.github/workflows/test-report-redirect.yml)
+adds a commit status linking to it, for convenience.
 
 ## Create tests
 
@@ -165,3 +158,7 @@ cd ./ui-tests
 jlpm up "@playwright/test"
 jlpm playwright install
 ```
+
+Afterwards, refresh the stylesheets vendored for the PDF export report so that
+it keeps matching `jlpm playwright show-report`. See
+[scripts/vendor/playwright-html-reporter/README.md](./scripts/vendor/playwright-html-reporter/README.md).

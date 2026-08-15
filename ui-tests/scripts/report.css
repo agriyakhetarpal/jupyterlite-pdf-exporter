@@ -1,0 +1,164 @@
+/*
+ * Copyright (c) Agriya Khetarpal
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Gallery styles that we apply on top of the vendored Playwright reporter CSS
+ * in vendor/playwright-html-reporter/. We rely on light and dark mode based on
+ * Playwright's Primer colour tokens.
+ */
+
+/* Set inline in Playwright's <Link> in links.tsx */
+.htmlreport a {
+  color: var(--color-fg-default);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* A grid of cards in each chip, rather than a list of test rows */
+.pdf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 12px;
+  padding: 12px;
+}
+
+.pdf-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  background-color: var(--color-canvas-default);
+}
+
+.pdf-card:hover {
+  background-color: var(--color-canvas-subtle);
+}
+
+.pdf-card-outcome-unexpected {
+  border-color: var(--color-danger-fg);
+}
+
+.pdf-card-header {
+  flex: none;
+  align-items: flex-start;
+  gap: 4px;
+  line-height: 20px;
+}
+
+.pdf-card .test-file-title {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.pdf-card-duration {
+  flex: none;
+  margin-left: auto;
+  padding-left: 8px;
+  color: var(--color-fg-muted);
+}
+
+.pdf-card .test-file-details-row {
+  padding: 4px 0 0;
+  margin: 0;
+}
+
+.pdf-card-preview {
+  display: block;
+  margin-top: 10px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  overflow: hidden;
+  /* PDFs render on white regardless of the page theme. */
+  background-color: #fff;
+}
+
+.pdf-card-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pdf-card-preview:hover {
+  border-color: var(--color-accent-fg);
+}
+
+.pdf-card-no-preview {
+  margin-top: 10px;
+  padding: 24px 8px;
+  border: 1px dashed var(--color-border-default);
+  border-radius: 6px;
+  color: var(--color-fg-muted);
+  text-align: center;
+}
+
+.pdf-card-meta {
+  margin-top: 10px;
+  color: var(--color-fg-muted);
+  line-height: 18px;
+}
+
+.pdf-card-settings {
+  display: block;
+  margin-top: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background-color: var(--color-canvas-subtle);
+  color: var(--color-fg-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  overflow-wrap: anywhere;
+}
+
+.pdf-card-text {
+  margin-top: 10px;
+}
+
+.pdf-card-text > summary {
+  cursor: pointer;
+  color: var(--color-fg-muted);
+  user-select: none;
+}
+
+.pdf-card-text > pre {
+  max-height: 240px;
+  margin: 6px 0 0;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: var(--color-canvas-subtle);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: pre-wrap;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+/* Hidden by the filter, the search box, or the speedboard view */
+.pdf-card[hidden],
+.chip[hidden] {
+  display: none;
+}
+
+.pdf-no-results {
+  padding: 16px;
+  color: var(--color-fg-muted);
+}
+
+/* The settings popover, anchored under the gear in the nav */
+#settings-dialog {
+  position: absolute;
+  margin: 0;
+  z-index: 10;
+  min-width: 150px;
+  box-shadow: var(--box-shadow);
+}
+
+@media only screen and (max-width: 600px) {
+  .pdf-grid {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+}
