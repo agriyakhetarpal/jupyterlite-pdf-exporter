@@ -178,7 +178,7 @@ jobs:
       - name: Install JupyterLite and extension dependencies
         run: |
           set -eux
-          pip install -r lite/requirements.txt
+          pip install --group lite
           pip install wheelhouse/*.whl
 
       - name: Build JupyterLite
