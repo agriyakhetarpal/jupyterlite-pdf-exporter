@@ -7,3 +7,8 @@ declare module '*.tar.gz' {
   const url: string;
   export default url;
 }
+
+declare module '*.typ' {
+  const source: string;
+  export default source;
+}

@@ -86,7 +86,7 @@ To change the settings for yourself, open the "Settings Editor" from the "Settin
 
 Only the fonts that come bundled with the Typst compiler are available.
 
-Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Typst rule" column shows the rule the setting turns into. This is handy if you would like to read the [Typst](https://typst.app/docs/) and [Callisto](https://github.com/sijow/callisto) documentation, but you do not need to know everything to use the settings.
+Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Typst rule" column shows the rule the setting turns into, in [typst/wrapper.typ](typst/wrapper.typ). This is handy if you would like to read the [Typst](https://typst.app/docs/) and [Callisto](https://github.com/sijow/callisto) documentation, but you do not need to know everything to use the settings.
 
 | Setting           | Key               | What it does                                                  | Typst rule                | Example value(s)                      |
 | ----------------- | ----------------- | ------------------------------------------------------------- | ------------------------- | ------------------------------------- |

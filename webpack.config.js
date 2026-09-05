@@ -3,6 +3,10 @@
 // bundle and fetched at runtime.
 module.exports = {
   module: {
-    rules: [{ test: /\.tar\.gz$/, type: 'asset/resource' }]
+    rules: [
+      { test: /\.tar\.gz$/, type: 'asset/resource' },
+      // The Typst wrapper is inlined as a string
+      { test: /\.typ$/, type: 'asset/source' }
+    ]
   }
 };

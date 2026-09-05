@@ -11,7 +11,9 @@ import { pdfExportSettings } from './settings';
 
 import { installBundledPackages } from './typst-packages';
 
-import { buildTypstWrapper } from './typst-wrapper';
+import { buildTypstSettings } from './typst-settings';
+
+import wrapperSource from '../typst/wrapper.typ';
 
 // Typst compiler creates a global $typst
 declare const $typst: {
@@ -49,17 +51,21 @@ export async function exportNotebookToPdf(
     // we work  on a copy to leave the caller's notebook untouched.
     const working = structuredClone(notebook);
     preprocessNotebook(working);
-    const wrapper = buildTypstWrapper(pdfExportSettings.current);
+    const typstSettings = buildTypstSettings(pdfExportSettings.current);
 
     pdfExportProgress.update('Generating PDF…');
 
     const encoder = new TextEncoder();
 
     $typst.resetShadow();
-    $typst.mapShadow('/main.typ', encoder.encode(wrapper));
+    $typst.mapShadow('/main.typ', encoder.encode(wrapperSource));
     $typst.mapShadow(
       '/notebook.ipynb',
       encoder.encode(JSON.stringify(working))
+    );
+    $typst.mapShadow(
+      '/settings.json',
+      encoder.encode(JSON.stringify(typstSettings))
     );
     const pdfData = await $typst.pdf({ mainFilePath: '/main.typ' });
 

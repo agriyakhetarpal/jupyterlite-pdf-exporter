@@ -40,6 +40,7 @@
         "src/**/*.{ts,tsx}",
         "schema/*.json",
         "typst-packages/*.{tar.gz,txt}",
+        "typst/*.typ",
         "LICENSE-TYPST.txt"
     ],
     "main": "lib/index.js",
