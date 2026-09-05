@@ -90,20 +90,20 @@ Here is a table of what each setting changes. The "Key" column is the name you w
 
 | Setting           | Key               | What it does                                                                                          | Typst rule                       | Example value(s)                      |
 | ----------------- | ----------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------- |
-| Page size         | `pageSize`        | Sets the paper size of the PDF                                                                        | `page(paper:)`                   | `a4`, `us-letter`                     |
-| Font size         | `fontSize`        | Sets the base text size                                                                               | `text(size:)`                    | `10pt`, `12pt`                        |
-| Margins           | `margin`          | Sets the space around the page edges                                                                  | `page(margin:)`                  | `{ "top": "2.5cm" }`                  |
-| Main font         | `mainFont`        | Picks the body font from the bundled fonts                                                            | `text(font:)`                    | `Libertinus Serif`                    |
-| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                                                          | `page(numbering:)`               | `true` (default)                      |
-| Table of contents | `tableOfContents` | Adds a contents list at the start                                                                     | `outline()`                      | `false` (default)                     |
-| Number sections   | `numberSections`  | Adds numbers to headings                                                                              | `heading(numbering:)`            | `false` (default)                     |
-| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                                                        | `par(leading:)`                  | `1` (default), `1.5`                  |
-| Link color        | `linkColor`       | Sets the colour used for links                                                                        | `show link`                      | `#0F4C81`                             |
 | Theme             | `theme`           | Picks how cells are laid out, from Callisto's built-in themes                                         | `callisto.render(theme:)`        | `notebook` (default), `neat`, `plain` |
 | Prompt gutter     | `promptGutter`    | Which cells are indented to make room for the `In [n]:` and `Out[n]:` prompts of the `notebook` theme | `pad(left:)`                     | `code` (default), `all`               |
 | Hide code inputs  | `hideInputs`      | Leaves the source (inputs) of code cells out and keeps their outputs                                  | `callisto.render(input:)`        | `false` (default)                     |
 | Hide code outputs | `hideOutputs`     | Leaves the outputs of code cells out and keeps their source                                           | `callisto.render(output:)`       | `false` (default)                     |
 | ANSI colours      | `ansiColors`      | Renders the colours that ANSI escape codes in text outputs request, or strips the codes               | `callisto.render(console-text:)` | `true` (default)                      |
+| Page size         | `pageSize`        | Sets the paper size of the PDF                                                                        | `page(paper:)`                   | `a4`, `us-letter`                     |
+| Margins           | `margin`          | Sets the space around the page edges                                                                  | `page(margin:)`                  | `{ "top": "2.5cm" }`                  |
+| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                                                          | `page(numbering:)`               | `true` (default)                      |
+| Main font         | `mainFont`        | Picks the body font from the bundled fonts                                                            | `text(font:)`                    | `Libertinus Serif`                    |
+| Font size         | `fontSize`        | Sets the base text size                                                                               | `text(size:)`                    | `10pt`, `12pt`                        |
+| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                                                        | `par(leading:)`                  | `1` (default), `1.5`                  |
+| Link color        | `linkColor`       | Sets the colour used for links                                                                        | `show link`                      | `#0F4C81`                             |
+| Table of contents | `tableOfContents` | Adds a contents list at the start                                                                     | `outline()`                      | `false` (default)                     |
+| Number sections   | `numberSections`  | Adds numbers to headings                                                                              | `heading(numbering:)`            | `false` (default)                     |
 
 The `margin` key takes an object with any of `top`, `bottom`, `left`, and `right`, for example `{ "top": "2.5cm", "bottom": "2.5cm", "left": "2cm", "right": "2cm" }`.
 

@@ -15,20 +15,20 @@ export interface IPdfMargin {
  * The user-facing PDF export settings, based on schema/plugin.json.
  */
 export interface IPdfExportSettings {
-  pageSize: string;
-  fontSize: string;
-  margin: IPdfMargin;
-  mainFont: string;
-  pageNumbers: boolean;
-  tableOfContents: boolean;
-  numberSections: boolean;
-  lineSpacing: number;
-  linkColor: string;
   theme: 'notebook' | 'neat' | 'plain';
   promptGutter: 'code' | 'all';
   hideInputs: boolean;
   hideOutputs: boolean;
   ansiColors: boolean;
+  pageSize: string;
+  margin: IPdfMargin;
+  pageNumbers: boolean;
+  mainFont: string;
+  fontSize: string;
+  lineSpacing: number;
+  linkColor: string;
+  tableOfContents: boolean;
+  numberSections: boolean;
 }
 
 /**
@@ -36,25 +36,25 @@ export interface IPdfExportSettings {
  * used until the settings registry loads, and as fallbacks for missing keys.
  */
 const DEFAULT_SETTINGS: IPdfExportSettings = {
+  theme: 'notebook',
+  promptGutter: 'code',
+  hideInputs: false,
+  hideOutputs: false,
+  ansiColors: true,
   pageSize: 'a4',
-  fontSize: '10pt',
   margin: {
     top: '2.5cm',
     bottom: '2.5cm',
     left: '2cm',
     right: '2cm'
   },
-  mainFont: 'Libertinus Serif',
   pageNumbers: true,
-  tableOfContents: false,
-  numberSections: false,
+  mainFont: 'Libertinus Serif',
+  fontSize: '10pt',
   lineSpacing: 1,
   linkColor: '#0000ee',
-  theme: 'notebook',
-  promptGutter: 'code',
-  hideInputs: false,
-  hideOutputs: false,
-  ansiColors: true
+  tableOfContents: false,
+  numberSections: false
 };
 
 /**

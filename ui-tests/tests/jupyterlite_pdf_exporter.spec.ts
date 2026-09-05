@@ -28,3 +28,36 @@ test('should list the PDF exporter in the command palette', async ({
 
   expect(label).toContain('PDF');
 });
+
+test('should disable the prompt gutter for themes without prompts', async ({
+  page,
+  request
+}) => {
+  await page.goto();
+  await page.evaluate(async () => {
+    await window.jupyterapp.commands.execute('settingeditor:open', {
+      query: 'JupyterLite PDF Exporter'
+    });
+  });
+
+  const form = page.locator('.jp-SettingsForm').first();
+  const theme = form.locator('select[id$="_theme"]');
+  const promptGutter = form.locator('select[id$="_promptGutter"]');
+
+  await expect(theme).toHaveValue(/./);
+  await expect(promptGutter).toBeEnabled();
+
+  await theme.selectOption({ label: 'Neat' });
+  await expect(promptGutter).toBeDisabled();
+
+  await theme.selectOption({ label: 'Plain' });
+  await expect(promptGutter).toBeDisabled();
+
+  await theme.selectOption({ label: 'Notebook' });
+  await expect(promptGutter).toBeEnabled();
+
+  // The form saves as it changes, so put the settings back for other tests
+  await request.put('/lab/api/settings/jupyterlite-pdf-exporter:plugin', {
+    data: { raw: '{}' }
+  });
+});
