@@ -213,6 +213,31 @@ STATUS_ICONS = {
 }
 
 
+SNAPSHOT_KINDS = ("expected", "actual", "diff")
+
+
+def read_snapshot_attachments(results: list[dict]) -> dict[str, dict[str, Path]]:
+    """
+    Group the files Playwright attaches when a toMatchSnapshot assertion fails.
+
+    For a snapshot named `simple-page-1.png`, these are `simple-page-1-expected.png`,
+    `simple-page-1-actual.png`, and `simple-page-1-diff.png`. Text snapshots only
+    have the first two. Returns a map of the snapshot name to the paths of each kind.
+    """
+    snapshots: dict[str, dict[str, Path]] = {}
+    for result in results:
+        for attachment in result.get("attachments", []):
+            name = Path(attachment.get("name", ""))
+            base, _, kind = name.stem.rpartition("-")
+            path = attachment.get("path")
+            if kind not in SNAPSHOT_KINDS or not base or not path:
+                continue
+            path = Path(path)
+            if path.exists():
+                snapshots.setdefault(base + name.suffix, {})[kind] = path
+    return snapshots
+
+
 def read_results() -> dict:
     """
     Flatten Playwright's JSON report into the handful of fields we render.
@@ -247,6 +272,7 @@ def read_results() -> dict:
                         "line": spec.get("line", 0),
                         "duration": sum(r.get("duration", 0) for r in results),
                         "status": status,
+                        "snapshots": read_snapshot_attachments(results),
                     }
                 )
         for child in suite.get("suites", []):
@@ -279,8 +305,11 @@ def read_exports() -> dict[str, dict]:
     return exports
 
 
-def build_preview(meta: dict) -> Markup:
-    """The PDF page render, linked to the full PDF"""
+def build_preview(meta: dict) -> tuple[Markup, Markup]:
+    """
+    The PDF page render, which opens in the lightbox, and a link to the full
+    PDF for the metadata line
+    """
 
     def read(ext: str) -> bytes | None:
         path = OUTPUT_DIR / f"{meta['slug']}.{ext}"
@@ -288,13 +317,62 @@ def build_preview(meta: dict) -> Markup:
 
     pdf, png = read("pdf"), read("png")
     if not (pdf and png):
-        return Markup('<div class="pdf-card-no-preview">No page render captured.</div>')
+        return (
+            Markup('<div class="pdf-card-no-preview">No page render captured.</div>'),
+            Markup(""),
+        )
     title = meta.get("title", meta["slug"])
-    return markup(
-        t'<a class="pdf-card-preview" href="{data_uri(pdf, "application/pdf")}" '
-        t'target="_blank" rel="noopener" title="Open the full PDF">'
+    preview = markup(
+        t'<button type="button" class="pdf-card-preview" data-lightbox '
+        t'title="Enlarge the first page">'
         t'<img loading="lazy" src="{data_uri(png, "image/png")}" '
-        t'alt="First page of the PDF exported for {title}" /></a>'
+        t'alt="First page of the PDF exported for {title}" /></button>'
+    )
+    link = markup(
+        t'<a class="pdf-card-pdf" href="{data_uri(pdf, "application/pdf")}" '
+        t'target="_blank" rel="noopener">Open PDF</a>'
+    )
+    return preview, link
+
+
+def build_snapshots(snapshots: dict[str, dict[str, Path]]) -> Markup:
+    """The expected, actual, and diff of every snapshot that did not match"""
+    if not snapshots:
+        return Markup("")
+    blocks: list[Markup] = []
+    for name, files in sorted(snapshots.items()):
+        columns: list[Markup] = []
+        for kind in SNAPSHOT_KINDS:
+            path = files.get(kind)
+            if path is None:
+                continue
+            if path.suffix == ".png":
+                # Opens the lightbox, which compares expected and actual
+                figure = markup(
+                    t'<button type="button" class="pdf-snapshot-open" data-lightbox '
+                    t'title="Compare expected and actual">'
+                    t'<img loading="lazy" src="{data_uri(path.read_bytes(), "image/png")}" '
+                    t'alt="The {kind} render of {name}" /></button>'
+                )
+            else:
+                figure = markup(t"<pre>{path.read_text()}</pre>")
+            columns.append(
+                markup(
+                    t'<figure class="pdf-snapshot" data-kind="{kind}">'
+                    t"<figcaption>{kind}</figcaption>{figure}</figure>"
+                )
+            )
+        blocks.append(
+            markup(
+                t'<div class="pdf-snapshot-name">{name}</div>'
+                t'<div class="pdf-snapshot-row" data-snapshot="{name}">'
+                t"{join(columns)}</div>"
+            )
+        )
+    return markup(
+        t'<details class="pdf-card-snapshots" open>'
+        t"<summary>Snapshot mismatches ({len(snapshots)})</summary>"
+        t"{join(blocks)}</details>"
     )
 
 
@@ -322,14 +400,17 @@ def build_card(test: dict, meta: dict | None) -> Markup:
         )
         text_path = OUTPUT_DIR / f"{meta['slug']}.txt"
         text = text_path.read_text() if text_path.exists() else "(none)"
+        preview, pdf_link = build_preview(meta)
         body = markup(
-            t"{build_preview(meta)}"
-            t'<div class="pdf-card-meta">{meta.get("notebook", "?")} &middot; '
-            t"{pages} page(s) &middot; {size} &middot; {dims}</div>"
+            t"{preview}"
+            t'<div class="pdf-card-meta"><span>{meta.get("notebook", "?")}</span>'
+            t"<span>{pages} page(s)</span><span>{size}</span><span>{dims}</span>"
+            t"{pdf_link}</div>"
             t"{settings_line}"
             t'<details class="pdf-card-text"><summary>Extracted text</summary>'
             t"<pre>{text}</pre></details>"
         )
+    body = markup(t"{body}{build_snapshots(test.get('snapshots', {}))}")
 
     # Both are missing when we are building without results.json.
     duration = (

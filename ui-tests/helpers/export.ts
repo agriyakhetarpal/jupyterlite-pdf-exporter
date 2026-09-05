@@ -94,5 +94,10 @@ export async function exportNotebook(
     )
   );
 
+  expect.soft(analysis.text).toMatchSnapshot(`${slug}.txt`);
+  analysis.snapshots.forEach((png, index) => {
+    expect.soft(png).toMatchSnapshot(`${slug}-page-${index + 1}.png`);
+  });
+
   return { ...analysis, pdf };
 }
