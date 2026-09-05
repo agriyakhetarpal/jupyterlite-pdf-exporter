@@ -3393,10 +3393,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myriaddreamin/typst-all-in-one.ts@npm:0.7.0":
-  version: 0.7.0
-  resolution: "@myriaddreamin/typst-all-in-one.ts@npm:0.7.0"
-  checksum: c1686dbf4402880b16e19d80b8b251328c288ee15337d986e075a60d2e49487315033077404346c9aeeab5347feb03e563f423f1e70496134b3f4ba67ea3e294
+"@myriaddreamin/typst-all-in-one.ts@npm:0.8.0-rc3":
+  version: 0.8.0-rc3
+  resolution: "@myriaddreamin/typst-all-in-one.ts@npm:0.8.0-rc3"
+  checksum: 94bc72c79c630e92194b05a279d9ed904a94a42aa8973b0468b20afd4ab57a8803aaf1b3c7fe1effe665158646506c0870b6768bc59dabd0f930bac2022dc7e4
   languageName: node
   linkType: hard
 
@@ -7942,7 +7942,7 @@ __metadata:
     "@jupyterlab/testutils": ^4.5.8
     "@jupyterlab/translation": ^4.5.8
     "@jupyterlite/services": ^0.7.6
-    "@myriaddreamin/typst-all-in-one.ts": 0.7.0
+    "@myriaddreamin/typst-all-in-one.ts": 0.8.0-rc3
     "@types/emscripten": ^1.41.5
     "@types/jest": ^30.0.0
     "@types/json-schema": ^7.0.15

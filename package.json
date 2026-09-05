@@ -90,7 +90,7 @@
         "@jupyterlab/statusbar": "^4.5.8",
         "@jupyterlab/translation": "^4.5.8",
         "@jupyterlite/services": "^0.7.6",
-        "@myriaddreamin/typst-all-in-one.ts": "0.7.0",
+        "@myriaddreamin/typst-all-in-one.ts": "0.8.0-rc3",
         "pandoc-wasm": "1.1.0"
     },
     "devDependencies": {
