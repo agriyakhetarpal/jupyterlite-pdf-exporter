@@ -24,6 +24,8 @@ export interface IPdfExportSettings {
   numberSections: boolean;
   lineSpacing: number;
   linkColor: string;
+  theme: 'notebook' | 'neat' | 'plain';
+  promptGutter: 'code' | 'all';
 }
 
 /**
@@ -44,7 +46,9 @@ const DEFAULT_SETTINGS: IPdfExportSettings = {
   tableOfContents: false,
   numberSections: false,
   lineSpacing: 1,
-  linkColor: '#0000ee'
+  linkColor: '#0000ee',
+  theme: 'notebook',
+  promptGutter: 'code'
 };
 
 /**
@@ -73,67 +77,3 @@ class PdfExportSettings {
 }
 
 export const pdfExportSettings = new PdfExportSettings();
-
-/**
- * These are the pieces of a Pandoc `convert()` call derived from the settings:
- * top-level options and the template `variables` map.
- */
-export interface IPandocConfig {
-  options: Record<string, unknown>;
-  variables: Record<string, unknown>;
-}
-
-/**
- * Translate the user settings into Pandoc options and Typst template variables.
- *
- * This is a pure function so it can be unit tested without the browser. The
- * general rule is to omit any unset or empty value so that Pandoc keeps its
- * default output. The only special case I noticed is page numbering, which
- * Pandoc turns on by default. We pass "1" to keep it on and "" to turn it off.
- */
-export function buildPandocConfig(settings: IPdfExportSettings): IPandocConfig {
-  const options: Record<string, unknown> = {};
-  const variables: Record<string, unknown> = {};
-
-  if (settings.pageSize) {
-    variables.papersize = settings.pageSize;
-  }
-  if (settings.fontSize) {
-    variables.fontsize = settings.fontSize;
-  }
-  if (settings.mainFont) {
-    variables.mainfont = settings.mainFont;
-  }
-  const linkColor = settings.linkColor.trim();
-  if (linkColor) {
-    // Strip leading "#" from colour value
-    variables.linkcolor = linkColor.replace(/^#/, '');
-  }
-  if (settings.lineSpacing && settings.lineSpacing !== 1) {
-    variables.linestretch = settings.lineSpacing;
-  }
-
-  // Only include margin sides that are set, and only add the map if non-empty
-  const margin: Record<string, string> = {};
-  for (const side of ['top', 'bottom', 'left', 'right'] as const) {
-    const value = settings.margin?.[side];
-    if (value) {
-      margin[side] = value;
-    }
-  }
-  if (Object.keys(margin).length > 0) {
-    variables.margin = margin;
-  }
-
-  // Pandoc numbers pages by default
-  variables['page-numbering'] = settings.pageNumbers ? '1' : '';
-
-  if (settings.tableOfContents) {
-    options['table-of-contents'] = true;
-  }
-  if (settings.numberSections) {
-    options['number-sections'] = true;
-  }
-
-  return { options, variables };
-}

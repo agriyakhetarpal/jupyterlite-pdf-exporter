@@ -10,7 +10,7 @@
 | PyPI downloads | [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=total&units=NONE&left_color=GREY&right_color=ORANGE&left_text=all%20time)](https://pepy.tech/projects/jupyterlite-pdf-exporter) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=weekly&units=NONE&left_color=GREY&right_color=ORANGE&left_text=weekly)](https://pepy.tech/projects/jupyterlite-pdf-exporter) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=monthly&units=NONE&left_color=GREY&right_color=ORANGE&left_text=monthly)](https://pepy.tech/projects/jupyterlite-pdf-exporter) |
 | conda package  | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupyterlite-pdf-exporter.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter) [![Recipe](https://img.shields.io/badge/recipe-jupyterlite--pdf--exporter-green.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/jupyterlite-pdf-exporter.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter)                                                                                                                                                                                                                       |
 
-A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).
+A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on a WebAssembly distribution of [Typst](https://typst.org/) and the [Callisto](https://typst.app/universe/package/callisto) Typst package.
 
 - This Jupyter extension registers a PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
 - In JupyterLab and Jupyter Notebook, it adds an "Export Notebook to PDF" command to the File menu and the command palette.
@@ -23,8 +23,8 @@ The usual way to convert a notebook into a PDF is `nbconvert` driving a LaTeX di
 
 This extension provides a different mechanism to export notebooks to PDF that runs entirely in your browser:
 
-1. [Pandoc](https://pandoc.org/), compiled to WebAssembly, converts the notebook to a [Typst](https://typst.org/) markup IR (intermediate representation).
-2. The Typst compiler, a modern typesetting system that stands in for LaTeX and is also compiled to WebAssembly, renders that IR into a PDF.
+1. [Callisto](https://typst.app/universe/package/callisto), a Typst package, reads the notebook and turns each cell into Typst content. Markdown cells are converted via [cmarker](https://github.com/SabrinaJewson/cmarker.typ), LaTeX math is converted via [MiTeX](https://github.com/mitex-rs/mitex). Rich outputs such as images, tables, and formatted text are also supported.
+2. The [Typst](https://typst.org/) compiler, a modern typesetting system that stands in for LaTeX and is compiled to WebAssembly, renders that content into a PDF.
 
 ## Installation
 
@@ -61,7 +61,7 @@ In both JupyterLab and JupyterLite environments, the entry point to usage lives 
     This extension does not depend on or enforce a particular version of JupyterLite or JupyterLab, but please note that cutting-edge versions of JupyterLite, JupyterLab, and Jupyter Notebook may introduce breaking changes. If you face any troubles, please [file an issue](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues/new/choose)!
 
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
-- The extension relies on WebAssembly distributions of Pandoc and Typst. These distributions are quite large (over 50 MiB) and may take some time to download and initialise when the extension is first used. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
+- The extension relies on a WebAssembly distribution of Typst. It is quite large (about 40 MiB on disk, or about 15 MiB when sent compressed over the network) and may take some time to download and initialise when the extension is first used. The distribution also bundles the Typst packages it needs to function. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
 
 ### JupyterLite
 
@@ -86,21 +86,31 @@ To change the settings for yourself, open the "Settings Editor" from the "Settin
 
 Only the fonts that come bundled with the Typst compiler are available.
 
-Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Pandoc mapping" column shows where the value ends up. A "variable" is passed as a [Pandoc template variable](https://pandoc.org/MANUAL.html#variables) and an "option" is a top-level [Pandoc option](https://pandoc.org/MANUAL.html#general-options). You do not need to know these to use the settings, but they are handy if you want to read the Pandoc and Typst docs.
+Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Typst rule" column shows the rule the setting turns into, in [typst/wrapper.typ](typst/wrapper.typ). This is handy if you would like to read the [Typst](https://typst.app/docs/) and [Callisto](https://github.com/sijow/callisto) documentation, but you do not need to know everything to use the settings.
 
-| Setting           | Key               | What it does                               | Pandoc mapping             | Example value(s)     |
-| ----------------- | ----------------- | ------------------------------------------ | -------------------------- | -------------------- |
-| Page size         | `pageSize`        | Sets the paper size of the PDF             | variable `papersize`       | `a4`, `us-letter`    |
-| Font size         | `fontSize`        | Sets the base text size                    | variable `fontsize`        | `10pt`, `12pt`       |
-| Margins           | `margin`          | Sets the space around the page edges       | variable `margin`          | `{ "top": "2.5cm" }` |
-| Main font         | `mainFont`        | Picks the body font from the bundled fonts | variable `mainfont`        | `Libertinus Serif`   |
-| Page numbers      | `pageNumbers`     | Turns page numbers on or off               | variable `page-numbering`  | `true` (default)     |
-| Table of contents | `tableOfContents` | Adds a contents list at the start          | option `table-of-contents` | `false` (default)    |
-| Number sections   | `numberSections`  | Adds numbers to headings                   | option `number-sections`   | `false` (default)    |
-| Line spacing      | `lineSpacing`     | Sets the spacing between lines             | variable `linestretch`     | `1` (default), `1.5` |
-| Link color        | `linkColor`       | Sets the colour used for links             | variable `linkcolor`       | `#0F4C81`            |
+| Setting           | Key               | What it does                                                                                          | Typst rule                | Example value(s)                      |
+| ----------------- | ----------------- | ----------------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------- |
+| Page size         | `pageSize`        | Sets the paper size of the PDF                                                                        | `page(paper:)`            | `a4`, `us-letter`                     |
+| Font size         | `fontSize`        | Sets the base text size                                                                               | `text(size:)`             | `10pt`, `12pt`                        |
+| Margins           | `margin`          | Sets the space around the page edges                                                                  | `page(margin:)`           | `{ "top": "2.5cm" }`                  |
+| Main font         | `mainFont`        | Picks the body font from the bundled fonts                                                            | `text(font:)`             | `Libertinus Serif`                    |
+| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                                                          | `page(numbering:)`        | `true` (default)                      |
+| Table of contents | `tableOfContents` | Adds a contents list at the start                                                                     | `outline()`               | `false` (default)                     |
+| Number sections   | `numberSections`  | Adds numbers to headings                                                                              | `heading(numbering:)`     | `false` (default)                     |
+| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                                                        | `par(leading:)`           | `1` (default), `1.5`                  |
+| Link color        | `linkColor`       | Sets the colour used for links                                                                        | `show link`               | `#0F4C81`                             |
+| Theme             | `theme`           | Picks how cells are laid out, from Callisto's built-in themes                                         | `callisto.render(theme:)` | `notebook` (default), `neat`, `plain` |
+| Prompt gutter     | `promptGutter`    | Which cells are indented to make room for the `In [n]:` and `Out[n]:` prompts of the `notebook` theme | `pad(left:)`              | `code` (default), `all`               |
 
 The `margin` key takes an object with any of `top`, `bottom`, `left`, and `right`, for example `{ "top": "2.5cm", "bottom": "2.5cm", "left": "2cm", "right": "2cm" }`.
+
+The `theme` key picks one of the themes that come with Callisto:
+
+- The `notebook` theme is the default and it closely resembles the Jupyter interface, with `In [n]:` and `Out[n]:` prompts next to each cell.
+- The `neat` theme keeps the cell styling but drops the prompts, which reads more like a document.
+- The `plain` theme does not apply any styling to the cells.
+
+Callisto draws the `In[n]:` and `Out[n]:` prompts in the left page margin, which means that they get cut off when the margin is narrower than the prompt; for example, with a large font or a multiple-digit execution count or anything else that forces the prompts to overflow (see [sijow/callisto#22](https://github.com/sijow/callisto/issues/22) for details). To avoid that, the exporter indents cells by the width of the widest prompt in the notebook. By default, only code cells are indented, not Markdown or raw cells. You may set `promptGutter` to `all` to also indent Markdown and raw cells by the same amount, so that every cell in your notebook shares one left edge.
 
 For `linkColor`, the Settings Editor shows a colour picker for ease of use. In `overrides.json` or `jupyter-lite.json`, you can use a HEX value such as `#0F4C81` (with or without the `#`). An invalid value fails the PDF export.
 
@@ -118,6 +128,7 @@ Each key goes under the plugin ID `jupyterlite-pdf-exporter:plugin`. Here is a f
     "numberSections": true,
     "lineSpacing": 1.15,
     "linkColor": "#0F4C81",
+    "theme": "neat",
     "margin": {
       "top": "3cm",
       "bottom": "3cm",
@@ -173,20 +184,20 @@ Then rebuild your JupyterLite distribution and open it in the browser via `jupyt
 
 ## License
 
-The source code is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE.txt) file for details).
+The source code and binaries are licensed under the terms of the BSD-3-Clause "New" or "Revised" License. Please see the [LICENSE](LICENSE.txt) file for details.
 
-> [!IMPORTANT]
-> However, the source distribution and wheel for this extension on PyPI are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt) for details.
+Here is a table of the licenses of the dependencies bundled by this extension. The Typst packages are Callisto and its dependencies, which are fetched from the [Typst package registry](https://typst.app/universe/).
 
-The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [Typst license file](LICENSE-TYPST.txt) for details.
+| Component                                                                                                                                       | License      | File                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------- |
+| [`@myriaddreamin/typst-all-in-one.ts`](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one.ts), the WebAssembly distribution of Typst | `Apache-2.0` | [LICENSE-TYPST.txt](LICENSE-TYPST.txt)                          |
+| [Callisto](https://github.com/sijow/callisto)                                                                                                   | `MIT`        | [LICENSE-callisto.txt](typst-packages/LICENSE-callisto.txt)     |
+| [cmarker](https://github.com/SabrinaJewson/cmarker.typ)                                                                                         | `MIT`        | [LICENSE-cmarker.txt](typst-packages/LICENSE-cmarker.txt)       |
+| [MiTeX](https://github.com/mitex-rs/mitex)                                                                                                      | `Apache-2.0` | [LICENSE-mitex.txt](typst-packages/LICENSE-mitex.txt)           |
+| [based](https://github.com/EpicEricEE/typst-based)                                                                                              | `MIT`        | [LICENSE-based.txt](typst-packages/LICENSE-based.txt)           |
+| [percencode](https://github.com/Servostar/typst-percencode)                                                                                     | `MIT`        | [LICENSE-percencode.txt](typst-packages/LICENSE-percencode.txt) |
 
-### Why?
-
-The WebAssembly distribution of Pandoc, through its dependency on the `pandoc-wasm` project on the `npm` package registry, is licensed under the terms of the GNU General Public License version 2.0 (`GPL-2.0-or-later`). Binary distributions of this extension bundle the `pandoc.wasm` file, and as a result, are regarded as derivative works of the WebAssembly distribution of Pandoc.
-
-### More details
-
-For an overview of the licenses of all the JavaScript dependencies of this extension at runtime, please navigate to your JupyterLite deployment > "Help" menu > "Licenses" after installing and rebuilding it.
+For an overview of the licenses of all the JavaScript dependencies of this extension at runtime, please navigate to your Jupyter deployment > "Help" menu > "Licenses".
 
 ## Thanks 💛
 
@@ -195,7 +206,12 @@ This project would not have been possible without the following open source proj
 - [JupyterLite](https://jupyterlite.rtfd.io/en/latest/): A JupyterLab distribution that runs entirely in the web browser, powered by WebAssembly and Web Workers.
 - [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/): The next-generation web-based user interface for Project Jupyter, with a rich ecosystem of extensions.
 - [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/): The original web-based interactive computing environment for Jupyter, which continues to be widely used and developed in its own right.
-- [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
+- [Callisto](https://github.com/sijow/callisto): A Typst package that reads Jupyter notebooks and renders their cells, on which this extension is built.
 - [Typst](https://typst.app/): A modern typesetting system that provides high-quality PDF output and a user-friendly syntax for document design.
-- [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.
+- [cmarker](https://github.com/SabrinaJewson/cmarker.typ) and [MiTeX](https://github.com/mitex-rs/mitex): Typst packages that Callisto uses to convert Markdown and LaTeX math.
 - [@myriaddreamin/typst-all-in-one](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one): A WebAssembly distribution of Typst that allows it to run in web browsers and other JavaScript environments.
+
+I made use of the following open source projects in earlier versions of this extension. They are no longer used in the current version, but this extension would not have been possible without them!
+
+- [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
+- [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.

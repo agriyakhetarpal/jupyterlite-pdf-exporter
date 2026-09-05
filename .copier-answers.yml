@@ -10,7 +10,7 @@ has_settings: true
 kind: frontend
 labextension_name: jupyterlite-pdf-exporter
 project_short_description: A PDF exporter for JupyterLite based on a WebAssembly distribution
-    of Pandoc
+    of Typst
 python_name: jupyterlite_pdf_exporter
 repository: https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter
 test: true

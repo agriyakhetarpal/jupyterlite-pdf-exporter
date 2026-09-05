@@ -5,8 +5,8 @@ build-backend = "hatchling.build"
 [project]
 name = "jupyterlite-pdf-exporter"
 readme = "README.md"
-license = "GPL-2.0-or-later"
-license-files = ["LICENSE.txt", "LICENSE-PANDOC.txt", "LICENSE-TYPST.txt"]
+license = "BSD-3-Clause"
+license-files = ["LICENSE.txt", "LICENSE-TYPST.txt", "typst-packages/LICENSE-*.txt"]
 requires-python = ">=3.10"
 classifiers = [
     "Development Status :: 4 - Beta",

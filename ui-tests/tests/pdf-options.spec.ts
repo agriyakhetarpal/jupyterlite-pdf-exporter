@@ -23,6 +23,24 @@ const TEST_CASES: {
       // A4 := 595.28 x 841.89 pt
       expect(a.width).toBe(595);
       expect(a.height).toBe(842);
+      // The notebook theme shows cell prompts
+      expect(a.text).toContain('In [1]:');
+    }
+  },
+  {
+    slug: 'opt-promptgutter-all',
+    title: 'promptGutter: all',
+    settings: { promptGutter: 'all' },
+    check: a => {
+      expect(a.text).toContain('In [1]:');
+    }
+  },
+  {
+    slug: 'opt-theme-neat',
+    title: 'theme: neat',
+    settings: { theme: 'neat' },
+    check: a => {
+      expect(a.text).not.toContain('In [1]:');
     }
   },
   {
@@ -89,8 +107,8 @@ const TEST_CASES: {
     title: 'numberSections: true',
     settings: { numberSections: true },
     check: a => {
-      expect(a.text).toMatch(/1\s+First section/);
-      expect(a.text).toMatch(/2\s+Second section/);
+      expect(a.text).toMatch(/1\.1\.\s+First section/);
+      expect(a.text).toMatch(/1\.2\.\s+Second section/);
     }
   },
   {
@@ -115,7 +133,7 @@ const TEST_CASES: {
     },
     check: a => {
       expect(a.width).toBe(612);
-      expect(a.text).toMatch(/1\s+First section/);
+      expect(a.text).toMatch(/1\.1\.\s+First section/);
     }
   }
 ];
