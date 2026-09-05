@@ -1,7 +1,7 @@
 {
     "name": "jupyterlite-pdf-exporter",
     "version": "0.5.0",
-    "description": "A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook (including JupyterHub deployments), based on a WebAssembly distribution of Typst and the Callisto package.",
+    "description": "A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook (including JupyterHub deployments), based on a WebAssembly distribution of Typst and the Callisto Typst package.",
     "keywords": [
         "jupyter",
         "jupyterlab",

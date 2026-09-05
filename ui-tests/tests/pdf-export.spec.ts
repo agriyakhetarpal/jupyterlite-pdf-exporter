@@ -79,6 +79,25 @@ const FIXTURES: {
       expect(r.text).toContain('[Output not available in PDF]');
       expect(r.text).toContain('IntSlider(value=42)');
     }
+  },
+  {
+    file: 'tags.ipynb',
+    title: 'nbconvert cell tags',
+    check: r => {
+      expect(r.text).toContain('kept-cell-source');
+      expect(r.text).toContain('kept-cell-output');
+      // remove-input keeps the output
+      expect(r.text).not.toContain('removed-input-source');
+      expect(r.text).toContain('kept-output-of-hidden-input');
+      // remove_output keeps the source
+      expect(r.text).toContain('kept-source-of-hidden-output');
+      expect(r.text).not.toContain('removed-output-text');
+      // remove_cell and remove-cell drop the whole cell
+      expect(r.text).not.toContain('removed-cell-source');
+      expect(r.text).not.toContain('removed-cell-output');
+      expect(r.text).not.toContain('removed-markdown-text');
+      expect(r.text).toContain('The last cell stays.');
+    }
   }
 ];
 

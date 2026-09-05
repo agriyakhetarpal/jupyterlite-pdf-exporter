@@ -53,6 +53,28 @@
   (callisto.default-handlers.at("image-markdown"))(data, ctx: ctx, ..args)
 }
 
+// nbconvert and Jupyter Book conventions: use cell tags to leave cells, or their
+// inputs or outputs out of an export. We honour both snake_case and kebab_case tags.
+#let has-tag(cell, name) = {
+  let tags = cell.at("metadata", default: (:)).at("tags", default: ())
+  tags.contains(name) or tags.contains(name.replace("-", "_"))
+}
+
+#let cell-handler(cell, ctx: none, ..args) = {
+  if has-tag(cell, "remove-cell") { return none }
+  (callisto.default-handlers.at("cell"))(cell, ctx: ctx, ..args)
+}
+
+// Callisto decides the hiding of inputs and outputs per cell from ctx.input
+// and ctx.output, which the hideInputs and hideOutputs settings set for the
+// whole notebook. A tag can only hide more...
+#let code-cell-handler(cell, ctx: none, ..args) = {
+  let ctx = ctx
+  if has-tag(cell, "remove-input") { ctx.input = false }
+  if has-tag(cell, "remove-output") { ctx.output = false }
+  (callisto.default-handlers.at("code-cell"))(cell, ctx: ctx, ..args)
+}
+
 // Callisto's notebook theme places the In/Out prompts 1.2em to the left of
 // each code cell, see https://github.com/sijow/callisto/blob/a402a27f5aa17d4b4e45ced1bf3dcd3a7227a6dc/themes/notebook.typ#L8-L12.
 // This puts them in the page margin, where they are clipped once the margin
@@ -66,7 +88,8 @@
 // faithful to the notebook layout as seen in JupyterLab/nbconvert, but then
 // we don't have as wide margins like nbconvert does.
 #let prompt-gutter() = {
-  let counts = json("notebook.ipynb").cells
+  let counts = json("notebook.ipynb")
+    .cells
     .filter(cell => cell.cell_type == "code")
     .map(cell => cell.at("execution_count", default: none))
     .filter(count => count != none)
@@ -79,23 +102,29 @@
   handler(cell, ctx: ctx, ..args),
 )
 
-#let theme = if settings.theme == "notebook" and settings.promptGutter == "code" {
-  callisto.themes.notebook + (
-    "code-cell": with-prompt-gutter(callisto.default-handlers.at("code-cell")),
-  )
+#let code-cell = if settings.theme == "notebook" and settings.promptGutter == "code" {
+  with-prompt-gutter(code-cell-handler)
 } else {
-  settings.theme
+  code-cell-handler
 }
 
 #if settings.tableOfContents { outline() }
 
 #let body = callisto.render(
   nb: path("notebook.ipynb"),
-  theme: theme,
+  theme: settings.theme,
+  // auto keeps Callisto's support for "#| echo: false" types of cell headers
+  input: if settings.hideInputs { false } else { auto },
+  output: if settings.hideOutputs { false } else { auto },
+  console-text: if settings.ansiColors { auto } else { "strip" },
   ignore-wrong-format: true,
   // Markdown can carry Typst code in HTML comments; do not run it
   cmarker: (raw-typst: false),
-  handlers: ("image-markdown": image-markdown),
+  handlers: (
+    "image-markdown": image-markdown,
+    "cell": cell-handler,
+    "code-cell": code-cell,
+  ),
 )
 
 #if settings.theme == "notebook" and settings.promptGutter == "all" {

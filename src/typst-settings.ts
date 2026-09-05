@@ -32,6 +32,9 @@ export interface ITypstSettings {
   linkColor: string | null;
   theme: string;
   promptGutter: string;
+  hideInputs: boolean;
+  hideOutputs: boolean;
+  ansiColors: boolean;
 }
 
 /**
@@ -83,6 +86,9 @@ export function buildTypstSettings(
     lineSpacing: settings.lineSpacing || 1,
     linkColor: linkColor ? `#${linkColor}` : null,
     theme: settings.theme,
-    promptGutter: settings.promptGutter
+    promptGutter: settings.promptGutter,
+    hideInputs: settings.hideInputs,
+    hideOutputs: settings.hideOutputs,
+    ansiColors: settings.ansiColors
   };
 }

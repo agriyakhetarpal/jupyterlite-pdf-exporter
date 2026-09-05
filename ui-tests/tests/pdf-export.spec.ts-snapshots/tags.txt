@@ -1,0 +1,1 @@
+Cell tags Cells in this notebook carry the tags that nbconvert and Jupyter Book use to leave things out of an export. The exporter should honour them, in both spellings. In [1]: print('kept-cell-source') kept-cell-output kept-output-of-hidden-input In [3]: print('kept-source-of-hidden-output') The last cell stays. 1

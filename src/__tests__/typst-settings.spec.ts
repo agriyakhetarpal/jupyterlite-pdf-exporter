@@ -21,7 +21,10 @@ const baseSettings: IPdfExportSettings = {
   lineSpacing: 1,
   linkColor: '',
   theme: 'notebook',
-  promptGutter: 'code'
+  promptGutter: 'code',
+  hideInputs: false,
+  hideOutputs: false,
+  ansiColors: true
 };
 
 describe('parseLength', () => {
@@ -64,7 +67,10 @@ describe('buildTypstSettings', () => {
       lineSpacing: 1,
       linkColor: null,
       theme: 'notebook',
-      promptGutter: 'code'
+      promptGutter: 'code',
+      hideInputs: false,
+      hideOutputs: false,
+      ansiColors: true
     });
   });
 
@@ -127,5 +133,17 @@ describe('buildTypstSettings', () => {
     expect(data.tableOfContents).toBe(true);
     expect(data.numberSections).toBe(true);
     expect(data.pageNumbers).toBe(false);
+  });
+
+  it('passes the cell visibility toggles through', () => {
+    const data = buildTypstSettings({
+      ...baseSettings,
+      hideInputs: true,
+      hideOutputs: true,
+      ansiColors: false
+    });
+    expect(data.hideInputs).toBe(true);
+    expect(data.hideOutputs).toBe(true);
+    expect(data.ansiColors).toBe(false);
   });
 });

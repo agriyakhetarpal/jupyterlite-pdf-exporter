@@ -88,19 +88,22 @@ Only the fonts that come bundled with the Typst compiler are available.
 
 Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Typst rule" column shows the rule the setting turns into, in [typst/wrapper.typ](typst/wrapper.typ). This is handy if you would like to read the [Typst](https://typst.app/docs/) and [Callisto](https://github.com/sijow/callisto) documentation, but you do not need to know everything to use the settings.
 
-| Setting           | Key               | What it does                                                                                          | Typst rule                | Example value(s)                      |
-| ----------------- | ----------------- | ----------------------------------------------------------------------------------------------------- | ------------------------- | ------------------------------------- |
-| Page size         | `pageSize`        | Sets the paper size of the PDF                                                                        | `page(paper:)`            | `a4`, `us-letter`                     |
-| Font size         | `fontSize`        | Sets the base text size                                                                               | `text(size:)`             | `10pt`, `12pt`                        |
-| Margins           | `margin`          | Sets the space around the page edges                                                                  | `page(margin:)`           | `{ "top": "2.5cm" }`                  |
-| Main font         | `mainFont`        | Picks the body font from the bundled fonts                                                            | `text(font:)`             | `Libertinus Serif`                    |
-| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                                                          | `page(numbering:)`        | `true` (default)                      |
-| Table of contents | `tableOfContents` | Adds a contents list at the start                                                                     | `outline()`               | `false` (default)                     |
-| Number sections   | `numberSections`  | Adds numbers to headings                                                                              | `heading(numbering:)`     | `false` (default)                     |
-| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                                                        | `par(leading:)`           | `1` (default), `1.5`                  |
-| Link color        | `linkColor`       | Sets the colour used for links                                                                        | `show link`               | `#0F4C81`                             |
-| Theme             | `theme`           | Picks how cells are laid out, from Callisto's built-in themes                                         | `callisto.render(theme:)` | `notebook` (default), `neat`, `plain` |
-| Prompt gutter     | `promptGutter`    | Which cells are indented to make room for the `In [n]:` and `Out[n]:` prompts of the `notebook` theme | `pad(left:)`              | `code` (default), `all`               |
+| Setting           | Key               | What it does                                                                                          | Typst rule                       | Example value(s)                      |
+| ----------------- | ----------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------- | ------------------------------------- |
+| Page size         | `pageSize`        | Sets the paper size of the PDF                                                                        | `page(paper:)`                   | `a4`, `us-letter`                     |
+| Font size         | `fontSize`        | Sets the base text size                                                                               | `text(size:)`                    | `10pt`, `12pt`                        |
+| Margins           | `margin`          | Sets the space around the page edges                                                                  | `page(margin:)`                  | `{ "top": "2.5cm" }`                  |
+| Main font         | `mainFont`        | Picks the body font from the bundled fonts                                                            | `text(font:)`                    | `Libertinus Serif`                    |
+| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                                                          | `page(numbering:)`               | `true` (default)                      |
+| Table of contents | `tableOfContents` | Adds a contents list at the start                                                                     | `outline()`                      | `false` (default)                     |
+| Number sections   | `numberSections`  | Adds numbers to headings                                                                              | `heading(numbering:)`            | `false` (default)                     |
+| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                                                        | `par(leading:)`                  | `1` (default), `1.5`                  |
+| Link color        | `linkColor`       | Sets the colour used for links                                                                        | `show link`                      | `#0F4C81`                             |
+| Theme             | `theme`           | Picks how cells are laid out, from Callisto's built-in themes                                         | `callisto.render(theme:)`        | `notebook` (default), `neat`, `plain` |
+| Prompt gutter     | `promptGutter`    | Which cells are indented to make room for the `In [n]:` and `Out[n]:` prompts of the `notebook` theme | `pad(left:)`                     | `code` (default), `all`               |
+| Hide code inputs  | `hideInputs`      | Leaves the source (inputs) of code cells out and keeps their outputs                                  | `callisto.render(input:)`        | `false` (default)                     |
+| Hide code outputs | `hideOutputs`     | Leaves the outputs of code cells out and keeps their source                                           | `callisto.render(output:)`       | `false` (default)                     |
+| ANSI colours      | `ansiColors`      | Renders the colours that ANSI escape codes in text outputs request, or strips the codes               | `callisto.render(console-text:)` | `true` (default)                      |
 
 The `margin` key takes an object with any of `top`, `bottom`, `left`, and `right`, for example `{ "top": "2.5cm", "bottom": "2.5cm", "left": "2cm", "right": "2cm" }`.
 
@@ -113,6 +116,18 @@ The `theme` key picks one of the themes that come with Callisto:
 Callisto draws the `In[n]:` and `Out[n]:` prompts in the left page margin, which means that they get cut off when the margin is narrower than the prompt; for example, with a large font or a multiple-digit execution count or anything else that forces the prompts to overflow (see [sijow/callisto#22](https://github.com/sijow/callisto/issues/22) for details). To avoid that, the exporter indents cells by the width of the widest prompt in the notebook. By default, only code cells are indented, not Markdown or raw cells. You may set `promptGutter` to `all` to also indent Markdown and raw cells by the same amount, so that every cell in your notebook shares one left edge.
 
 For `linkColor`, the Settings Editor shows a colour picker for ease of use. In `overrides.json` or `jupyter-lite.json`, you can use a HEX value such as `#0F4C81` (with or without the `#`). An invalid value fails the PDF export.
+
+#### Leaving cells out via tags
+
+Besides the `hideInputs` and `hideOutputs` settings, which apply to every code cell, you may also leave out individual cells, or their inputs or outputs, with cell tags. This is based on the conventions associated with [Jupyter Book (v1)](https://jupyterbook.org/en/stable/interactive/hiding.html) and the [nbconvert](https://nbconvert.readthedocs.io/en/latest/removing_cells.html) projects. You may add a tag to a cell from the property inspector available in the right sidebar.
+
+| Tag                                | Effect                                        |
+| ---------------------------------- | --------------------------------------------- |
+| `remove-cell` or `remove_cell`     | Leaves out the whole cell, of any type        |
+| `remove-input` or `remove_input`   | Leaves out the source (inputs) of a code cell |
+| `remove-output` or `remove_output` | Leaves out the outputs of a code cell         |
+
+When the `hideInputs` setting is off and the cell has no `remove-input` tag, the source appears, and likewise for outputs. In that sense, the tags can only hide more than the settings do, not less.
 
 #### An example deployment configuration
 

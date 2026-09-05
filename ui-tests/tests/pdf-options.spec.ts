@@ -36,6 +36,37 @@ const TEST_CASES: {
     }
   },
   {
+    slug: 'opt-hideinputs',
+    title: 'hideInputs: true',
+    settings: { hideInputs: true },
+    check: a => {
+      // The source prints the same phrase as its output, so count the
+      // occurrences, and use the comment in the result cell as a marker
+      // that only exists in source
+      expect(a.text).not.toContain('A result gets an Out prompt');
+      expect(a.text.split('output from a code cell').length - 1).toBe(1);
+      // Only In prompts go with the inputs. A result keeps its Out prompt
+      expect(a.text).not.toContain('In [');
+      expect(a.text).toContain('Out[2]:');
+    }
+  },
+  {
+    slug: 'opt-hideoutputs',
+    title: 'hideOutputs: true',
+    settings: { hideOutputs: true },
+    check: a => {
+      expect(a.text).toContain('A result gets an Out prompt');
+      expect(a.text.split('output from a code cell').length - 1).toBe(1);
+      expect(a.text).toContain('In [2]:');
+      expect(a.text).not.toContain('Out[');
+    }
+  },
+  {
+    slug: 'opt-ansicolors-off',
+    title: 'ansiColors: false',
+    settings: { ansiColors: false }
+  },
+  {
     slug: 'opt-theme-neat',
     title: 'theme: neat',
     settings: { theme: 'neat' },

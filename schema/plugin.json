@@ -126,6 +126,24 @@
         { "const": "all", "title": "All cells (Code, Markdown, Raw)" }
       ],
       "default": "code"
+    },
+    "hideInputs": {
+      "title": "Hide code inputs",
+      "description": "Leave the source of code cells out of the PDF and keep their outputs.",
+      "type": "boolean",
+      "default": false
+    },
+    "hideOutputs": {
+      "title": "Hide code outputs",
+      "description": "Leave the outputs of code cells out of the PDF and keep their source.",
+      "type": "boolean",
+      "default": false
+    },
+    "ansiColors": {
+      "title": "ANSI colours",
+      "description": "Render the colours and styles that ANSI escape codes in text outputs ask for, such as in tracebacks. Turn off to strip the codes and print plain text.",
+      "type": "boolean",
+      "default": true
     }
   },
   "additionalProperties": false
