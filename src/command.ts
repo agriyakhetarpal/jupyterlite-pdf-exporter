@@ -51,7 +51,7 @@ function findExportSubmenu(mainMenu: IMainMenu): Menu | null {
 /**
  * A JupyterFrontEndPlugin that adds an "Export Notebook to PDF" command for
  * JupyterLab and Jupyter Notebook. It reads the active notebook and runs the same
- * Pandoc and Typst pipeline used by the JupyterLite exporter.
+ * Typst pipeline used by the JupyterLite exporter.
  *
  * In JupyterLite, the native "Save and Export Notebook As" menu already offers PDF
  * export, so we skip this command there to avoid duplicating. We detect JupyterLite
@@ -92,7 +92,7 @@ export const commandPlugin: JupyterFrontEndPlugin<void> = {
               'Save and Export Notebook: PDF (via jupyterlite-pdf-exporter)'
             ),
       caption: trans.__(
-        'Export the current notebook to a PDF in the browser using Pandoc and Typst, with neither a LaTeX distribution nor a server needed'
+        'Export the current notebook to a PDF in the browser using Typst, with neither a LaTeX distribution nor a server needed'
       ),
       describedBy: {
         args: {
