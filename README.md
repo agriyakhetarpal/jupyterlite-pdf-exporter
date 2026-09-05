@@ -181,20 +181,20 @@ Then rebuild your JupyterLite distribution and open it in the browser via `jupyt
 
 ## License
 
-The source code is licensed under the terms of the BSD-3-Clause "New" or "Revised" License (`BSD-3-Clause`; see the [LICENSE](LICENSE.txt) file for details).
+The source code and binaries are licensed under the terms of the BSD-3-Clause "New" or "Revised" License. Please see the [LICENSE](LICENSE.txt) file for details.
 
-> [!IMPORTANT]
-> However, the source distribution and wheel for this extension on PyPI are licensed under the terms of the GNU General Public License version 2.0 (GPL-2.0) or later (`GPL-2.0-or-later`). Please see the [Pandoc license file](LICENSE-PANDOC.txt) for details.
+Here is a table of the licenses of the dependencies bundled by this extension. The Typst packages are Callisto and its dependencies, which are fetched from the [Typst package registry](https://typst.app/universe/).
 
-The WebAssembly/JavaScript distribution of Typst, `@myriaddreamin/typst-all-in-one`, is licensed under the terms of the Apache License 2.0 (`Apache-2.0`). Please see the [Typst license file](LICENSE-TYPST.txt) for details.
+| Component                                                                                                                                       | License      | File                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------- |
+| [`@myriaddreamin/typst-all-in-one.ts`](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one.ts), the WebAssembly distribution of Typst | `Apache-2.0` | [LICENSE-TYPST.txt](LICENSE-TYPST.txt)                          |
+| [Callisto](https://github.com/sijow/callisto)                                                                                                   | `MIT`        | [LICENSE-callisto.txt](typst-packages/LICENSE-callisto.txt)     |
+| [cmarker](https://github.com/SabrinaJewson/cmarker.typ)                                                                                         | `MIT`        | [LICENSE-cmarker.txt](typst-packages/LICENSE-cmarker.txt)       |
+| [MiTeX](https://github.com/mitex-rs/mitex)                                                                                                      | `Apache-2.0` | [LICENSE-mitex.txt](typst-packages/LICENSE-mitex.txt)           |
+| [based](https://github.com/EpicEricEE/typst-based)                                                                                              | `MIT`        | [LICENSE-based.txt](typst-packages/LICENSE-based.txt)           |
+| [percencode](https://github.com/Servostar/typst-percencode)                                                                                     | `MIT`        | [LICENSE-percencode.txt](typst-packages/LICENSE-percencode.txt) |
 
-### Why?
-
-The WebAssembly distribution of Pandoc, through its dependency on the `pandoc-wasm` project on the `npm` package registry, is licensed under the terms of the GNU General Public License version 2.0 (`GPL-2.0-or-later`). Binary distributions of this extension bundle the `pandoc.wasm` file, and as a result, are regarded as derivative works of the WebAssembly distribution of Pandoc.
-
-### More details
-
-For an overview of the licenses of all the JavaScript dependencies of this extension at runtime, please navigate to your JupyterLite deployment > "Help" menu > "Licenses" after installing and rebuilding it.
+For an overview of the licenses of all the JavaScript dependencies of this extension at runtime, please navigate to your Jupyter deployment > "Help" menu > "Licenses".
 
 ## Thanks 💛
 
