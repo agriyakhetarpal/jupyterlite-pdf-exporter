@@ -95,6 +95,38 @@ describe('buildTypstWrapper', () => {
     ).toContain('rgb("#0F4C81")');
   });
 
+  it('accepts every Typst length unit', () => {
+    for (const size of ['12pt', '3mm', '2.5cm', '1in', '1.2em', '.5cm']) {
+      expect(buildTypstWrapper({ ...baseSettings, fontSize: size })).toContain(
+        `size: ${size}`
+      );
+    }
+  });
+
+  it('rejects lengths that are not a number with a unit', () => {
+    expect(() =>
+      buildTypstWrapper({ ...baseSettings, fontSize: '10pt); #while true {}' })
+    ).toThrow(/Invalid font size/);
+    expect(() =>
+      buildTypstWrapper({
+        ...baseSettings,
+        margin: { ...baseSettings.margin, left: 'wide' }
+      })
+    ).toThrow(/Invalid left margin/);
+  });
+
+  it('rejects a line spacing that is not a positive number', () => {
+    expect(() =>
+      buildTypstWrapper({ ...baseSettings, lineSpacing: -1 })
+    ).toThrow(/Invalid line spacing/);
+  });
+
+  it('does not run Typst code from Markdown', () => {
+    expect(buildTypstWrapper(baseSettings)).toContain(
+      'cmarker: (raw-typst: false)'
+    );
+  });
+
   it('rejects a link color that is not hex', () => {
     expect(() =>
       buildTypstWrapper({ ...baseSettings, linkColor: 'blue' })

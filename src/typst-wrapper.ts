@@ -48,8 +48,21 @@ function typstString(value: string): string {
 }
 
 /**
- * Normalise a colour to "#rrggbb" form, or throw if it is not a hex colour.
+ * Check that a value is a Typst length such as "2.5cm".
+ * @param value - the length to check
+ * @param name - what the value is, for the error message
+ * @returns the trimmed length
+ * @throws if the value is not a length with a unit
  */
+function typstLength(value: string, name: string): string {
+  const length = value.trim();
+  if (!/^\d*\.?\d+(pt|mm|cm|in|em)$/.test(length)) {
+    throw new Error(
+      `Invalid ${name} "${value}". Expected a length such as "12pt" or "2.5cm"`
+    );
+  }
+  return length;
+}
 
 /**
  * Normalise a colour to "#rrggbb" form.
@@ -86,7 +99,9 @@ export function buildTypstWrapper(
   }
   const margin = (['top', 'bottom', 'left', 'right'] as const)
     .filter(side => settings.margin?.[side])
-    .map(side => `${side}: ${settings.margin[side]}`);
+    .map(
+      side => `${side}: ${typstLength(settings.margin[side], `${side} margin`)}`
+    );
   if (margin.length > 0) {
     page.push(`margin: (${margin.join(', ')})`);
   }
@@ -98,16 +113,18 @@ export function buildTypstWrapper(
     text.push(`font: ${typstString(settings.mainFont)}`);
   }
   if (settings.fontSize) {
-    text.push(`size: ${settings.fontSize}`);
+    text.push(`size: ${typstLength(settings.fontSize, 'font size')}`);
   }
   if (text.length > 0) {
     lines.push(`#set text(${text.join(', ')})`);
   }
 
-  const leading =
-    settings.lineSpacing && settings.lineSpacing !== 1
-      ? settings.lineSpacing
-      : 1;
+  const leading = settings.lineSpacing || 1;
+  if (!Number.isFinite(leading) || leading <= 0) {
+    throw new Error(
+      `Invalid line spacing "${settings.lineSpacing}". Expected a positive number`
+    );
+  }
   lines.push(`#set par(justify: true, leading: ${leading} * 0.65em)`);
 
   if (settings.linkColor.trim()) {
@@ -128,6 +145,8 @@ export function buildTypstWrapper(
     `  nb: path(${typstString(notebookPath)}),`,
     `  theme: ${typstString(settings.theme)},`,
     '  ignore-wrong-format: true,',
+    // Markdown can carry Typst code in HTML comments. Do not run it
+    '  cmarker: (raw-typst: false),',
     '  handlers: ("image-markdown": image-markdown),',
     ')',
     ''

@@ -22,6 +22,7 @@
       "title": "Font size",
       "description": "The base text size. Include the unit, for example \"10pt\" or \"12pt\". Leave empty to use the default.",
       "type": "string",
+      "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
       "default": "10pt"
     },
     "margin": {
@@ -29,10 +30,30 @@
       "description": "The space around the page edges. Include the unit, for example \"2cm\". Leave a field empty to use the default for that side.",
       "type": "object",
       "properties": {
-        "top": { "title": "Top", "type": "string", "default": "2.5cm" },
-        "bottom": { "title": "Bottom", "type": "string", "default": "2.5cm" },
-        "left": { "title": "Left", "type": "string", "default": "2cm" },
-        "right": { "title": "Right", "type": "string", "default": "2cm" }
+        "top": {
+          "title": "Top",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2.5cm"
+        },
+        "bottom": {
+          "title": "Bottom",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2.5cm"
+        },
+        "left": {
+          "title": "Left",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2cm"
+        },
+        "right": {
+          "title": "Right",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2cm"
+        }
       },
       "additionalProperties": false,
       "default": {

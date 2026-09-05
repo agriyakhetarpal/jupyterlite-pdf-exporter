@@ -107,6 +107,16 @@ describe('preprocessNotebook', () => {
     expect(firstOutput(notebook).data).toEqual({ 'text/plain': 'Map' });
   });
 
+  it('drops Typst source outputs so they are not evaluated', () => {
+    const notebook = notebookWith({
+      output_type: 'display_data',
+      data: { 'text/vnd.typst': '#while true {}', 'text/plain': 'x' },
+      metadata: {}
+    });
+    preprocessNotebook(notebook);
+    expect(firstData(notebook)).toEqual({ 'text/plain': 'x' });
+  });
+
   it('adds a placeholder when nothing can be rendered', () => {
     const notebook = notebookWith({
       output_type: 'display_data',

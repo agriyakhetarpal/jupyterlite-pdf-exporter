@@ -12,7 +12,6 @@ import type {
  * A list of MIME types that Callisto can render
  */
 const RENDERABLE_MIME_TYPES = new Set([
-  'text/vnd.typst',
   'image/svg+xml',
   'image/png',
   'image/jpeg',
@@ -106,6 +105,10 @@ export function preprocessNotebook(notebook: INotebookContent): void {
       if (data === undefined) {
         continue;
       }
+
+      // Callisto would evaluate this as Typst code, so leave it to the
+      // plain text fallback
+      delete data['text/vnd.typst'];
 
       const html = asString(data['text/html']);
       if (html !== undefined) {
