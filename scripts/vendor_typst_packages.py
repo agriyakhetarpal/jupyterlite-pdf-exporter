@@ -14,6 +14,7 @@ import urllib.request
 from pathlib import Path
 
 # Keep in sync with src/typst-packages.ts
+# Keep in sync with src/typst-wrapper.ts
 PACKAGES = {
     "callisto": "0.3.0",
     "cmarker": "0.1.10",

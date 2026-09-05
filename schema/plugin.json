@@ -84,6 +84,17 @@
       "type": "string",
       "format": "color",
       "default": "#0000ee"
+    },
+    "theme": {
+      "title": "Theme",
+      "description": "How cells are laid out. \"Neat\" is a clean document look, \"Notebook\" adds In/Out prompts like the Jupyter interface, and \"Plain\" applies no styling.",
+      "type": "string",
+      "oneOf": [
+        { "const": "neat", "title": "Neat" },
+        { "const": "notebook", "title": "Notebook" },
+        { "const": "plain", "title": "Plain" }
+      ],
+      "default": "neat"
     }
   },
   "additionalProperties": false
