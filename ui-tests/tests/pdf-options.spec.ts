@@ -36,6 +36,32 @@ const TEST_CASES: {
     }
   },
   {
+    slug: 'opt-hideinputs',
+    title: 'hideInputs: true',
+    settings: { hideInputs: true },
+    check: a => {
+      // The source prints the same phrase as its output, so count the
+      // occurrences. pdf.js splits highlighted source into tokens, so
+      // match a bare word for the source itself
+      expect(a.text).not.toContain('print');
+      expect(a.text.split('output from a code cell').length - 1).toBe(1);
+    }
+  },
+  {
+    slug: 'opt-hideoutputs',
+    title: 'hideOutputs: true',
+    settings: { hideOutputs: true },
+    check: a => {
+      expect(a.text).toContain('print');
+      expect(a.text.split('output from a code cell').length - 1).toBe(1);
+    }
+  },
+  {
+    slug: 'opt-ansicolors-off',
+    title: 'ansiColors: false',
+    settings: { ansiColors: false }
+  },
+  {
     slug: 'opt-theme-neat',
     title: 'theme: neat',
     settings: { theme: 'neat' },
