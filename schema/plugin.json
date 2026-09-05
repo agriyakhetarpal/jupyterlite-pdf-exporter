@@ -3,7 +3,7 @@
   "jupyter.lab.setting-icon": "ui-components:pdf",
   "jupyter.lab.setting-icon-label": "JupyterLite PDF Exporter",
   "title": "JupyterLite PDF Exporter",
-  "description": "Settings for the JupyterLite PDF exporter. These control the look and feel of the exported PDFs via Pandoc template variable mappings.",
+  "description": "Settings for the JupyterLite PDF exporter. These control the look and feel of the exported PDFs.",
   "type": "object",
   "properties": {
     "pageSize": {

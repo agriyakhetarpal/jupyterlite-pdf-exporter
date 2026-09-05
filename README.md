@@ -10,7 +10,7 @@
 | PyPI downloads | [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=total&units=NONE&left_color=GREY&right_color=ORANGE&left_text=all%20time)](https://pepy.tech/projects/jupyterlite-pdf-exporter) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=weekly&units=NONE&left_color=GREY&right_color=ORANGE&left_text=weekly)](https://pepy.tech/projects/jupyterlite-pdf-exporter) [![PyPI Downloads](https://static.pepy.tech/personalized-badge/jupyterlite-pdf-exporter?period=monthly&units=NONE&left_color=GREY&right_color=ORANGE&left_text=monthly)](https://pepy.tech/projects/jupyterlite-pdf-exporter) |
 | conda package  | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/jupyterlite-pdf-exporter.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter) [![Recipe](https://img.shields.io/badge/recipe-jupyterlite--pdf--exporter-green.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter) [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/jupyterlite-pdf-exporter.svg)](https://anaconda.org/conda-forge/jupyterlite-pdf-exporter)                                                                                                                                                                                                                       |
 
-A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on WebAssembly distributions of [Pandoc](https://pandoc.org/app) and [Typst](https://typst.org/).
+A serverless PDF exporter for JupyterLite, JupyterLab, and Jupyter Notebook, based on a WebAssembly distribution of [Typst](https://typst.org/) and the [Callisto](https://typst.app/universe/package/callisto) Typst package.
 
 - This Jupyter extension registers a PDF exporter with [JupyterLite's `INbConvertExporters` interface](https://jupyterlite.readthedocs.io/en/stable/howto/extensions/custom-exporters.html).
 - In JupyterLab and Jupyter Notebook, it adds an "Export Notebook to PDF" command to the File menu and the command palette.
@@ -23,8 +23,8 @@ The usual way to convert a notebook into a PDF is `nbconvert` driving a LaTeX di
 
 This extension provides a different mechanism to export notebooks to PDF that runs entirely in your browser:
 
-1. [Pandoc](https://pandoc.org/), compiled to WebAssembly, converts the notebook to a [Typst](https://typst.org/) markup IR (intermediate representation).
-2. The Typst compiler, a modern typesetting system that stands in for LaTeX and is also compiled to WebAssembly, renders that IR into a PDF.
+1. [Callisto](https://typst.app/universe/package/callisto), a Typst package, reads the notebook and turns each cell into Typst content. Markdown cells are converted via [cmarker](https://github.com/SabrinaJewson/cmarker.typ), LaTeX math is converted via [MiTeX](https://github.com/mitex-rs/mitex). Rich outputs such as images, tables, and formatted text are also supported.
+2. The [Typst](https://typst.org/) compiler, a modern typesetting system that stands in for LaTeX and is compiled to WebAssembly, renders that content into a PDF.
 
 ## Installation
 
@@ -61,7 +61,7 @@ In both JupyterLab and JupyterLite environments, the entry point to usage lives 
     This extension does not depend on or enforce a particular version of JupyterLite or JupyterLab, but please note that cutting-edge versions of JupyterLite, JupyterLab, and Jupyter Notebook may introduce breaking changes. If you face any troubles, please [file an issue](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues/new/choose)!
 
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
-- The extension relies on WebAssembly distributions of Pandoc and Typst. These distributions are quite large (over 50 MiB) and may take some time to download and initialise when the extension is first used. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
+- The extension relies on a WebAssembly distribution of Typst. It is quite large (about 40 MiB on disk, or about 15 MiB when sent compressed over the network) and may take some time to download and initialise when the extension is first used. The distribution also bundles the Typst packages it needs to function. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
 
 ### JupyterLite
 
@@ -86,21 +86,28 @@ To change the settings for yourself, open the "Settings Editor" from the "Settin
 
 Only the fonts that come bundled with the Typst compiler are available.
 
-Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Pandoc mapping" column shows where the value ends up. A "variable" is passed as a [Pandoc template variable](https://pandoc.org/MANUAL.html#variables) and an "option" is a top-level [Pandoc option](https://pandoc.org/MANUAL.html#general-options). You do not need to know these to use the settings, but they are handy if you want to read the Pandoc and Typst docs.
+Here is a table of what each setting changes. The "Key" column is the name you write in `overrides.json` or in `settingsOverrides`. The "Typst rule" column shows the rule the setting turns into. This is handy if you would like to read the [Typst](https://typst.app/docs/) and [Callisto](https://github.com/sijow/callisto) documentation, but you do not need to know everything to use the settings.
 
-| Setting           | Key               | What it does                               | Pandoc mapping             | Example value(s)     |
-| ----------------- | ----------------- | ------------------------------------------ | -------------------------- | -------------------- |
-| Page size         | `pageSize`        | Sets the paper size of the PDF             | variable `papersize`       | `a4`, `us-letter`    |
-| Font size         | `fontSize`        | Sets the base text size                    | variable `fontsize`        | `10pt`, `12pt`       |
-| Margins           | `margin`          | Sets the space around the page edges       | variable `margin`          | `{ "top": "2.5cm" }` |
-| Main font         | `mainFont`        | Picks the body font from the bundled fonts | variable `mainfont`        | `Libertinus Serif`   |
-| Page numbers      | `pageNumbers`     | Turns page numbers on or off               | variable `page-numbering`  | `true` (default)     |
-| Table of contents | `tableOfContents` | Adds a contents list at the start          | option `table-of-contents` | `false` (default)    |
-| Number sections   | `numberSections`  | Adds numbers to headings                   | option `number-sections`   | `false` (default)    |
-| Line spacing      | `lineSpacing`     | Sets the spacing between lines             | variable `linestretch`     | `1` (default), `1.5` |
-| Link color        | `linkColor`       | Sets the colour used for links             | variable `linkcolor`       | `#0F4C81`            |
+| Setting           | Key               | What it does                                                  | Typst rule                | Example value(s)                      |
+| ----------------- | ----------------- | ------------------------------------------------------------- | ------------------------- | ------------------------------------- |
+| Page size         | `pageSize`        | Sets the paper size of the PDF                                | `page(paper:)`            | `a4`, `us-letter`                     |
+| Font size         | `fontSize`        | Sets the base text size                                       | `text(size:)`             | `10pt`, `12pt`                        |
+| Margins           | `margin`          | Sets the space around the page edges                          | `page(margin:)`           | `{ "top": "2.5cm" }`                  |
+| Main font         | `mainFont`        | Picks the body font from the bundled fonts                    | `text(font:)`             | `Libertinus Serif`                    |
+| Page numbers      | `pageNumbers`     | Turns page numbers on or off                                  | `page(numbering:)`        | `true` (default)                      |
+| Table of contents | `tableOfContents` | Adds a contents list at the start                             | `outline()`               | `false` (default)                     |
+| Number sections   | `numberSections`  | Adds numbers to headings                                      | `heading(numbering:)`     | `false` (default)                     |
+| Line spacing      | `lineSpacing`     | Sets the spacing between lines                                | `par(leading:)`           | `1` (default), `1.5`                  |
+| Link color        | `linkColor`       | Sets the colour used for links                                | `show link`               | `#0F4C81`                             |
+| Theme             | `theme`           | Picks how cells are laid out, from Callisto's built-in themes | `callisto.render(theme:)` | `notebook` (default), `neat`, `plain` |
 
 The `margin` key takes an object with any of `top`, `bottom`, `left`, and `right`, for example `{ "top": "2.5cm", "bottom": "2.5cm", "left": "2cm", "right": "2cm" }`.
+
+The `theme` key picks one of the themes that come with Callisto:
+
+- The `notebook` theme is the default and it closely resembles the Jupyter interface, with `In [n]:` and `Out[n]:` prompts next to each cell.
+- The `neat` theme keeps the cell styling but drops the prompts, which reads more like a document.
+- The `plain` theme does not apply any styling to the cells.
 
 For `linkColor`, the Settings Editor shows a colour picker for ease of use. In `overrides.json` or `jupyter-lite.json`, you can use a HEX value such as `#0F4C81` (with or without the `#`). An invalid value fails the PDF export.
 
@@ -118,6 +125,7 @@ Each key goes under the plugin ID `jupyterlite-pdf-exporter:plugin`. Here is a f
     "numberSections": true,
     "lineSpacing": 1.15,
     "linkColor": "#0F4C81",
+    "theme": "neat",
     "margin": {
       "top": "3cm",
       "bottom": "3cm",
