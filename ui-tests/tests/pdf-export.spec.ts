@@ -59,7 +59,9 @@ const FIXTURES: {
       for (const symbol of ['∇', '𝜕', '𝜀', '𝜇', 'ℏ', 'Ψ', '∮', '∬']) {
         expect(r.text).toContain(symbol);
       }
-      expect(r.text).not.toContain('\\nabla');
+      // The source cells contain the LaTeX, so check for the wrapper that
+      // IPython.display.Math puts around a text/latex output instead
+      expect(r.text).not.toContain('displaystyle');
     }
   },
   {

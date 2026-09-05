@@ -72,7 +72,7 @@ export async function exportNotebook(
 
   expect(pdf.subarray(0, 5).toString('latin1')).toBe('%PDF-');
 
-  const analysis = await analysePdf(page.context(), pdf);
+  const analysis = await analysePdf(pdf);
 
   // Write the metadata for the test report
   fs.writeFileSync(path.join(OUTPUT_DIR, `${slug}.txt`), analysis.text);
@@ -95,7 +95,7 @@ export async function exportNotebook(
   );
 
   expect.soft(analysis.text).toMatchSnapshot(`${slug}.txt`);
-  analysis.snapshots.forEach((png, index) => {
+  analysis.pages.forEach((png, index) => {
     expect.soft(png).toMatchSnapshot(`${slug}-page-${index + 1}.png`);
   });
 
