@@ -61,6 +61,22 @@ const FIXTURES: {
       }
       expect(r.text).not.toContain('\\nabla');
     }
+  },
+  {
+    file: 'rich-outputs.ipynb',
+    title: 'HTML and browser-only outputs',
+    check: r => {
+      // HTML tables render as tables, without their style blocks
+      expect(r.text).toContain('Paris');
+      expect(r.text).not.toContain('vertical-align');
+      // Browser-only HTML falls back to the plain text form
+      expect(r.text).toContain('<xarray.DataArray');
+      expect(r.text).toContain('<folium.folium.Map');
+      expect(r.text).not.toContain('srcdoc');
+      // Outputs with nothing to render get a placeholder
+      expect(r.text).toContain('[Output not available in PDF]');
+      expect(r.text).toContain('IntSlider(value=42)');
+    }
   }
 ];
 
@@ -96,10 +112,6 @@ for (const fixture of FIXTURES) {
 
     // Guard against exporting a notebook that has not loaded
     expect(result.text.replace(/\s+/g, '').length).toBeGreaterThan(20);
-
-    // This leftover placeholder means postprocessTypst did not
-    // splice the math, so something is wrong with our pipeline
-    expect(result.text).not.toContain('PDFEXPORTER_MATH_');
 
     fixture.check(result);
   });

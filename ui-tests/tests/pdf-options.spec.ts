@@ -23,6 +23,16 @@ const TEST_CASES: {
       // A4 := 595.28 x 841.89 pt
       expect(a.width).toBe(595);
       expect(a.height).toBe(842);
+      // The notebook theme shows cell prompts
+      expect(a.text).toContain('In [1]:');
+    }
+  },
+  {
+    slug: 'opt-theme-neat',
+    title: 'theme: neat',
+    settings: { theme: 'neat' },
+    check: a => {
+      expect(a.text).not.toContain('In [1]:');
     }
   },
   {
