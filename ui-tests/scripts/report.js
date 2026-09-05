@@ -15,6 +15,9 @@
  * - diff: the difference between the two; and
  * - slider: a slider to compare expected and actual; and
  * - onion: an onion skin view.
+ *
+ * When a card's preview opens the lightbox, the arrow keys and a pager in
+ * the header move through the pages of the exported PDF.
  */
 
 (function () {
@@ -356,6 +359,10 @@
   var lightboxDivider = document.getElementById('lightbox-divider');
   var lightboxFooter = document.getElementById('lightbox-footer');
   var lightboxRange = document.getElementById('lightbox-range');
+  var lightboxPager = document.getElementById('lightbox-pager');
+  var lightboxPage = document.getElementById('lightbox-page');
+  var lightboxPrev = document.getElementById('lightbox-prev');
+  var lightboxNext = document.getElementById('lightbox-next');
   var modeButtons = [].slice.call(
     lightboxModes.querySelectorAll('[data-mode]')
   );
@@ -364,6 +371,20 @@
   // or by "image" if we are not doing a comparison
   var lightboxImages = {};
   var lightboxMode = 'image';
+
+  // The page renders of an export, and the one on show
+  var lightboxPages = [];
+  var lightboxPageIndex = 0;
+
+  function showPage(index) {
+    lightboxPageIndex = Math.max(0, Math.min(index, lightboxPages.length - 1));
+    lightboxImages.image = lightboxPages[lightboxPageIndex];
+    lightboxBase.src = lightboxImages.image;
+    lightboxPage.textContent =
+      'Page ' + (lightboxPageIndex + 1) + ' of ' + lightboxPages.length;
+    lightboxPrev.disabled = lightboxPageIndex === 0;
+    lightboxNext.disabled = lightboxPageIndex === lightboxPages.length - 1;
+  }
 
   function blends() {
     return lightboxMode === 'slider' || lightboxMode === 'onion';
@@ -416,6 +437,8 @@
 
   function openLightbox(options) {
     lightboxImages = options.images;
+    lightboxPages = options.pages || [];
+    lightboxPager.hidden = lightboxPages.length < 2;
     lightboxTitle.textContent = options.title;
     lightboxSubtitle.textContent = options.subtitle || '';
     lightboxPdf.hidden = !options.pdf;
@@ -432,6 +455,7 @@
     });
 
     setMode(comparable ? options.mode || 'slider' : 'image');
+    if (lightboxPages.length) showPage(0);
     lightbox.showModal();
   }
 
@@ -458,9 +482,17 @@
         });
       } else {
         var pdf = card && card.querySelector('.pdf-card-pdf');
+        var pages = [el.querySelector('img').getAttribute('src')];
+        var more = card && card.querySelector('.pdf-card-more-pages');
+        if (more) {
+          [].forEach.call(more.content.querySelectorAll('img'), function (img) {
+            pages.push(img.getAttribute('src'));
+          });
+        }
         openLightbox({
           title: title,
-          images: { image: el.querySelector('img').getAttribute('src') },
+          images: { image: pages[0] },
+          pages: pages,
           pdf: pdf ? pdf.getAttribute('href') : ''
         });
       }
@@ -473,6 +505,12 @@
     });
   });
   lightboxRange.addEventListener('input', applyRange);
+  lightboxPrev.addEventListener('click', function () {
+    showPage(lightboxPageIndex - 1);
+  });
+  lightboxNext.addEventListener('click', function () {
+    showPage(lightboxPageIndex + 1);
+  });
   document
     .getElementById('lightbox-close')
     .addEventListener('click', function () {
@@ -484,10 +522,16 @@
   });
   lightbox.addEventListener('keydown', function (event) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-    if (lightboxModes.hidden || event.target === lightboxRange) return;
+    if (event.target === lightboxRange) return;
+    var step = event.key === 'ArrowRight' ? 1 : -1;
+    if (!lightboxPager.hidden) {
+      showPage(lightboxPageIndex + step);
+      event.preventDefault();
+      return;
+    }
+    if (lightboxModes.hidden) return;
     var modes = availableModes();
     var index = modes.indexOf(lightboxMode);
-    var step = event.key === 'ArrowRight' ? 1 : -1;
     setMode(modes[(index + step + modes.length) % modes.length]);
     event.preventDefault();
   });

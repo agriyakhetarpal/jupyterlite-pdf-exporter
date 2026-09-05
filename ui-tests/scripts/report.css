@@ -97,6 +97,23 @@
   border-color: var(--color-accent-fg);
 }
 
+/* How many pages the lightbox can page through, on multi-page exports */
+.pdf-card-preview {
+  position: relative;
+}
+
+.pdf-card-pages {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: rgb(0 0 0 / 65%);
+  color: #fff;
+  font-size: 11px;
+  line-height: 16px;
+}
+
 .pdf-card-no-preview {
   margin-top: 10px;
   padding: 24px 8px;
@@ -315,6 +332,42 @@
 .lightbox-link {
   color: var(--color-accent-fg) !important;
   white-space: nowrap;
+}
+
+.lightbox-pager {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-fg-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.lightbox-pager > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--color-btn-border);
+  border-radius: 6px;
+  background-color: var(--color-btn-bg);
+  color: var(--color-btn-text);
+  cursor: pointer;
+}
+
+.lightbox-pager > button > svg {
+  fill: currentColor;
+}
+
+.lightbox-pager > button:hover:not(:disabled) {
+  background-color: var(--color-btn-hover-bg);
+}
+
+.lightbox-pager > button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .lightbox-close {
