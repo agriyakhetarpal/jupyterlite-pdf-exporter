@@ -25,16 +25,11 @@ const RENDERABLE_MIME_TYPES = new Set([
 ]);
 
 /**
- * HTML that only works in a browser. This can be embedded pages, form controls,
- * scripts, and inline SVG icon sheets such as the ones emitted by xarray and Vega
+ * Elements that only work in a browser. This can be embedded pages, form
+ * controls, scripts, and inline SVG icon sheets such as the ones emitted by
+ * xarray and Vega
  */
-const INTERACTIVE_HTML = /<(iframe|input|script|svg)\b/i;
-
-/**
- * To recognise style blocks that libraries, such as pandas and xarray,
- * ship with their HTML reprs.
- */
-const STYLE_BLOCK = /<style\b[^>]*>[\s\S]*?<\/style>/gi;
+const INTERACTIVE_ELEMENTS = 'iframe, input, script, svg';
 
 /**
  * A placeholder that we show for outputs whose representation is not renderable
@@ -73,14 +68,17 @@ function asString(value: unknown): string | undefined {
  * @returns the cleaned HTML, or undefined if it has nothing to show
  */
 export function sanitizeHtml(html: string): string | undefined {
-  if (INTERACTIVE_HTML.test(html)) {
+  // Parsing as a document never runs scripts, and lets us drop elements
+  // such as the style blocks that pandas ships with its tables
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  if (doc.querySelector(INTERACTIVE_ELEMENTS)) {
     return undefined;
   }
-  const cleaned = html.replace(STYLE_BLOCK, '');
-  if (cleaned.replace(/<[^>]*>/g, '').trim() === '') {
+  doc.querySelectorAll('style').forEach(element => element.remove());
+  if (!doc.body.textContent?.trim()) {
     return undefined;
   }
-  return cleaned;
+  return doc.body.innerHTML;
 }
 
 /**

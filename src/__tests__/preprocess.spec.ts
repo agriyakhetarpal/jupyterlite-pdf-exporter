@@ -43,9 +43,9 @@ describe('sanitizeHtml', () => {
   it('strips style blocks such as the ones pandas emits', () => {
     const html =
       '<div><style scoped>.dataframe { color: red; }</style><table><tr><td>1</td></tr></table></div>';
-    expect(sanitizeHtml(html)).toBe(
-      '<div><table><tr><td>1</td></tr></table></div>'
-    );
+    const cleaned = sanitizeHtml(html);
+    expect(cleaned).not.toContain('<style');
+    expect(cleaned).toContain('<td>1</td>');
   });
 
   it('drops HTML with embedded pages, form controls, scripts, or inline SVG', () => {
