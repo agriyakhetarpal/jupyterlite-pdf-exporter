@@ -25,10 +25,32 @@ PACKAGES = {
 
 REGISTRY = "https://packages.typst.org/preview"
 TARGET = Path(__file__).resolve().parent.parent / "typst-packages"
+CHECKSUMS = TARGET / "checksums.txt"
+
+
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def check() -> None:
+    """Verify the committed archives against checksums.txt."""
+    failures = 0
+    for line in CHECKSUMS.read_text().splitlines():
+        expected, archive = line.split("  ")
+        status = "OK" if sha256((TARGET / archive).read_bytes()) == expected else "FAILED"
+        failures += status == "FAILED"
+        print(f"{archive}: {status}")
+    if failures:
+        sys.exit(f"{failures} archive(s) do not match checksums.txt")
 
 
 def main() -> None:
+    if "--check" in sys.argv:
+        check()
+        return
+
     TARGET.mkdir(exist_ok=True)
+    checksums = []
     for name, version in PACKAGES.items():
         archive = f"{name}-{version}.tar.gz"
 
@@ -36,6 +58,7 @@ def main() -> None:
             data = response.read()
 
         (TARGET / archive).write_bytes(data)
+        checksums.append(f"{sha256(data)}  {archive}")
 
         with tarfile.open(fileobj=io.BytesIO(data), mode="r:gz") as tar:
             members = {m.name.lstrip("./"): m for m in tar.getmembers()}
@@ -54,8 +77,10 @@ def main() -> None:
 
         (TARGET / f"LICENSE-{name}.txt").write_bytes(text)
 
-        digest = hashlib.sha256(data).hexdigest()[:12]
-        print(f"{archive}: {len(data)} bytes, sha256 {digest}")
+        print(f"{archive}: {len(data)} bytes")
+
+    CHECKSUMS.write_text("\n".join(checksums) + "\n")
+    print(f"wrote {CHECKSUMS.relative_to(TARGET.parent)}")
 
 
 if __name__ == "__main__":
