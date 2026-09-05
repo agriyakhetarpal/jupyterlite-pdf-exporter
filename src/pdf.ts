@@ -1,19 +1,17 @@
 // Copyright (c) Agriya Khetarpal
 // SPDX-License-Identifier: BSD-3-Clause
 
-import { isCode } from '@jupyterlab/nbformat';
+import type { INotebookContent } from '@jupyterlab/nbformat';
 
-import type {
-  IBaseOutput,
-  IMimeBundle,
-  INotebookContent
-} from '@jupyterlab/nbformat';
+import { preprocessNotebook } from './preprocess';
 
 import { pdfExportProgress } from './progress';
 
-import { buildPandocConfig, pdfExportSettings } from './settings';
+import { pdfExportSettings } from './settings';
 
 import { installBundledPackages } from './typst-packages';
+
+import { buildTypstWrapper } from './typst-wrapper';
 
 // Typst compiler creates a global $typst
 declare const $typst: {
@@ -22,31 +20,18 @@ declare const $typst: {
   pdf: (options: { mainFilePath: string }) => Promise<Uint8Array>;
 };
 
-let pandocConvert:
-  | ((
-      options: Record<string, unknown>,
-      stdin: string | null,
-      files: Record<string, string | Blob>
-    ) => Promise<{
-      stdout: string;
-      stderr: string;
-      mediaFiles?: Record<string, string | Blob>;
-    }>)
-  | null = null;
-let pandocLoadingPromise: Promise<void> | null = null;
 let typstLoaded = false;
 let typstLoadingPromise: Promise<void> | null = null;
 
 /**
- * Export a notebook to a PDF using pandoc-wasm and Typst.
+ * Export a notebook to a PDF with Typst and Callisto.
  *
- * The pipeline is as follows:
- * Notebook JSON ➡️ pandoc (ipynb ➡️ typst) ➡️ Typst markup ➡️ typst-ts ➡️ PDF
+ * The notebook is preprocessed, then compiled together with a Typst
+ * wrapper that imports Callisto and applies the user settings.
  *
- * This function should remain free of any JupyterLab or JupyterLite dependency. It
- * takes the notebook content directly so it can be called from both the JupyterLite
- * exporter adapter and the JupyterLab command
- *
+ * This function should remain free of any JupyterLab or JupyterLite dependency.
+ * It takes the notebook content directly so it can be called from both the
+ * JupyterLite exporter adapter and the JupyterLab command.
  *
  * @param notebook The notebook content (nbformat JSON) to export
  * @param path The path to the notebook, used to name the downloaded file
@@ -56,71 +41,26 @@ export async function exportNotebookToPdf(
   path: string
 ): Promise<void> {
   try {
-    // step 1: load both pandoc and typst in parallel on first use
+    // step 1: load Typst and the bundled packages
     pdfExportProgress.start('Preparing PDF export…');
-    await Promise.all([loadPandoc(), loadTypst()]);
+    await loadTypst();
 
-    // step 2: preprocess and convert notebook to Typst via pandoc-wasm
-    pdfExportProgress.update('Converting notebook…');
     // Note to self: preprocessNotebook rewrites outputs in place, so
     // we work  on a copy to leave the caller's notebook untouched.
     const working = structuredClone(notebook);
-    const mathMap = preprocessNotebook(working);
-    const notebookJson = JSON.stringify(working);
-    const files: Record<string, string | Blob> = {
-      'notebook.ipynb': notebookJson
-    };
+    preprocessNotebook(working);
+    const wrapper = buildTypstWrapper(pdfExportSettings.current);
 
-    const { options, variables } = buildPandocConfig(pdfExportSettings.current);
-
-    const result = await pandocConvert!(
-      {
-        from: 'ipynb',
-        to: 'typst',
-        standalone: true,
-        'extract-media': '.',
-        'input-files': ['notebook.ipynb'],
-        ...options,
-        variables
-      },
-      null,
-      files
-    );
-
-    if (result.stderr && result.stderr.includes('ERROR')) {
-      throw new Error(`Pandoc conversion failed: ${result.stderr}`);
-    }
-
-    // step 3: splice converted Typst math back into the Typst source
-    const typstContent =
-      mathMap.size > 0
-        ? await postprocessTypst(result.stdout, mathMap)
-        : result.stdout;
-
-    // step 4: compile the Typst to a PDF
     pdfExportProgress.update('Generating PDF…');
+
+    const encoder = new TextEncoder();
+
     $typst.resetShadow();
-    const typstBytes = new TextEncoder().encode(typstContent);
-    $typst.mapShadow('/main.typ', typstBytes);
-
-    // We also need to map extracted media files (e.g., matplotlib plots) into Typst's filesystem
-    // TODO investigate if there's a more efficient way to pass these through without needing to go
-    // through JS memory, especially for large files
-    // TODO investigate if ipywidgets and other sorts of media work or if we need special handling for them
-    if (result.mediaFiles) {
-      for (const [filename, content] of Object.entries(result.mediaFiles)) {
-        let bytes: Uint8Array;
-        if (content instanceof Blob) {
-          bytes = new Uint8Array(await content.arrayBuffer());
-        } else if (typeof content === 'string') {
-          bytes = new TextEncoder().encode(content);
-        } else {
-          continue;
-        }
-        $typst.mapShadow('/' + filename, bytes);
-      }
-    }
-
+    $typst.mapShadow('/main.typ', encoder.encode(wrapper));
+    $typst.mapShadow(
+      '/notebook.ipynb',
+      encoder.encode(JSON.stringify(working))
+    );
     const pdfData = await $typst.pdf({ mainFilePath: '/main.typ' });
 
     // This should not really happen since we'll at least have the PDF header
@@ -129,7 +69,7 @@ export async function exportNotebookToPdf(
       throw new Error('Typst produced empty PDF output');
     }
 
-    // step 5: download the PDF in the browser
+    // last step: download the PDF in the browser
     const pdfBlob = new Blob([pdfData.buffer as ArrayBuffer], {
       type: 'application/pdf'
     });
@@ -144,32 +84,10 @@ export async function exportNotebookToPdf(
 }
 
 /**
- * Lazy load the pandoc-wasm module. This is a large dependency, so
- * we only want to load it when the user actually tries to export a
- * notebook as PDF for the first time. Subsequent calls should reuse
- * the loaded module.
- * @returns – a promise that resolves when the pandoc-wasm module is loaded.
- */
-async function loadPandoc(): Promise<void> {
-  if (pandocConvert) {
-    return;
-  }
-  if (pandocLoadingPromise) {
-    return pandocLoadingPromise;
-  }
-
-  pandocLoadingPromise = (async () => {
-    const pandocModule = await import('pandoc-wasm');
-    pandocConvert = pandocModule.convert;
-  })();
-
-  return pandocLoadingPromise;
-}
-
-/**
- * Lazy load the Typst compiler module. This package sets the global
- * $typst when imported as a side effect.
- * @returns – a promise that resolves when the Typst compiler is loaded.
+ * Lazy load the Typst compiler and the bundled packages. The compiler is a
+ * large download, so this only happens on the first export. The module sets
+ * the global $typst as a side effect of being imported.
+ * @returns – a promise that resolves when the compiler is ready.
  */
 async function loadTypst(): Promise<void> {
   if (typstLoaded && typeof $typst !== 'undefined') {
@@ -198,165 +116,6 @@ async function loadTypst(): Promise<void> {
   })();
 
   return typstLoadingPromise;
-}
-
-/**
- * A code cell output we can rewrite in place. The nbformat IOutput union pins
- * output_type to fixed literals on each member, which blocks reassigning it, and
- * only some members expose data. We build on IBaseOutput (whose output_type is a
- * plain string) and add an optional data bundle, so we can both read and rewrite
- * output_type and data. Every nbformat IOutput is assignable to this shape, so we
- * can safely view the outputs through it.
- */
-interface IMutableOutput extends IBaseOutput {
-  data?: IMimeBundle;
-}
-
-/**
- * This function pre-processes a notebook object in-place before passing it to
- * Pandoc, and returns a map of placeholder ➡️ LaTeX math content.
- *
- * Pandoc's IPyNB reader maps every MIME type to a pandoc block:
- *   text/latex, text/html ➡️ raw blocks, dropped by the Typst writer
- *   text/plain            ➡️ a code block, the only format that survives
- *
- * The Math outputs are handled via a very janky two-stage workaround, together
- * with postprocessTypst:
- *   1. Each text/latex output is stored in the returned map and
- *      text/plain is overwritten with a unique placeholder string, so
- *      the placeholder survives Pandoc's conversion as a code block.
- *   2. postprocessTypst converts each placeholder's LaTeX to Typst math
- *      by running Pandoc on "$$LATEX$$" (Markdown ➡️ Typst), which
- *      produces a native DisplayMath AST node that the Typst writer
- *      converts via TeXMath, then splices it into the Typst source.
- *
- * IPython.display.Math wraps its LaTeX in "$\displaystyle …$"; that
- * wrapper is stripped before the content is stored.
- *
- * update_display_data outputs are also converted to display_data here,
- * since the nbformat spec does not include update_display_data as a
- * stored output type and Pandoc seems to ignore it?
- */
-function preprocessNotebook(notebook: INotebookContent): Map<string, string> {
-  const mathMap = new Map<string, string>();
-  let counter = 0;
-
-  for (const cell of notebook.cells) {
-    // Only code cells carry outputs. The Array.isArray check also guards
-    // malformed code cells. I don't think this should ever happen, but
-    // Copilot was suggesting it for type safety, so here we are.
-    if (!isCode(cell) || !Array.isArray(cell.outputs)) {
-      continue;
-    }
-
-    // View the outputs through IMutableOutput, so we can rewrite output_type and
-    // the data bundle. Every nbformat IOutput is assignable to this shape.
-    for (const output of cell.outputs as IMutableOutput[]) {
-      if (output.output_type === 'update_display_data') {
-        output.output_type = 'display_data';
-      }
-
-      const data = output.data;
-      const latex = data?.['text/latex'];
-      if (data === undefined || latex === undefined) {
-        continue;
-      }
-
-      // text/latex is stored as a string or a list of strings. Anything
-      // else is not something we can turn into math, so we skip it.
-      const latexString = Array.isArray(latex) ? latex.join('') : latex;
-      if (typeof latexString !== 'string') {
-        continue;
-      }
-      const raw = latexString.trim();
-
-      // IPython.display.Math wraps content in "$\displaystyle …$" (single-dollar,
-      // inline delimiters). Strip the wrapper so we have the bare LaTeX expression.
-      const displayStyleMatch = raw.match(
-        /^\$\\displaystyle\s*([\s\S]*?)\s*\$$/
-      );
-      const mathContent = displayStyleMatch ? displayStyleMatch[1] : raw;
-
-      const placeholder = `PDFEXPORTER_MATH_${counter++}`;
-      mathMap.set(placeholder, mathContent);
-      data['text/plain'] = placeholder;
-      delete data['text/latex'];
-    }
-  }
-
-  return mathMap;
-}
-
-/**
- * This function post-processes Pandoc's Typst output to replace math placeholderswith
- * Typst math.
- *
- * For each placeholder, we:
- *  1. Run Pandoc on "$$LATEX_CONTENT$$" (Markdown with display math) ➡️ Typst.
- *     Pandoc's Markdown reader creates a native DisplayMath AST node from the
- *     $$…$$ delimiters, and the Typst writer then converts it via TeXMath.
- *  2. Find the code block in the Typst source that contains the placeholder
- *     (Pandoc renders text/plain as a fenced raw block: ```\nPLACEHOLDER\n```).
- *  3. Replace that entire code block with the converted Typst math.
- */
-async function postprocessTypst(
-  typstContent: string,
-  mathMap: Map<string, string>
-): Promise<string> {
-  for (const [placeholder, latexContent] of mathMap) {
-    // Convert the LaTeX expression to Typst math using pandoc
-    let typstMath: string;
-    try {
-      const mathResult = await pandocConvert!(
-        { from: 'markdown', to: 'typst', standalone: false },
-        `$$\n${latexContent}\n$$`,
-        {}
-      );
-      typstMath = mathResult.stdout.trim();
-    } catch {
-      // If pandoc cannot convert the expression, fall back to a literal
-      // LaTeX code block so at least the source is visible.
-      typstMath = `\`\`\`latex\n${latexContent}\n\`\`\``;
-    }
-
-    // Pandoc's Typst writer renders a CodeBlock as:
-    //   ```\nCONTENT\n```
-    // Find the fenced block whose content is exactly our placeholder and
-    // replace the whole block (fence lines included) with the Typst math.
-    const idx = typstContent.indexOf(placeholder);
-    if (idx === -1) {
-      continue;
-    }
-
-    const fenceOpen = typstContent.lastIndexOf('`', idx);
-    // Walk back to the start of the opening fence (which is "```")
-    let fenceStart = fenceOpen;
-    while (fenceStart > 0 && typstContent[fenceStart - 1] === '`') {
-      fenceStart--;
-    }
-
-    // Find the closing fence after the placeholder
-    const afterPlaceholder = idx + placeholder.length;
-    const closingFenceStart = typstContent.indexOf('`', afterPlaceholder);
-    if (closingFenceStart === -1) {
-      continue;
-    }
-    let closingFenceEnd = closingFenceStart;
-    while (
-      closingFenceEnd + 1 < typstContent.length &&
-      typstContent[closingFenceEnd + 1] === '`'
-    ) {
-      closingFenceEnd++;
-    }
-
-    typstContent =
-      typstContent.slice(0, fenceStart) +
-      typstMath +
-      '\n' +
-      typstContent.slice(closingFenceEnd + 1);
-  }
-
-  return typstContent;
 }
 
 /**
