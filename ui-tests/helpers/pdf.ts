@@ -1,22 +1,10 @@
 // Copyright (c) Agriya Khetarpal
 // SPDX-License-Identifier: BSD-3-Clause
 
-import * as fs from 'fs';
-import * as path from 'path';
+import { PDFiumLibrary } from '@hyzyla/pdfium';
+import type { PDFiumPage } from '@hyzyla/pdfium';
 
-import type { BrowserContext } from '@playwright/test';
-
-/**
- * A helper to join parts of a path relative to the pdfjs-dist package
- * @param parts Path segments to join
- * @returns The resolved path to the file
- */
-function pdfjsFile(...parts: string[]): string {
-  return path.join(
-    path.dirname(require.resolve('pdfjs-dist/package.json')),
-    ...parts
-  );
-}
+import { PNG } from 'pngjs';
 
 /**
  * The result of analysing a PDF with analysePdf. Contains the page count, text,
@@ -26,134 +14,79 @@ export interface IPdfAnalysis {
   pageCount: number;
   /** Text of every page */
   text: string;
-  /** A PNG render of each page, at the report scale */
+  /** A PNG render of each page */
   pages: Buffer[];
-  /** A PNG render of each page, at the (smaller) snapshot scale */
-  snapshots: Buffer[];
   /** Size in points */
   width: number;
   height: number;
 }
 
 /**
- * Scales at which we rasterise the pages. We have a pretty crisp scale for
- * the previews, OTOH, the reference snapshots are committed to the repo
- * and I want to keep their size manageable. So we use a smaller one for them.
- * Reference: at 1.5, an A4 page is roughly 900 by 1260 pixels
+ * The scale at which pages are rasterised, for both the report and the
+ * committed snapshots. At 2.5, an A4 page is roughly 1490 by 2100 pixels and
+ * a typical page is under 100 KiB as a PNG
  */
-export const REPORT_SCALE = 2.5;
-export const SNAPSHOT_SCALE = 1.5;
+export const RENDER_SCALE = 2.5;
 
 /**
- * Read a PDF with pdf.js
+ * PDFium compiled to WebAssembly, so pages rasterise to the same pixels on
+ * every platform and the snapshots can be generated on any machine. The
+ * library is initialised once and shared by all the tests in the worker.
+ */
+let libraryPromise: Promise<PDFiumLibrary> | null = null;
+
+function library(): Promise<PDFiumLibrary> {
+  libraryPromise ??= PDFiumLibrary.init();
+  return libraryPromise;
+}
+
+/**
+ * Rasterise a page to a PNG at the given scale
+ */
+async function renderPng(page: PDFiumPage, scale: number): Promise<Buffer> {
+  const { data, width, height } = await page.render({
+    scale,
+    render: 'bitmap'
+  });
+  const png = new PNG({ width, height });
+  png.data = Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+  return PNG.sync.write(png);
+}
+
+/**
+ * Read a PDF with PDFium
  */
 export async function analysePdf(
-  context: BrowserContext,
   pdf: Buffer,
-  scales: { report: number; snapshot: number } = {
-    report: REPORT_SCALE,
-    snapshot: SNAPSHOT_SCALE
-  }
+  scale = RENDER_SCALE
 ): Promise<IPdfAnalysis> {
-  const libSource = fs.readFileSync(
-    pdfjsFile('legacy', 'build', 'pdf.mjs'),
-    'utf8'
-  );
-  const workerSource = fs.readFileSync(
-    pdfjsFile('legacy', 'build', 'pdf.worker.mjs'),
-    'utf8'
-  );
-
-  const page = await context.newPage();
+  const document = await (await library()).loadDocument(pdf);
   try {
-    await page.goto('about:blank');
+    const texts: string[] = [];
+    const pages: Buffer[] = [];
+    let width = 0;
+    let height = 0;
 
-    const result = await page.evaluate(
-      async ({ libSource, workerSource, data, scales }) => {
-        const toUrl = (source: string) =>
-          URL.createObjectURL(
-            new Blob([source], { type: 'application/javascript' })
-          );
-
-        const pdfjsLib = (await import(
-          /* webpackIgnore: true */ toUrl(libSource)
-        )) as typeof import('pdfjs-dist');
-        // N.B. Must point somewhere, or PDFWorker.create throws on an opaque
-        // origin. Spawning then fails and pdf.js parses on the main thread
-        pdfjsLib.GlobalWorkerOptions.workerSrc = toUrl(workerSource);
-
-        const bytes = Uint8Array.from(atob(data), c => c.charCodeAt(0));
-        const doc = await pdfjsLib.getDocument({ data: bytes, verbosity: 0 })
-          .promise;
-
-        const render = async (
-          pdfPage: Awaited<ReturnType<typeof doc.getPage>>,
-          scale: number
-        ) => {
-          const viewport = pdfPage.getViewport({ scale });
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.ceil(viewport.width);
-          canvas.height = Math.ceil(viewport.height);
-          const canvasContext = canvas.getContext('2d');
-          if (!canvasContext) {
-            throw new Error('Could not get a 2d canvas context');
-          }
-          await pdfPage.render({ canvasContext, canvas, viewport }).promise;
-          return canvas.toDataURL('image/png').split(',')[1];
-        };
-
-        const texts: string[] = [];
-        const pages: string[] = [];
-        const snapshots: string[] = [];
-        let width = 0;
-        let height = 0;
-
-        for (let i = 1; i <= doc.numPages; i++) {
-          const pdfPage = await doc.getPage(i);
-
-          const content = await pdfPage.getTextContent();
-          texts.push(
-            content.items
-              .map(item => ('str' in item ? item.str : ''))
-              .join(' ')
-              .replace(/\s+/g, ' ')
-              .trim()
-          );
-
-          if (i === 1) {
-            const base = pdfPage.getViewport({ scale: 1 });
-            width = Math.round(base.width);
-            height = Math.round(base.height);
-          }
-
-          pages.push(await render(pdfPage, scales.report));
-          snapshots.push(await render(pdfPage, scales.snapshot));
-        }
-
-        return {
-          pageCount: doc.numPages,
-          texts,
-          pages,
-          snapshots,
-          width,
-          height
-        };
-      },
-      { libSource, workerSource, data: pdf.toString('base64'), scales }
-    );
-
-    const decode = (encoded: string[]) =>
-      encoded.map(p => Buffer.from(p, 'base64'));
+    // The wrapper closes a page after rendering it, so take a fresh page
+    // object for each render
+    for (let index = 0; index < document.getPageCount(); index++) {
+      texts.push(document.getPage(index).getText().replace(/\s+/g, ' ').trim());
+      if (index === 0) {
+        const size = document.getPage(index).getOriginalSize();
+        width = Math.round(size.originalWidth);
+        height = Math.round(size.originalHeight);
+      }
+      pages.push(await renderPng(document.getPage(index), scale));
+    }
 
     return {
-      pageCount: result.pageCount,
-      text: result.texts.join('\n\n'),
-      pages: decode(result.pages),
-      snapshots: decode(result.snapshots),
-      width: result.width,
-      height: result.height
+      pageCount: document.getPageCount(),
+      text: texts.join('\n\n'),
+      pages,
+      width,
+      height
     };
   } finally {
-    await page.close();
+    document.destroy();
   }
 }

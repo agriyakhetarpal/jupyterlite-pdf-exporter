@@ -292,6 +292,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyzyla/pdfium@npm:2.1.13":
+  version: 2.1.13
+  resolution: "@hyzyla/pdfium@npm:2.1.13"
+  checksum: f79b5804874607f661e4d72c3ef8d01c3f199cf84799193b6aacd2e1c25a7630c834e2da6d3bf335889be3b195076c1d7bf0985fca81f805127f412108d84e7e
+  languageName: node
+  linkType: hard
+
 "@iconify/types@npm:^2.0.0":
   version: 2.0.0
   resolution: "@iconify/types@npm:2.0.0"
@@ -1449,129 +1456,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@napi-rs/canvas-android-arm64@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-android-arm64@npm:1.0.6"
-  conditions: os=android & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-darwin-arm64@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-darwin-arm64@npm:1.0.6"
-  conditions: os=darwin & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-darwin-x64@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-darwin-x64@npm:1.0.6"
-  conditions: os=darwin & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-arm-gnueabihf@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-arm-gnueabihf@npm:1.0.6"
-  conditions: os=linux & cpu=arm
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-arm64-gnu@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-arm64-gnu@npm:1.0.6"
-  conditions: os=linux & cpu=arm64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-arm64-musl@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-arm64-musl@npm:1.0.6"
-  conditions: os=linux & cpu=arm64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-riscv64-gnu@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-riscv64-gnu@npm:1.0.6"
-  conditions: os=linux & cpu=riscv64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-x64-gnu@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-x64-gnu@npm:1.0.6"
-  conditions: os=linux & cpu=x64 & libc=glibc
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-linux-x64-musl@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-linux-x64-musl@npm:1.0.6"
-  conditions: os=linux & cpu=x64 & libc=musl
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-win32-arm64-msvc@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-win32-arm64-msvc@npm:1.0.6"
-  conditions: os=win32 & cpu=arm64
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas-win32-x64-msvc@npm:1.0.6":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas-win32-x64-msvc@npm:1.0.6"
-  conditions: os=win32 & cpu=x64
-  languageName: node
-  linkType: hard
-
-"@napi-rs/canvas@npm:^1.0.0":
-  version: 1.0.6
-  resolution: "@napi-rs/canvas@npm:1.0.6"
-  dependencies:
-    "@napi-rs/canvas-android-arm64": 1.0.6
-    "@napi-rs/canvas-darwin-arm64": 1.0.6
-    "@napi-rs/canvas-darwin-x64": 1.0.6
-    "@napi-rs/canvas-linux-arm-gnueabihf": 1.0.6
-    "@napi-rs/canvas-linux-arm64-gnu": 1.0.6
-    "@napi-rs/canvas-linux-arm64-musl": 1.0.6
-    "@napi-rs/canvas-linux-riscv64-gnu": 1.0.6
-    "@napi-rs/canvas-linux-x64-gnu": 1.0.6
-    "@napi-rs/canvas-linux-x64-musl": 1.0.6
-    "@napi-rs/canvas-win32-arm64-msvc": 1.0.6
-    "@napi-rs/canvas-win32-x64-msvc": 1.0.6
-  dependenciesMeta:
-    "@napi-rs/canvas-android-arm64":
-      optional: true
-    "@napi-rs/canvas-darwin-arm64":
-      optional: true
-    "@napi-rs/canvas-darwin-x64":
-      optional: true
-    "@napi-rs/canvas-linux-arm-gnueabihf":
-      optional: true
-    "@napi-rs/canvas-linux-arm64-gnu":
-      optional: true
-    "@napi-rs/canvas-linux-arm64-musl":
-      optional: true
-    "@napi-rs/canvas-linux-riscv64-gnu":
-      optional: true
-    "@napi-rs/canvas-linux-x64-gnu":
-      optional: true
-    "@napi-rs/canvas-linux-x64-musl":
-      optional: true
-    "@napi-rs/canvas-win32-arm64-msvc":
-      optional: true
-    "@napi-rs/canvas-win32-x64-msvc":
-      optional: true
-    canvas:
-      built: true
-    skia-canvas:
-      built: true
-  checksum: e893a136de059e8789f3630f5fe6631c8768b68dd8546dfc056ddd71c47ca69ca7d8ec738c7b7bc64af81c1cb732cedf3dfd7a66c9eb0501d60629d397ba09df
-  languageName: node
-  linkType: hard
-
 "@playwright/test@npm:^1.60.0, @playwright/test@npm:^1.62.1":
   version: 1.62.1
   resolution: "@playwright/test@npm:1.62.1"
@@ -2310,12 +2194,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:*":
+  version: 26.4.1
+  resolution: "@types/node@npm:26.4.1"
+  dependencies:
+    undici-types: ~8.3.0
+  checksum: 1db2b61b2f291c3a8a6e8d4d1a470634911e41047a48ef78d5c2f2c2935e69b362505a85b35004dbea5ee8c091947a951c61dd88605428e3bc5c8a6bf6483524
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^22.0.0":
   version: 22.20.1
   resolution: "@types/node@npm:22.20.1"
   dependencies:
     undici-types: ~6.21.0
   checksum: 03cc6d9941229b13fa9ab4e477d6550e85ed3e3d5f85734c03c84e0c18346d8a7c9f22b93570bb9cb4a44ffa176279f8a7ab3cd328fbdcf5d4e6ec541ce03f21
+  languageName: node
+  linkType: hard
+
+"@types/pngjs@npm:^6.0.5":
+  version: 6.0.5
+  resolution: "@types/pngjs@npm:6.0.5"
+  dependencies:
+    "@types/node": "*"
+  checksum: 132fce25817d47a784ed48aa678332521b0f7e6edbaa76f3fa4e9ca1228078788ae712f99ad4d1a324d9ba0b14829958677eabf3ebef1fb6e120816f433f0cd8
   languageName: node
   linkType: hard
 
@@ -2933,14 +2835,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.20":
-  version: 1.11.21
-  resolution: "dayjs@npm:1.11.21"
-  checksum: f168e00e88c5bf5a1153090f2fb279e0f7b5f0ee332062abfd5c6e2e8e0f1ba27c3f278183d73668cdfeefdd50b1d13346fdc2ace441962fc9ca6363f902ad05
-  languageName: node
-  linkType: hard
-
-"dayjs@npm:^1.11.7":
+"dayjs@npm:^1.11.20, dayjs@npm:^1.11.7":
   version: 1.11.23
   resolution: "dayjs@npm:1.11.23"
   checksum: 2149ddb54548066e892a35099c7d90cba3eb467fe717b5df16f04ff4225e64bd653e14e7b420dd02bcf10566c1879508705798ca604f91c2424cc10de9135e84
@@ -3348,10 +3243,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jupyterlite-pdf-exporter-ui-tests@workspace:."
   dependencies:
+    "@hyzyla/pdfium": 2.1.13
     "@jupyterlab/galata": ^5.0.5
     "@playwright/test": ^1.62.1
     "@types/node": ^22.0.0
-    pdfjs-dist: ^6.2.108
+    "@types/pngjs": ^6.0.5
+    pngjs: ^7.0.0
     typescript: ~5.5.4
   languageName: unknown
   linkType: soft
@@ -3657,18 +3554,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfjs-dist@npm:^6.2.108":
-  version: 6.2.108
-  resolution: "pdfjs-dist@npm:6.2.108"
-  dependencies:
-    "@napi-rs/canvas": ^1.0.0
-  dependenciesMeta:
-    "@napi-rs/canvas":
-      optional: true
-  checksum: 7730968c6f252b5f88df7c67ef4e5caa799e7e0687c3ada3c01164f53846b7e19214b538076b7195537a681748efcecd44738c5923081ddac5b88a57c6abe989
-  languageName: node
-  linkType: hard
-
 "picocolors@npm:^1.1.1":
   version: 1.1.1
   resolution: "picocolors@npm:1.1.1"
@@ -3704,6 +3589,13 @@ __metadata:
   bin:
     playwright: cli.js
   checksum: 1e18e684d97b3d42ac6c80defe676c4c6c85d96394b690407f75b7a9007d8d44d774c9e9c40957a7319ff70a4d4dad103d6362415b81055256b823abe89abdca
+  languageName: node
+  linkType: hard
+
+"pngjs@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "pngjs@npm:7.0.0"
+  checksum: b19a018930d27de26229c1b3ff250b3a25d09caa22cbb0b0459987d91eb0a560a18ab5d67da45a38ed7514140f26d1db58de83c31159ec101f2bb270a3c707f1
   languageName: node
   linkType: hard
 
@@ -4098,6 +3990,13 @@ __metadata:
   version: 6.21.0
   resolution: "undici-types@npm:6.21.0"
   checksum: 46331c7d6016bf85b3e8f20c159d62f5ae471aba1eb3dc52fff35a0259d58dcc7d592d4cc4f00c5f9243fa738a11cfa48bd20203040d4a9e6bc25e807fab7ab3
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~8.3.0":
+  version: 8.3.0
+  resolution: "undici-types@npm:8.3.0"
+  checksum: bdc1d54d8b48f3f2a801f7707a2ad53b76711039dd9a276382d4bdbbded79355574309425096127a42313731bde7a76cc299855fc06872797edd0acbfcef5bc0
   languageName: node
   linkType: hard
 

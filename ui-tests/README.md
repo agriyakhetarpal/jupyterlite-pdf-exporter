@@ -86,9 +86,17 @@ Every export is also compared against reference snapshots committed under
 `tests/<spec>-snapshots/`: the text extracted from the PDF (`<slug>.txt`) and a
 render of each page (`<slug>-page-<n>.png`). We do this to catch content and layout regressions, i.e., both text and visual.
 
-These assertions are present in [helpers/export.ts](./helpers/export.ts).
+These assertions are present in [helpers/export.ts](./helpers/export.ts). The
+pages are rasterised with [PDFium](https://pdfium.googlesource.com/pdfium/) compiled to WebAssembly.
 
-To add or update snapshots, comment on the pull request:
+To add or update snapshots, run the tests with the update flag and commit the
+new files under `tests/<spec>-snapshots/`:
+
+```sh
+jlpm test:update
+```
+
+You may also comment on the pull request:
 
 ```markdown
 bot please update snapshots
@@ -109,9 +117,9 @@ When a snapshot mismatches, you have three places to compare:
 3. After the bot updates the snapshots, GitHub's "Files changed" view shows the
    old and new PNGs with its two-up, swipe, and onion-skin comparisons.
 
-If a bump of `@playwright/test` or `pdfjs-dist` shifts a few pixels, that may be
-enough to make the diff fail and is expected. In such cases, you may ask the bot
-to update the snapshots, and subsequently review the diff.
+If a bump of `@hyzyla/pdfium` shifts a few pixels, that may be enough to make
+the diff fail and is expected. In such cases, update the snapshots and review
+the diff.
 
 ## Create tests
 
