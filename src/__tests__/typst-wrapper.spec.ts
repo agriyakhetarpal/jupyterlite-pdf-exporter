@@ -152,6 +152,15 @@ describe('buildTypstWrapper', () => {
     expect(wrapper).not.toContain('#set heading');
   });
 
+  it('rejects a theme Callisto does not have', () => {
+    expect(() =>
+      buildTypstWrapper({
+        ...baseSettings,
+        theme: 'fancy' as IPdfExportSettings['theme']
+      })
+    ).toThrow(/Unknown theme/);
+  });
+
   it('passes the theme through', () => {
     const wrapper = buildTypstWrapper({ ...baseSettings, theme: 'neat' });
     expect(wrapper).toContain('theme: "neat"');

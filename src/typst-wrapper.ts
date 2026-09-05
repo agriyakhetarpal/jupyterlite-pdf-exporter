@@ -134,6 +134,12 @@ export function buildTypstWrapper(
     lines.push('#set heading(numbering: "1.")');
   }
 
+  if (!['notebook', 'neat', 'plain'].includes(settings.theme)) {
+    throw new Error(
+      `Unknown theme "${settings.theme}". Expected "notebook", "neat", or "plain"`
+    );
+  }
+
   lines.push(FIT_TABLES, IMAGE_HANDLER, '');
 
   if (settings.tableOfContents) {
