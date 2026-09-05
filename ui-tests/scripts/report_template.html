@@ -50,7 +50,11 @@
                 $notice
               </div>
               <div style="flex: auto"></div>
-              <div id="started-at" style="margin-right: 10px" data-iso="$started_at_iso">
+              <div
+                id="started-at"
+                style="margin-right: 10px"
+                data-iso="$started_at_iso"
+              >
                 $started_at
               </div>
               <div>Total time: $total_time</div>
@@ -59,19 +63,76 @@
           $content
         </main>
       </div>
+      <dialog id="settings-dialog">
+        <label class="header-setting-theme">
+          Theme:
+          <select id="theme-select">
+            <option value="dark-mode">Dark mode</option>
+            <option value="light-mode">Light mode</option>
+            <option value="system">System</option>
+          </select>
+        </label>
+      </dialog>
+      <dialog id="lightbox" aria-labelledby="lightbox-title">
+        <div class="lightbox-header">
+          <span id="lightbox-title" class="lightbox-title"></span>
+          <span id="lightbox-subtitle" class="lightbox-subtitle"></span>
+          <div id="lightbox-modes" class="lightbox-modes" role="tablist" hidden>
+            <button type="button" role="tab" data-mode="expected">
+              Expected
+            </button>
+            <button type="button" role="tab" data-mode="actual">Actual</button>
+            <button type="button" role="tab" data-mode="diff">Diff</button>
+            <button type="button" role="tab" data-mode="slider">Slider</button>
+            <button type="button" role="tab" data-mode="onion">
+              Onion skin
+            </button>
+          </div>
+          <a
+            id="lightbox-pdf"
+            class="lightbox-link"
+            href="#"
+            target="_blank"
+            rel="noopener"
+            hidden
+            >Open PDF</a
+          >
+          <button
+            type="button"
+            id="lightbox-close"
+            class="lightbox-close"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        <div class="lightbox-body">
+          <div id="lightbox-stage" class="lightbox-stage">
+            <img id="lightbox-base" alt="" />
+            <img id="lightbox-overlay" alt="" hidden />
+            <div id="lightbox-divider" class="lightbox-divider" hidden></div>
+          </div>
+        </div>
+        <div id="lightbox-footer" class="lightbox-footer" hidden>
+          <span>Expected</span>
+          <input
+            id="lightbox-range"
+            type="range"
+            min="0"
+            max="100"
+            value="50"
+            aria-label="Blend between expected and actual"
+          />
+          <span>Actual</span>
+          <span class="lightbox-hint">
+            <span><kbd>&larr;</kbd><kbd>&rarr;</kbd> switch view</span>
+            <span><kbd>Esc</kbd> close</span>
+          </span>
+        </div>
+      </dialog>
     </div>
-    <dialog id="settings-dialog">
-      <label class="header-setting-theme">
-        Theme:
-        <select id="theme-select">
-          <option value="dark-mode">Dark mode</option>
-          <option value="light-mode">Light mode</option>
-          <option value="system">System</option>
-        </select>
-      </label>
-    </dialog>
     <script>
-      $script
+      $script;
     </script>
   </body>
 </html>

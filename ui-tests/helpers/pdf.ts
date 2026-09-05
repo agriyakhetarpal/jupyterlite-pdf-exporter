@@ -26,12 +26,23 @@ export interface IPdfAnalysis {
   pageCount: number;
   /** Text of every page */
   text: string;
-  /** A PNG render of each page */
+  /** A PNG render of each page, at the report scale */
   pages: Buffer[];
+  /** A PNG render of each page, at the (smaller) snapshot scale */
+  snapshots: Buffer[];
   /** Size in points */
   width: number;
   height: number;
 }
+
+/**
+ * Scales at which we rasterise the pages. We have a pretty crisp scale for
+ * the previews, OTOH, the reference snapshots are committed to the repo
+ * and I want to keep their size manageable. So we use a smaller one for them.
+ * Reference: at 1.5, an A4 page is roughly 900 by 1260 pixels
+ */
+export const REPORT_SCALE = 2.5;
+export const SNAPSHOT_SCALE = 1.5;
 
 /**
  * Read a PDF with pdf.js
@@ -39,7 +50,10 @@ export interface IPdfAnalysis {
 export async function analysePdf(
   context: BrowserContext,
   pdf: Buffer,
-  scale = 2.5
+  scales: { report: number; snapshot: number } = {
+    report: REPORT_SCALE,
+    snapshot: SNAPSHOT_SCALE
+  }
 ): Promise<IPdfAnalysis> {
   const libSource = fs.readFileSync(
     pdfjsFile('legacy', 'build', 'pdf.mjs'),
@@ -55,7 +69,7 @@ export async function analysePdf(
     await page.goto('about:blank');
 
     const result = await page.evaluate(
-      async ({ libSource, workerSource, data, scale }) => {
+      async ({ libSource, workerSource, data, scales }) => {
         const toUrl = (source: string) =>
           URL.createObjectURL(
             new Blob([source], { type: 'application/javascript' })
@@ -72,8 +86,25 @@ export async function analysePdf(
         const doc = await pdfjsLib.getDocument({ data: bytes, verbosity: 0 })
           .promise;
 
+        const render = async (
+          pdfPage: Awaited<ReturnType<typeof doc.getPage>>,
+          scale: number
+        ) => {
+          const viewport = pdfPage.getViewport({ scale });
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.ceil(viewport.width);
+          canvas.height = Math.ceil(viewport.height);
+          const canvasContext = canvas.getContext('2d');
+          if (!canvasContext) {
+            throw new Error('Could not get a 2d canvas context');
+          }
+          await pdfPage.render({ canvasContext, canvas, viewport }).promise;
+          return canvas.toDataURL('image/png').split(',')[1];
+        };
+
         const texts: string[] = [];
         const pages: string[] = [];
+        const snapshots: string[] = [];
         let width = 0;
         let height = 0;
 
@@ -95,27 +126,30 @@ export async function analysePdf(
             height = Math.round(base.height);
           }
 
-          const viewport = pdfPage.getViewport({ scale });
-          const canvas = document.createElement('canvas');
-          canvas.width = Math.ceil(viewport.width);
-          canvas.height = Math.ceil(viewport.height);
-          const canvasContext = canvas.getContext('2d');
-          if (!canvasContext) {
-            throw new Error('Could not get a 2d canvas context');
-          }
-          await pdfPage.render({ canvasContext, canvas, viewport }).promise;
-          pages.push(canvas.toDataURL('image/png').split(',')[1]);
+          pages.push(await render(pdfPage, scales.report));
+          snapshots.push(await render(pdfPage, scales.snapshot));
         }
 
-        return { pageCount: doc.numPages, texts, pages, width, height };
+        return {
+          pageCount: doc.numPages,
+          texts,
+          pages,
+          snapshots,
+          width,
+          height
+        };
       },
-      { libSource, workerSource, data: pdf.toString('base64'), scale }
+      { libSource, workerSource, data: pdf.toString('base64'), scales }
     );
+
+    const decode = (encoded: string[]) =>
+      encoded.map(p => Buffer.from(p, 'base64'));
 
     return {
       pageCount: result.pageCount,
       text: result.texts.join('\n\n'),
-      pages: result.pages.map((p: string) => Buffer.from(p, 'base64')),
+      pages: decode(result.pages),
+      snapshots: decode(result.snapshots),
       width: result.width,
       height: result.height
     };

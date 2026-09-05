@@ -14,6 +14,16 @@
   cursor: pointer;
 }
 
+.htmlreport .pdf-card-pdf {
+  color: var(--color-accent-fg);
+}
+
+/* Hint via an arrow that these open in a new tab */
+.pdf-card-pdf::after,
+.lightbox-link::after {
+  content: ' \2197';
+}
+
 /* A grid of cards in each chip, rather than a list of test rows */
 .pdf-grid {
   display: grid;
@@ -66,7 +76,10 @@
 
 .pdf-card-preview {
   display: block;
+  width: 100%;
   margin-top: 10px;
+  padding: 0;
+  cursor: zoom-in;
   border: 1px solid var(--color-border-default);
   border-radius: 6px;
   overflow: hidden;
@@ -94,6 +107,9 @@
 }
 
 .pdf-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
   margin-top: 10px;
   color: var(--color-fg-muted);
   line-height: 18px;
@@ -134,6 +150,260 @@
   white-space: pre-wrap;
   overflow: auto;
   overflow-wrap: anywhere;
+}
+
+/* Expected, actual, and diff of the snapshots that did not match */
+.pdf-card-snapshots {
+  margin-top: 10px;
+}
+
+.pdf-card-snapshots > summary {
+  cursor: pointer;
+  color: var(--color-danger-fg);
+  user-select: none;
+}
+
+.pdf-snapshot-name {
+  margin-top: 8px;
+  color: var(--color-fg-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.pdf-snapshot-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.pdf-snapshot {
+  min-width: 0;
+  margin: 0;
+}
+
+.pdf-snapshot > figcaption {
+  color: var(--color-fg-muted);
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.pdf-snapshot-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #fff;
+  cursor: zoom-in;
+}
+
+.pdf-snapshot-open:hover {
+  border-color: var(--color-accent-fg);
+}
+
+.pdf-snapshot-open > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pdf-snapshot > pre {
+  max-height: 240px;
+  margin: 0;
+  padding: 8px;
+  border-radius: 6px;
+  background-color: var(--color-canvas-subtle);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: pre-wrap;
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+/* The lightbox, which enlarges a page render and compares snapshots */
+#lightbox {
+  width: min(96vw, 1400px);
+  max-height: 96vh;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--color-canvas-default);
+  color: var(--color-fg-default);
+  box-shadow: var(--box-shadow);
+}
+
+#lightbox[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The display rules below would otherwise override the hidden attribute */
+#lightbox [hidden] {
+  display: none !important;
+}
+
+#lightbox::backdrop {
+  background-color: rgb(0 0 0 / 60%);
+}
+
+.lightbox-header,
+.lightbox-footer {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.lightbox-header {
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+.lightbox-footer {
+  border-top: 1px solid var(--color-border-default);
+  color: var(--color-fg-muted);
+  font-size: 12px;
+}
+
+.lightbox-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.lightbox-subtitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-fg-muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.lightbox-modes {
+  display: flex;
+  gap: 4px;
+}
+
+.lightbox-modes > button {
+  padding: 3px 10px;
+  border: 1px solid var(--color-btn-border);
+  border-radius: 6px;
+  background-color: var(--color-btn-bg);
+  color: var(--color-btn-text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.lightbox-modes > button:hover {
+  background-color: var(--color-btn-hover-bg);
+}
+
+.lightbox-modes > button[aria-selected='true'] {
+  border-color: var(--color-accent-fg);
+  background-color: var(--color-accent-subtle);
+  color: var(--color-accent-fg);
+}
+
+.lightbox-link {
+  color: var(--color-accent-fg) !important;
+  white-space: nowrap;
+}
+
+.lightbox-close {
+  padding: 0 6px;
+  border: none;
+  background: none;
+  color: var(--color-fg-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-close:hover {
+  color: var(--color-fg-default);
+}
+
+.lightbox-body {
+  flex: 1;
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: var(--color-canvas-subtle);
+}
+
+.lightbox-stage {
+  position: relative;
+  max-width: 100%;
+}
+
+.lightbox-stage > img {
+  display: block;
+  max-width: 100%;
+
+  /* Some room for the header and footer within the dialog */
+  max-height: calc(96vh - 110px);
+  width: auto;
+  height: auto;
+  border: 1px solid var(--color-border-default);
+  background-color: #fff;
+}
+
+#lightbox-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+.lightbox-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-accent-fg);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+
+#lightbox-range {
+  flex: 1;
+  margin: 0;
+}
+
+.lightbox-hint {
+  display: flex;
+  gap: 12px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.lightbox-hint kbd {
+  display: inline-block;
+  min-width: 16px;
+  margin-right: 2px;
+  padding: 0 4px;
+  border: 1px solid var(--color-border-default);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background-color: var(--color-canvas-default);
+  color: var(--color-fg-default);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: center;
 }
 
 /* Hidden by the filter, the search box, or the speedboard view */

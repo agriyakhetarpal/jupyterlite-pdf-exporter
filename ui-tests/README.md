@@ -80,6 +80,39 @@ open report.html  # or xdg-open on Linux
 In CI, we upload the report as an artifact, and [test-report-redirect.yml](../.github/workflows/test-report-redirect.yml)
 adds a commit status linking to it, for convenience.
 
+## Snapshots
+
+Every export is also compared against reference snapshots committed under
+`tests/<spec>-snapshots/`: the text extracted from the PDF (`<slug>.txt`) and a
+render of each page (`<slug>-page-<n>.png`). We do this to catch content and layout regressions, i.e., both text and visual.
+
+These assertions are present in [helpers/export.ts](./helpers/export.ts).
+
+To add or update snapshots, comment on the pull request:
+
+```markdown
+bot please update snapshots
+```
+
+[update-integration-tests.yml](../.github/workflows/update-integration-tests.yml)
+then builds the extension, runs `jlpm test:update` and pushes a commit with the new files to the PR branch.
+
+### Before and after
+
+When a snapshot mismatches, you have three places to compare:
+
+1. The Playwright report (the `jupyterlite-pdf-exporter-playwright-tests`
+   artifact) shows the expected and actual renders with a slider, plus the diff.
+2. The PDF export report (`report.html`) shows the expected, actual, and diff,
+   side-by-side on the failing card. You may click any of them to open a lightbox
+   with a slider and an onion skin between the expected and actual views.
+3. After the bot updates the snapshots, GitHub's "Files changed" view shows the
+   old and new PNGs with its two-up, swipe, and onion-skin comparisons.
+
+If a bump of `@playwright/test` or `pdfjs-dist` shifts a few pixels, that may be
+enough to make the diff fail and is expected. In such cases, you may ask the bot
+to update the snapshots, and subsequently review the diff.
+
 ## Create tests
 
 > All commands are assumed to be executed from the root directory

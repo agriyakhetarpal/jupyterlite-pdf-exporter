@@ -8,6 +8,13 @@
  * - the search box; and
  * - the speedboard; and
  * - the theme selector.
+ *
+ * On top of those, there is a lightbox for the page renders, with the following modes:
+ * - expected: the reference snapshot; and
+ * - actual: the page render of the current run; and
+ * - diff: the difference between the two; and
+ * - slider: a slider to compare expected and actual; and
+ * - onion: an onion skin view.
  */
 
 (function () {
@@ -310,32 +317,180 @@
   });
 
   // Chrome and Firefox refuse to navigate the top level to a data: URL, so the
-  // embedded PDF is handed over as a blob instead.
-  var blobUrls = new WeakMap();
+  // embedded PDF is handed over as a blob instead. These are keyed by the data
+  // URL, as the lightbox's link changes with each opened card.
+  var blobUrls = {};
+  function openPdf(event) {
+    var link = event.currentTarget;
+    var href = link.getAttribute('href') || '';
+    var comma = href.indexOf(',');
+    if (href.indexOf('data:') !== 0 || comma === -1) return;
+    event.preventDefault();
+    var url = blobUrls[href];
+    if (!url) {
+      // Decode synchronously: window.open only survives inside the gesture.
+      var binary = window.atob(href.slice(comma + 1));
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; ++i) bytes[i] = binary.charCodeAt(i);
+      url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+      blobUrls[href] = url;
+    }
+    window.open(url, '_blank', 'noopener');
+  }
   [].forEach.call(
-    document.querySelectorAll('.pdf-card-preview'),
+    document.querySelectorAll('.pdf-card-pdf, #lightbox-pdf'),
     function (link) {
-      link.addEventListener('click', function (event) {
-        var href = link.getAttribute('href') || '';
-        var comma = href.indexOf(',');
-        if (href.indexOf('data:') !== 0 || comma === -1) return;
-        event.preventDefault();
-        var url = blobUrls.get(link);
-        if (!url) {
-          // Decode synchronously: window.open only survives inside the gesture.
-          var binary = window.atob(href.slice(comma + 1));
-          var bytes = new Uint8Array(binary.length);
-          for (var i = 0; i < binary.length; ++i)
-            bytes[i] = binary.charCodeAt(i);
-          url = URL.createObjectURL(
-            new Blob([bytes], { type: 'application/pdf' })
-          );
-          blobUrls.set(link, url);
-        }
-        window.open(url, '_blank', 'noopener');
-      });
+      link.addEventListener('click', openPdf);
     }
   );
+
+  /* ------------------------------------------------------------ lightbox */
+
+  var lightbox = document.getElementById('lightbox');
+  var lightboxTitle = document.getElementById('lightbox-title');
+  var lightboxSubtitle = document.getElementById('lightbox-subtitle');
+  var lightboxModes = document.getElementById('lightbox-modes');
+  var lightboxPdf = document.getElementById('lightbox-pdf');
+  var lightboxBase = document.getElementById('lightbox-base');
+  var lightboxOverlay = document.getElementById('lightbox-overlay');
+  var lightboxDivider = document.getElementById('lightbox-divider');
+  var lightboxFooter = document.getElementById('lightbox-footer');
+  var lightboxRange = document.getElementById('lightbox-range');
+  var modeButtons = [].slice.call(
+    lightboxModes.querySelectorAll('[data-mode]')
+  );
+
+  // The images on show, keyed by kind (expected, actual, diff)
+  // or by "image" if we are not doing a comparison
+  var lightboxImages = {};
+  var lightboxMode = 'image';
+
+  function blends() {
+    return lightboxMode === 'slider' || lightboxMode === 'onion';
+  }
+
+  function applyRange() {
+    var value = Number(lightboxRange.value);
+    if (lightboxMode === 'slider') {
+      lightboxOverlay.style.clipPath = 'inset(0 ' + (100 - value) + '% 0 0)';
+      lightboxOverlay.style.opacity = '';
+      lightboxDivider.style.left = value + '%';
+      lightboxDivider.hidden = false;
+    } else {
+      lightboxOverlay.style.clipPath = '';
+      lightboxOverlay.style.opacity = String(value / 100);
+      lightboxDivider.hidden = true;
+    }
+  }
+
+  function setMode(mode) {
+    lightboxMode = mode;
+    if (blends()) {
+      lightboxBase.src = lightboxImages.expected;
+      lightboxOverlay.src = lightboxImages.actual;
+      lightboxOverlay.hidden = false;
+      applyRange();
+    } else {
+      lightboxBase.src = lightboxImages[mode] || '';
+      lightboxOverlay.hidden = true;
+      lightboxDivider.hidden = true;
+    }
+    lightboxFooter.hidden = !blends();
+    modeButtons.forEach(function (button) {
+      button.setAttribute(
+        'aria-selected',
+        String(button.dataset.mode === mode)
+      );
+    });
+  }
+
+  function availableModes() {
+    return modeButtons
+      .filter(function (button) {
+        return !button.hidden;
+      })
+      .map(function (button) {
+        return button.dataset.mode;
+      });
+  }
+
+  function openLightbox(options) {
+    lightboxImages = options.images;
+    lightboxTitle.textContent = options.title;
+    lightboxSubtitle.textContent = options.subtitle || '';
+    lightboxPdf.hidden = !options.pdf;
+    lightboxPdf.setAttribute('href', options.pdf || '#');
+
+    var comparable = !!(options.images.expected && options.images.actual);
+    lightboxModes.hidden = !comparable;
+    modeButtons.forEach(function (button) {
+      var mode = button.dataset.mode;
+      button.hidden =
+        mode === 'slider' || mode === 'onion'
+          ? !comparable
+          : !options.images[mode];
+    });
+
+    setMode(comparable ? options.mode || 'slider' : 'image');
+    lightbox.showModal();
+  }
+
+  [].forEach.call(document.querySelectorAll('[data-lightbox]'), function (el) {
+    el.addEventListener('click', function () {
+      var card = el.closest('.pdf-card');
+      var titleEl = card && card.querySelector('.test-file-title');
+      var title = titleEl ? titleEl.textContent : '';
+      var row = el.closest('.pdf-snapshot-row');
+      if (row) {
+        var images = {};
+        [].forEach.call(row.querySelectorAll('.pdf-snapshot'), function (fig) {
+          var img = fig.querySelector('img');
+          if (img) images[fig.dataset.kind] = img.getAttribute('src');
+        });
+        var kind = el.closest('.pdf-snapshot').dataset.kind;
+        openLightbox({
+          title: title,
+          subtitle: row.dataset.snapshot,
+          images: images,
+          // We should reach the comparison directly, unless the diff
+          // itself was clicked
+          mode: kind === 'diff' ? 'diff' : 'slider'
+        });
+      } else {
+        var pdf = card && card.querySelector('.pdf-card-pdf');
+        openLightbox({
+          title: title,
+          images: { image: el.querySelector('img').getAttribute('src') },
+          pdf: pdf ? pdf.getAttribute('href') : ''
+        });
+      }
+    });
+  });
+
+  modeButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
+      setMode(button.dataset.mode);
+    });
+  });
+  lightboxRange.addEventListener('input', applyRange);
+  document
+    .getElementById('lightbox-close')
+    .addEventListener('click', function () {
+      lightbox.close();
+    });
+  // A click on the backdrop reaches the dialog itself
+  lightbox.addEventListener('click', function (event) {
+    if (event.target === lightbox) lightbox.close();
+  });
+  lightbox.addEventListener('keydown', function (event) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (lightboxModes.hidden || event.target === lightboxRange) return;
+    var modes = availableModes();
+    var index = modes.indexOf(lightboxMode);
+    var step = event.key === 'ArrowRight' ? 1 : -1;
+    setMode(modes[(index + step + modes.length) % modes.length]);
+    event.preventDefault();
+  });
 
   // Show the run's start time in the reader's locale, not the build machine's.
   var startedAt = document.getElementById('started-at');

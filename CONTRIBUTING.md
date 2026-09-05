@@ -69,6 +69,22 @@ jlpm test
 #### Integration tests
 
 This extension uses [Playwright](https://playwright.dev/docs/intro) for the integration tests (aka user level tests).
-More precisely, the JupyterLab helper [Galata](https://github.com/jupyterlab/jupyterlab/tree/master/galata) is used to handle testing the extension in JupyterLab.
+More precisely, the JupyterLab helper [Galata](https://github.com/jupyterlab/jupyterlab/tree/main/galata) is used to handle testing the extension in JupyterLab.
 
 More information is provided within the [ui-tests](./ui-tests/README.md) README.
+
+The export tests compare each PDF against reference snapshots, which are the
+extracted text and a render of every page, committed under `ui-tests/tests/`.
+
+These are only produced on Linux in CI, so they are skipped when you run the
+tests on other platforms. If your change alters how a PDF looks, or adds a new
+export test, the integration tests will fail on your pull request until the
+snapshots are updated. To update them, comment on the pull request:
+
+```markdown
+bot please update snapshots
+```
+
+A commit with the new snapshots will be pushed to your branch. Review the image
+diffs in the "Files changed" tab, then push again or re-run the CI checks. Please
+refer to the [Snapshots](./ui-tests/README.md#snapshots) section for more information on how to update the snapshots.
