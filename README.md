@@ -203,7 +203,12 @@ This project would not have been possible without the following open source proj
 - [JupyterLite](https://jupyterlite.rtfd.io/en/latest/): A JupyterLab distribution that runs entirely in the web browser, powered by WebAssembly and Web Workers.
 - [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/): The next-generation web-based user interface for Project Jupyter, with a rich ecosystem of extensions.
 - [Jupyter Notebook](https://jupyter-notebook.readthedocs.io/): The original web-based interactive computing environment for Jupyter, which continues to be widely used and developed in its own right.
-- [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
+- [Callisto](https://github.com/sijow/callisto): A Typst package that reads Jupyter notebooks and renders their cells, on which this extension is built.
 - [Typst](https://typst.app/): A modern typesetting system that provides high-quality PDF output and a user-friendly syntax for document design.
-- [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.
+- [cmarker](https://github.com/SabrinaJewson/cmarker.typ) and [MiTeX](https://github.com/mitex-rs/mitex): Typst packages that Callisto uses to convert Markdown and LaTeX math.
 - [@myriaddreamin/typst-all-in-one](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one): A WebAssembly distribution of Typst that allows it to run in web browsers and other JavaScript environments.
+
+I made use of the following open source projects in earlier versions of this extension. They are no longer used in the current version, but this extension would not have been possible without them!
+
+- [Pandoc](https://pandoc.org/): A universal document converter that supports a wide variety of input and output formats, including Jupyter notebooks and PDF.
+- [pandoc-wasm](https://www.npmjs.com/package/pandoc-wasm): A WebAssembly distribution of Pandoc that allows it to run in web browsers and other JavaScript environments.
