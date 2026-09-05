@@ -24,6 +24,19 @@ const RENDERABLE_MIME_TYPES = new Set([
 ]);
 
 /**
+ * The MIME types that Callisto hands to a text handler. nbformat stores
+ * these as a string or as a list of strings, but a raw display can put any
+ * JSON value under them, which then reaches Callisto as a dictionary
+ */
+const TEXT_MIME_TYPES = new Set([
+  'text/markdown',
+  'text/latex',
+  'text/plain',
+  'text/html',
+  'application/json'
+]);
+
+/**
  * Elements that only work in a browser. This can be embedded pages, form
  * controls, scripts, and inline SVG icon sheets such as the ones emitted by
  * xarray and Vega
@@ -87,6 +100,8 @@ export function sanitizeHtml(html: string): string | undefined {
  *   not store the former as an output type
  * - HTML outputs lose their style blocks, and HTML that only works in a
  *   browser is dropped so the plain text fallback is used instead
+ * - Text values that are not strings, such as a dict that a raw display
+ *   put under `text/plain`, become their JSON so Callisto gets a string
  * - Outputs with no renderable MIME type get a plain text placeholder
  */
 export function preprocessNotebook(notebook: INotebookContent): void {
@@ -109,6 +124,13 @@ export function preprocessNotebook(notebook: INotebookContent): void {
       // Callisto would evaluate this as Typst code, so leave it to the
       // plain text fallback
       delete data['text/vnd.typst'];
+
+      for (const mime of TEXT_MIME_TYPES) {
+        const value = data[mime];
+        if (value !== undefined && asString(value) === undefined) {
+          data[mime] = JSON.stringify(value, null, 2);
+        }
+      }
 
       const html = asString(data['text/html']);
       if (html !== undefined) {
