@@ -13,6 +13,8 @@ import { pdfExportProgress } from './progress';
 
 import { buildPandocConfig, pdfExportSettings } from './settings';
 
+import { installBundledPackages } from './typst-packages';
+
 // Typst compiler creates a global $typst
 declare const $typst: {
   resetShadow: () => void;
@@ -192,6 +194,7 @@ async function loadTypst(): Promise<void> {
       };
       checkTypst();
     });
+    await installBundledPackages();
   })();
 
   return typstLoadingPromise;
