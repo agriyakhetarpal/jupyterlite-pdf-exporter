@@ -87,14 +87,14 @@
     },
     "theme": {
       "title": "Theme",
-      "description": "How cells are laid out. \"Neat\" is a clean document look, \"Notebook\" adds In/Out prompts like the Jupyter interface, and \"Plain\" applies no styling.",
+      "description": "How cells are laid out. \"Notebook\" adds In/Out prompts like the Jupyter interface, \"Neat\" is a clean document look without prompts, and \"Plain\" applies no styling.",
       "type": "string",
       "oneOf": [
-        { "const": "neat", "title": "Neat" },
         { "const": "notebook", "title": "Notebook" },
+        { "const": "neat", "title": "Neat" },
         { "const": "plain", "title": "Plain" }
       ],
-      "default": "neat"
+      "default": "notebook"
     }
   },
   "additionalProperties": false

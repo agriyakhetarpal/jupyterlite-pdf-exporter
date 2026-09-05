@@ -19,7 +19,7 @@ const baseSettings: IPdfExportSettings = {
   numberSections: false,
   lineSpacing: 1,
   linkColor: '',
-  theme: 'neat'
+  theme: 'notebook'
 };
 
 describe('buildPandocConfig', () => {

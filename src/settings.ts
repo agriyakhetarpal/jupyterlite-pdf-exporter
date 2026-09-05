@@ -46,7 +46,7 @@ const DEFAULT_SETTINGS: IPdfExportSettings = {
   numberSections: false,
   lineSpacing: 1,
   linkColor: '#0000ee',
-  theme: 'neat'
+  theme: 'notebook'
 };
 
 /**
