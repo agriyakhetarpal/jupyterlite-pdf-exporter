@@ -1,0 +1,1 @@
+Markdown image The image above has alt text. It must reach the PDF as an accessibility tag. 1

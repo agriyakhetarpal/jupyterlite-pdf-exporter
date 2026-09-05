@@ -1,0 +1,1 @@
+Simple export A heading, a paragraph, and a code cell with a text output. • first item • second item print ( ' Hello from the PDF exporter ' ) Hello from the PDF exporter 2 + 2 4 1
