@@ -3,7 +3,7 @@
 The archives in typst-packages/ are served as static assets to prevent the
 Typst compiler from reaching packages.typst.org.
 
-Usage: re-run after changing a version of any of the packages below.
+Usage: re-run after changing a version of any of the packages below. Pass --check to verify the committed archives instead of downloading.
 """
 
 import hashlib
