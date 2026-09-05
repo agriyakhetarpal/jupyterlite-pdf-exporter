@@ -3386,10 +3386,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@myriaddreamin/typst-all-in-one.ts@npm:0.8.0-rc3":
+"@myriaddreamin/typst-ts-web-compiler@npm:0.8.0-rc3":
   version: 0.8.0-rc3
-  resolution: "@myriaddreamin/typst-all-in-one.ts@npm:0.8.0-rc3"
-  checksum: 94bc72c79c630e92194b05a279d9ed904a94a42aa8973b0468b20afd4ab57a8803aaf1b3c7fe1effe665158646506c0870b6768bc59dabd0f930bac2022dc7e4
+  resolution: "@myriaddreamin/typst-ts-web-compiler@npm:0.8.0-rc3"
+  checksum: 7818dd7a7bc205c19ec1e366b3c2580021419e306d8b0040efc871dba9950fbbad703d9e4648e8cec200358d1fa768bb98fe1df6144bfa3d75f8759fff5e9706
+  languageName: node
+  linkType: hard
+
+"@myriaddreamin/typst.ts@npm:0.8.0-rc3":
+  version: 0.8.0-rc3
+  resolution: "@myriaddreamin/typst.ts@npm:0.8.0-rc3"
+  dependencies:
+    idb: ^7.1.1
+  peerDependencies:
+    "@myriaddreamin/typst-ts-renderer": ^0.8.0-rc3
+    "@myriaddreamin/typst-ts-web-compiler": ^0.8.0-rc3
+  peerDependenciesMeta:
+    "@myriaddreamin/typst-ts-renderer":
+      optional: true
+    "@myriaddreamin/typst-ts-web-compiler":
+      optional: true
+  checksum: 54cf56740ed6e4f35f1909b2b109ac80808e68a12fb3571cb0cf9a8eba28c01407b6cabee0e8fe7b6fa81c5de25a537f40319eff377c99a4db14f50bfae5fb26
   languageName: node
   linkType: hard
 
@@ -6890,6 +6907,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"idb@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "idb@npm:7.1.1"
+  checksum: 1973c28d53c784b177bdef9f527ec89ec239ec7cf5fcbd987dae75a16c03f5b7dfcc8c6d3285716fd0309dd57739805390bd9f98ce23b1b7d8849a3b52de8d56
+  languageName: node
+  linkType: hard
+
 "identity-obj-proxy@npm:^3.0.0":
   version: 3.0.0
   resolution: "identity-obj-proxy@npm:3.0.0"
@@ -7935,7 +7959,8 @@ __metadata:
     "@jupyterlab/testutils": ^4.5.8
     "@jupyterlab/translation": ^4.5.8
     "@jupyterlite/services": ^0.7.6
-    "@myriaddreamin/typst-all-in-one.ts": 0.8.0-rc3
+    "@myriaddreamin/typst-ts-web-compiler": 0.8.0-rc3
+    "@myriaddreamin/typst.ts": 0.8.0-rc3
     "@types/emscripten": ^1.41.5
     "@types/jest": ^30.0.0
     "@types/json-schema": ^7.0.15

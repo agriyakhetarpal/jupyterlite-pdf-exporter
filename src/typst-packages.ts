@@ -8,21 +8,22 @@ import mitexUrl from '../typst-packages/mitex-0.2.7.tar.gz';
 import percencodeUrl from '../typst-packages/percencode-0.1.0.tar.gz';
 
 /**
+ * The version of Callisto we import in the generated Typst wrapper
+ * Keep in sync with scripts/vendor_typst_packages.py
+ */
+export const CALLISTO_VERSION = '0.3.0';
+
+/**
  * Bundled Typst packages we ship
  * Keep in sync with scripts/vendor_typst_packages.py
  */
 const BUNDLED_PACKAGES: Record<string, string> = {
-  'callisto/0.3.0': callistoUrl,
+  [`callisto/${CALLISTO_VERSION}`]: callistoUrl,
   'cmarker/0.1.10': cmarkerUrl,
   'mitex/0.2.7': mitexUrl,
   'based/0.2.0': basedUrl,
   'percencode/0.1.0': percencodeUrl
 };
-
-/**
- * The version of Callisto we import in the generated Typst wrapper
- */
-export const CALLISTO_VERSION = '0.3.0';
 
 /**
  * A subset of typst.ts's types that the registry uses
@@ -43,22 +44,6 @@ interface IPackageResolveContext {
 interface IWritableAccessModel {
   insertFile(path: string, data: Uint8Array, mtime: Date): void;
 }
-
-interface IProvider {
-  key: string;
-  forRoles: string[];
-  provides: unknown[];
-}
-
-// Globals that are set by @myriaddreamin/typst-all-in-one.ts
-declare const $typst: { use: (...providers: IProvider[]) => void };
-declare const TypstSnippet: {
-  withAccessModel: (model: IWritableAccessModel) => IProvider;
-  withPackageRegistry: (registry: BundledPackageRegistry) => IProvider;
-};
-declare const TypstCompileModule: {
-  MemoryAccessModel: new () => IWritableAccessModel;
-};
 
 /**
  * A package registry for typst.ts that resolves @preview imports from the
@@ -128,18 +113,4 @@ export class BundledPackageRegistry {
   private _accessModel: IWritableAccessModel;
   private _archives = new Map<string, Uint8Array>();
   private _resolved = new Map<string, string>();
-}
-
-/**
- * Register the bundled packages with the global Typst compiler. This must run
- * before the compiler is first used.
- */
-export async function installBundledPackages(): Promise<void> {
-  const accessModel = new TypstCompileModule.MemoryAccessModel();
-  const registry = new BundledPackageRegistry(accessModel);
-  await registry.load();
-  $typst.use(
-    TypstSnippet.withAccessModel(accessModel),
-    TypstSnippet.withPackageRegistry(registry)
-  );
 }
