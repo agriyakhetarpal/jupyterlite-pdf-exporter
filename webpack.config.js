@@ -5,6 +5,8 @@ module.exports = {
   module: {
     rules: [
       { test: /\.tar\.gz$/, type: 'asset/resource' },
+      // The Typst compiler binary is fetched by the worker at runtime
+      { test: /\.wasm$/, type: 'asset/resource' },
       // The Typst wrapper is inlined as a string
       { test: /\.typ$/, type: 'asset/source' }
     ]

@@ -20,7 +20,11 @@ module.exports = {
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
-    '!src/**/.ipynb_checkpoints/*'
+    '!src/**/.ipynb_checkpoints/*',
+    // TypeScript cannot emit import.meta as CommonJS that Jest runs for our
+    // coverage, so this one file cannot be instrumented. The bundler compiles
+    // it as an ES module.
+    '!src/typst-worker-url.ts'
   ],
   coverageReporters: ['lcov', 'text'],
   testRegex: 'src/.*/.*.spec.ts[x]?$',

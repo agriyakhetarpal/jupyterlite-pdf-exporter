@@ -61,7 +61,7 @@ In both JupyterLab and JupyterLite environments, the entry point to usage lives 
     This extension does not depend on or enforce a particular version of JupyterLite or JupyterLab, but please note that cutting-edge versions of JupyterLite, JupyterLab, and Jupyter Notebook may introduce breaking changes. If you face any troubles, please [file an issue](https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues/new/choose)!
 
 - A modern web browser with support for WebAssembly and Web Workers (e.g., Chrome, Firefox, Safari, Edge, and so on). All browsers supported by JupyterLite should work with this extension.
-- The extension relies on a WebAssembly distribution of Typst. It is quite large (about 40 MiB on disk, or about 15 MiB when sent compressed over the network) and may take some time to download and initialise when the extension is first used. The distribution also bundles the Typst packages it needs to function. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
+- The extension relies on a WebAssembly distrbution of the Typst compiler. It is quite large (about 29 MiB on disk, or about 10 MiB when sent compressed over the network) and may take some time to download and initialise when the extension is first used. The compiler runs in a Web Worker, so the interface stays responsive while a PDF is being generated. The distribution also bundles the Typst packages it needs to function. For a better user experience, it is recommended to use this extension in an environment with a stable and reasonably fast internet connection.
 
 ### JupyterLite
 
@@ -203,14 +203,14 @@ The source code and binaries are licensed under the terms of the BSD-3-Clause "N
 
 Here is a table of the licenses of the dependencies bundled by this extension. The Typst packages are Callisto and its dependencies, which are fetched from the [Typst package registry](https://typst.app/universe/).
 
-| Component                                                                                                                                       | License      | File                                                            |
-| ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------- |
-| [`@myriaddreamin/typst-all-in-one.ts`](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one.ts), the WebAssembly distribution of Typst | `Apache-2.0` | [LICENSE-TYPST.txt](LICENSE-TYPST.txt)                          |
-| [Callisto](https://github.com/sijow/callisto)                                                                                                   | `MIT`        | [LICENSE-callisto.txt](typst-packages/LICENSE-callisto.txt)     |
-| [cmarker](https://github.com/SabrinaJewson/cmarker.typ)                                                                                         | `MIT`        | [LICENSE-cmarker.txt](typst-packages/LICENSE-cmarker.txt)       |
-| [MiTeX](https://github.com/mitex-rs/mitex)                                                                                                      | `Apache-2.0` | [LICENSE-mitex.txt](typst-packages/LICENSE-mitex.txt)           |
-| [based](https://github.com/EpicEricEE/typst-based)                                                                                              | `MIT`        | [LICENSE-based.txt](typst-packages/LICENSE-based.txt)           |
-| [percencode](https://github.com/Servostar/typst-percencode)                                                                                     | `MIT`        | [LICENSE-percencode.txt](typst-packages/LICENSE-percencode.txt) |
+| Component                                                                                                                                                                                                                                                               | License      | File                                                            |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------- |
+| [`@myriaddreamin/typst.ts`](https://www.npmjs.com/package/@myriaddreamin/typst.ts) and [`@myriaddreamin/typst-ts-web-compiler`](https://www.npmjs.com/package/@myriaddreamin/typst-ts-web-compiler), the WebAssembly build of the Typst compiler and its JavaScript API | `Apache-2.0` | [LICENSE-TYPST.txt](LICENSE-TYPST.txt)                          |
+| [Callisto](https://github.com/sijow/callisto)                                                                                                                                                                                                                           | `MIT`        | [LICENSE-callisto.txt](typst-packages/LICENSE-callisto.txt)     |
+| [cmarker](https://github.com/SabrinaJewson/cmarker.typ)                                                                                                                                                                                                                 | `MIT`        | [LICENSE-cmarker.txt](typst-packages/LICENSE-cmarker.txt)       |
+| [MiTeX](https://github.com/mitex-rs/mitex)                                                                                                                                                                                                                              | `Apache-2.0` | [LICENSE-mitex.txt](typst-packages/LICENSE-mitex.txt)           |
+| [based](https://github.com/EpicEricEE/typst-based)                                                                                                                                                                                                                      | `MIT`        | [LICENSE-based.txt](typst-packages/LICENSE-based.txt)           |
+| [percencode](https://github.com/Servostar/typst-percencode)                                                                                                                                                                                                             | `MIT`        | [LICENSE-percencode.txt](typst-packages/LICENSE-percencode.txt) |
 
 For an overview of the licenses of all the JavaScript dependencies of this extension at runtime, please navigate to your Jupyter deployment > "Help" menu > "Licenses".
 
@@ -224,7 +224,7 @@ This project would not have been possible without the following open source proj
 - [Callisto](https://github.com/sijow/callisto): A Typst package that reads Jupyter notebooks and renders their cells, on which this extension is built.
 - [Typst](https://typst.app/): A modern typesetting system that provides high-quality PDF output and a user-friendly syntax for document design.
 - [cmarker](https://github.com/SabrinaJewson/cmarker.typ) and [MiTeX](https://github.com/mitex-rs/mitex): Typst packages that Callisto uses to convert Markdown and LaTeX math.
-- [@myriaddreamin/typst-all-in-one](https://www.npmjs.com/package/@myriaddreamin/typst-all-in-one): A WebAssembly distribution of Typst that allows it to run in web browsers and other JavaScript environments.
+- [typst.ts](https://github.com/Myriad-Dreamin/typst.ts): A WebAssembly build of Typst with a JavaScript API, which allows it to run in web browsers and other JavaScript environments.
 
 I made use of the following open source projects in earlier versions of this extension. They are no longer used in the current version, but this extension would not have been possible without them!
 

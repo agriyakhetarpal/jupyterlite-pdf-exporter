@@ -90,7 +90,8 @@
         "@jupyterlab/statusbar": "^4.5.8",
         "@jupyterlab/translation": "^4.5.8",
         "@jupyterlite/services": "^0.7.6",
-        "@myriaddreamin/typst-all-in-one.ts": "0.8.0-rc3"
+        "@myriaddreamin/typst-ts-web-compiler": "0.8.0-rc3",
+        "@myriaddreamin/typst.ts": "0.8.0-rc3"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",

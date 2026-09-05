@@ -9,21 +9,23 @@ import { pdfExportProgress } from './progress';
 
 import { pdfExportSettings } from './settings';
 
-import { installBundledPackages } from './typst-packages';
-
 import { buildTypstSettings } from './typst-settings';
+
+import type { ICompileRequest, ICompileResponse } from './typst-worker';
+
+import { createTypstWorker } from './typst-worker-url';
 
 import wrapperSource from '../typst/wrapper.typ';
 
-// Typst compiler creates a global $typst
-declare const $typst: {
-  resetShadow: () => void;
-  mapShadow: (path: string, data: Uint8Array) => void;
-  pdf: (options: { mainFilePath: string }) => Promise<Uint8Array>;
-};
+/**
+ * How long a compilation may take before it is abandoned. We terminate
+ * the worker if we suspect that we are running perennial Typst code. A
+ * PDF export should never take more than a few seconds in practice.
+ */
+const COMPILE_TIMEOUT_MS = 120_000;
 
-let typstLoaded = false;
-let typstLoadingPromise: Promise<void> | null = null;
+let worker: Worker | null = null;
+let nextRequestId = 0;
 
 /**
  * Export a notebook to a PDF with Typst and Callisto.
@@ -43,39 +45,21 @@ export async function exportNotebookToPdf(
   path: string
 ): Promise<void> {
   try {
-    // step 1: load Typst and the bundled packages
     pdfExportProgress.start('Preparing PDF export…');
-    await loadTypst();
 
     // Note to self: preprocessNotebook rewrites outputs in place, so
-    // we work  on a copy to leave the caller's notebook untouched.
+    // we work on a copy to leave the caller's notebook untouched.
     const working = structuredClone(notebook);
     preprocessNotebook(working);
     const typstSettings = buildTypstSettings(pdfExportSettings.current);
 
     pdfExportProgress.update('Generating PDF…');
+    const pdfData = await compileInWorker({
+      '/main.typ': wrapperSource,
+      '/notebook.ipynb': JSON.stringify(working),
+      '/settings.json': JSON.stringify(typstSettings)
+    });
 
-    const encoder = new TextEncoder();
-
-    $typst.resetShadow();
-    $typst.mapShadow('/main.typ', encoder.encode(wrapperSource));
-    $typst.mapShadow(
-      '/notebook.ipynb',
-      encoder.encode(JSON.stringify(working))
-    );
-    $typst.mapShadow(
-      '/settings.json',
-      encoder.encode(JSON.stringify(typstSettings))
-    );
-    const pdfData = await $typst.pdf({ mainFilePath: '/main.typ' });
-
-    // This should not really happen since we'll at least have the PDF header
-    // and at least one cell in the notebook (even if it's empty)
-    if (!pdfData || pdfData.length === 0) {
-      throw new Error('Typst produced empty PDF output');
-    }
-
-    // last step: download the PDF in the browser
     const pdfBlob = new Blob([pdfData.buffer as ArrayBuffer], {
       type: 'application/pdf'
     });
@@ -90,38 +74,64 @@ export async function exportNotebookToPdf(
 }
 
 /**
- * Lazy load the Typst compiler and the bundled packages. The compiler is a
- * large download, so this only happens on the first export. The module sets
- * the global $typst as a side effect of being imported.
- * @returns – a promise that resolves when the compiler is ready.
+ * Get the compiler worker, starting it on first use. The compiler and the
+ * bundled packages load inside the worker on first use.
+ * @returns - the worker instance
  */
-async function loadTypst(): Promise<void> {
-  if (typstLoaded && typeof $typst !== 'undefined') {
-    return;
-  }
-  if (typstLoadingPromise) {
-    return typstLoadingPromise;
-  }
+function getWorker(): Worker {
+  worker ??= createTypstWorker();
+  return worker;
+}
 
-  typstLoadingPromise = (async () => {
-    await import('@myriaddreamin/typst-all-in-one.ts');
+/**
+ * Compile the given files in the worker and return the PDF bytes.
+ * @param files - a record of absolute paths to file contents, with /main.typ as the main file
+ * @returns - a promise that resolves to the compiled PDF bytes
+ */
+function compileInWorker(files: Record<string, string>): Promise<Uint8Array> {
+  const id = nextRequestId++;
+  const request: ICompileRequest = { id, files };
+  return new Promise((resolve, reject) => {
+    const target = getWorker();
 
-    // The module sets the global $typst asynchronously, so poll until ready
-    await new Promise<void>(resolve => {
-      const checkTypst = (): void => {
-        if (typeof $typst !== 'undefined') {
-          typstLoaded = true;
-          resolve();
-        } else {
-          setTimeout(checkTypst, 100);
-        }
-      };
-      checkTypst();
-    });
-    await installBundledPackages();
-  })();
+    const cleanup = (): void => {
+      clearTimeout(timer);
+      target.removeEventListener('message', onMessage);
+      target.removeEventListener('error', onError);
+    };
+    const onMessage = (event: MessageEvent<ICompileResponse>): void => {
+      if (event.data.id !== id) {
+        return;
+      }
+      cleanup();
+      if (event.data.pdf) {
+        resolve(event.data.pdf);
+      } else {
+        reject(new Error(event.data.error ?? 'Typst produced no output'));
+      }
+    };
+    const onError = (event: ErrorEvent): void => {
+      cleanup();
+      reject(new Error(event.message || 'The Typst worker failed'));
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      // A stuck compilation cannot be interrupted. Drop this worker,
+      // and let the next export operation start a new one as needed.
+      target.terminate();
+      worker = null;
+      reject(
+        new Error(
+          `Typst did not finish within ${COMPILE_TIMEOUT_MS / 1000} seconds. ` +
+            'The notebook may contain Typst code that never ends.'
+        )
+      );
+    }, COMPILE_TIMEOUT_MS);
 
-  return typstLoadingPromise;
+    target.addEventListener('message', onMessage);
+    target.addEventListener('error', onError);
+    target.postMessage(request);
+  });
 }
 
 /**
