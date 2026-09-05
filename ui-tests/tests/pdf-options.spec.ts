@@ -41,10 +41,13 @@ const TEST_CASES: {
     settings: { hideInputs: true },
     check: a => {
       // The source prints the same phrase as its output, so count the
-      // occurrences. pdf.js splits highlighted source into tokens, so
-      // match a bare word for the source itself
-      expect(a.text).not.toContain('print');
+      // occurrences, and use the comment in the result cell as a marker
+      // that only exists in source
+      expect(a.text).not.toContain('A result gets an Out prompt');
       expect(a.text.split('output from a code cell').length - 1).toBe(1);
+      // Only In prompts go with the inputs. A result keeps its Out prompt
+      expect(a.text).not.toContain('In [');
+      expect(a.text).toContain('Out[2]:');
     }
   },
   {
@@ -52,8 +55,10 @@ const TEST_CASES: {
     title: 'hideOutputs: true',
     settings: { hideOutputs: true },
     check: a => {
-      expect(a.text).toContain('print');
+      expect(a.text).toContain('A result gets an Out prompt');
       expect(a.text.split('output from a code cell').length - 1).toBe(1);
+      expect(a.text).toContain('In [2]:');
+      expect(a.text).not.toContain('Out[');
     }
   },
   {
