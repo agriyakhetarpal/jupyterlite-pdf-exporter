@@ -98,7 +98,7 @@ describe('buildTypstWrapper', () => {
   it('rejects a link color that is not hex', () => {
     expect(() =>
       buildTypstWrapper({ ...baseSettings, linkColor: 'blue' })
-    ).toThrow(/Invalid link color/);
+    ).toThrow(/Invalid colour/);
   });
 
   it('adds an outline and heading numbers when asked', () => {

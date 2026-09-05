@@ -89,8 +89,8 @@ const TEST_CASES: {
     title: 'numberSections: true',
     settings: { numberSections: true },
     check: a => {
-      expect(a.text).toMatch(/1\s+First section/);
-      expect(a.text).toMatch(/2\s+Second section/);
+      expect(a.text).toMatch(/1\.1\.\s+First section/);
+      expect(a.text).toMatch(/1\.2\.\s+Second section/);
     }
   },
   {
@@ -115,7 +115,7 @@ const TEST_CASES: {
     },
     check: a => {
       expect(a.width).toBe(612);
-      expect(a.text).toMatch(/1\s+First section/);
+      expect(a.text).toMatch(/1\.1\.\s+First section/);
     }
   }
 ];

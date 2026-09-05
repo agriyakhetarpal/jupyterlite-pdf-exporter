@@ -13,7 +13,7 @@ import { exportNotebook, IExport } from '../helpers/export';
  * @returns True if the PDF contains an image.
  */
 const hasImage = (pdf: Buffer) =>
-  pdf.toString('latin1').includes('/Subtype /Image');
+  /\/Subtype\s*\/Image/.test(pdf.toString('latin1'));
 
 /**
  * Check if a PDF embeds at least one image with alt text.
