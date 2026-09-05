@@ -11,10 +11,12 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
+    "@hyzyla/pdfium": "2.1.13",
     "@jupyterlab/galata": "^5.0.5",
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.0.0",
-    "pdfjs-dist": "^6.2.108",
+    "@types/pngjs": "^6.0.5",
+    "pngjs": "^7.0.0",
     "typescript": "~5.5.4"
   },
   "resolutions": {

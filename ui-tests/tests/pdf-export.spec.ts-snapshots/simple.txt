@@ -1,1 +1,1 @@
-Simple export A heading, a paragraph, and a code cell with a text output. • first item • second item In [1]: print ( ' Hello from the PDF exporter ' ) Hello from the PDF exporter In [1]: 2 + 2 Out[1]: 4 1
+Simple export A heading, a paragraph, and a code cell with a text output. • first item • second item In [1]: print('Hello from the PDF exporter') Hello from the PDF exporter In [1]: 2 + 2 Out[1]: 4 1
