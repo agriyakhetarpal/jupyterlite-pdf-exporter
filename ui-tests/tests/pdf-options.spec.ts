@@ -28,6 +28,14 @@ const TEST_CASES: {
     }
   },
   {
+    slug: 'opt-promptgutter-all',
+    title: 'promptGutter: all',
+    settings: { promptGutter: 'all' },
+    check: a => {
+      expect(a.text).toContain('In [1]:');
+    }
+  },
+  {
     slug: 'opt-theme-neat',
     title: 'theme: neat',
     settings: { theme: 'neat' },

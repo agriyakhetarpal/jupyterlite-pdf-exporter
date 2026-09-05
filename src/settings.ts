@@ -25,6 +25,7 @@ export interface IPdfExportSettings {
   lineSpacing: number;
   linkColor: string;
   theme: 'notebook' | 'neat' | 'plain';
+  promptGutter: 'code' | 'all';
 }
 
 /**
@@ -46,7 +47,8 @@ const DEFAULT_SETTINGS: IPdfExportSettings = {
   numberSections: false,
   lineSpacing: 1,
   linkColor: '#0000ee',
-  theme: 'notebook'
+  theme: 'notebook',
+  promptGutter: 'code'
 };
 
 /**

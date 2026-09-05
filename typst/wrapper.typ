@@ -53,13 +53,53 @@
   (callisto.default-handlers.at("image-markdown"))(data, ctx: ctx, ..args)
 }
 
+// Callisto's notebook theme places the In/Out prompts 1.2em to the left of
+// each code cell, see https://github.com/sijow/callisto/blob/a402a27f5aa17d4b4e45ced1bf3dcd3a7227a6dc/themes/notebook.typ#L8-L12.
+// This puts them in the page margin, where they are clipped once the margin
+// is narrower than the prompt. See https://github.com/sijow/callisto/issues/22
+//
+// This is a workaround that reserves room inside the text area, measured from
+// the widest prompt the user's notebook needs at the current font. By default,
+// only code cells are indented to utilise the space available efficiently.
+//
+// The promptGutter setting allows indenting all cells, which may be a tad more
+// faithful to the notebook layout as seen in JupyterLab/nbconvert, but then
+// we don't have as wide margins like nbconvert does.
+#let prompt-gutter() = {
+  let counts = json("notebook.ipynb").cells
+    .filter(cell => cell.cell_type == "code")
+    .map(cell => cell.at("execution_count", default: none))
+    .filter(count => count != none)
+  let widest = counts.fold(1, calc.max)
+  measure(raw("Out[" + str(widest) + "]:")).width + 1.2em
+}
+
+#let with-prompt-gutter(handler) = (cell, ctx: none, ..args) => context pad(
+  left: prompt-gutter(),
+  handler(cell, ctx: ctx, ..args),
+)
+
+#let theme = if settings.theme == "notebook" and settings.promptGutter == "code" {
+  callisto.themes.notebook + (
+    "code-cell": with-prompt-gutter(callisto.default-handlers.at("code-cell")),
+  )
+} else {
+  settings.theme
+}
+
 #if settings.tableOfContents { outline() }
 
-#callisto.render(
+#let body = callisto.render(
   nb: path("notebook.ipynb"),
-  theme: settings.theme,
+  theme: theme,
   ignore-wrong-format: true,
   // Markdown can carry Typst code in HTML comments; do not run it
   cmarker: (raw-typst: false),
   handlers: ("image-markdown": image-markdown),
 )
+
+#if settings.theme == "notebook" and settings.promptGutter == "all" {
+  context pad(left: prompt-gutter(), body)
+} else {
+  body
+}

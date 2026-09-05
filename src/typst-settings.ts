@@ -31,6 +31,7 @@ export interface ITypstSettings {
   lineSpacing: number;
   linkColor: string | null;
   theme: string;
+  promptGutter: string;
 }
 
 /**
@@ -81,6 +82,7 @@ export function buildTypstSettings(
     numberSections: settings.numberSections,
     lineSpacing: settings.lineSpacing || 1,
     linkColor: linkColor ? `#${linkColor}` : null,
-    theme: settings.theme
+    theme: settings.theme,
+    promptGutter: settings.promptGutter
   };
 }

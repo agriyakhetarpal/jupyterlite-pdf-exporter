@@ -20,7 +20,8 @@ const baseSettings: IPdfExportSettings = {
   numberSections: false,
   lineSpacing: 1,
   linkColor: '',
-  theme: 'notebook'
+  theme: 'notebook',
+  promptGutter: 'code'
 };
 
 describe('parseLength', () => {
@@ -62,7 +63,8 @@ describe('buildTypstSettings', () => {
       numberSections: false,
       lineSpacing: 1,
       linkColor: null,
-      theme: 'notebook'
+      theme: 'notebook',
+      promptGutter: 'code'
     });
   });
 
@@ -119,6 +121,9 @@ describe('buildTypstSettings', () => {
       pageNumbers: false
     });
     expect(data.theme).toBe('neat');
+    expect(
+      buildTypstSettings({ ...baseSettings, promptGutter: 'all' }).promptGutter
+    ).toBe('all');
     expect(data.tableOfContents).toBe(true);
     expect(data.numberSections).toBe(true);
     expect(data.pageNumbers).toBe(false);

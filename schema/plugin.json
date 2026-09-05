@@ -116,6 +116,16 @@
         { "const": "plain", "title": "Plain" }
       ],
       "default": "notebook"
+    },
+    "promptGutter": {
+      "title": "Prompt gutter",
+      "description": "With the \"Notebook\" theme, cells are indented to make room for the In/Out prompts. \"Code cells\" indents only code cells, \"All cells\" indents Markdown and raw cells too, such that every cell shares the same left edge.",
+      "type": "string",
+      "oneOf": [
+        { "const": "code", "title": "Code cells" },
+        { "const": "all", "title": "All cells (Code, Markdown, Raw)" }
+      ],
+      "default": "code"
     }
   },
   "additionalProperties": false
