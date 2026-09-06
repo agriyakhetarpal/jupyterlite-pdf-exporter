@@ -1,0 +1,200 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "jupyter.lab.setting-icon": "ui-components:pdf",
+  "jupyter.lab.setting-icon-label": "JupyterLite PDF Exporter",
+  "title": "JupyterLite PDF Exporter",
+  "description": "Settings for the JupyterLite PDF exporter. These control the look and feel of the exported PDFs.",
+  "type": "object",
+  "properties": {
+    "theme": {
+      "title": "Theme",
+      "description": "How cells are laid out. \"Notebook\" adds In/Out prompts like the Jupyter interface, \"Neat\" is a clean document look without prompts, and \"Plain\" applies no styling.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "notebook",
+          "title": "Notebook"
+        },
+        {
+          "const": "neat",
+          "title": "Neat"
+        },
+        {
+          "const": "plain",
+          "title": "Plain"
+        }
+      ],
+      "default": "notebook"
+    },
+    "promptGutter": {
+      "title": "Prompt gutter",
+      "description": "With the \"Notebook\" theme, cells are indented to make room for the In/Out prompts. \"Code cells\" indents only code cells, \"All cells\" indents Markdown and raw cells too, such that every cell shares the same left edge. This setting has no effect with the \"Neat\" or \"Plain\" themes.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "code",
+          "title": "Code cells"
+        },
+        {
+          "const": "all",
+          "title": "All cells (Code, Markdown, Raw)"
+        }
+      ],
+      "default": "code"
+    },
+    "hideInputs": {
+      "title": "Hide code inputs",
+      "description": "Leave the source of code cells out of the PDF and keep their outputs.",
+      "type": "boolean",
+      "default": false
+    },
+    "hideOutputs": {
+      "title": "Hide code outputs",
+      "description": "Leave the outputs of code cells out of the PDF and keep their source.",
+      "type": "boolean",
+      "default": false
+    },
+    "ansiColors": {
+      "title": "ANSI colours",
+      "description": "Render the colours and styles that ANSI escape codes in text outputs ask for, such as in tracebacks. Turn off to strip the codes and print plain text.",
+      "type": "boolean",
+      "default": true
+    },
+    "pageSize": {
+      "title": "Page size",
+      "description": "The paper size of the exported PDF.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "a4",
+          "title": "A4"
+        },
+        {
+          "const": "us-letter",
+          "title": "US Letter"
+        },
+        {
+          "const": "a3",
+          "title": "A3"
+        },
+        {
+          "const": "a5",
+          "title": "A5"
+        }
+      ],
+      "default": "a4"
+    },
+    "margin": {
+      "title": "Margins",
+      "description": "The space around the page edges. Include the unit, for example \"2cm\". Leave a field empty to use the default for that side.",
+      "type": "object",
+      "properties": {
+        "top": {
+          "title": "Top",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2.5cm"
+        },
+        "bottom": {
+          "title": "Bottom",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2.5cm"
+        },
+        "left": {
+          "title": "Left",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2cm"
+        },
+        "right": {
+          "title": "Right",
+          "type": "string",
+          "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+          "default": "2cm"
+        }
+      },
+      "additionalProperties": false,
+      "default": {
+        "top": "2.5cm",
+        "bottom": "2.5cm",
+        "left": "2cm",
+        "right": "2cm"
+      }
+    },
+    "pageNumbers": {
+      "title": "Page numbers",
+      "description": "Whether to print page numbers in the footer.",
+      "type": "boolean",
+      "default": true
+    },
+    "mainFont": {
+      "title": "Main font",
+      "description": "The body font. Only fonts bundled with the Typst compiler are available.",
+      "type": "string",
+      "oneOf": [
+        {
+          "const": "Libertinus Serif",
+          "title": "Libertinus Serif"
+        },
+        {
+          "const": "New Computer Modern",
+          "title": "New Computer Modern"
+        },
+        {
+          "const": "DejaVu Sans Mono",
+          "title": "DejaVu Sans Mono"
+        }
+      ],
+      "default": "Libertinus Serif"
+    },
+    "fontSize": {
+      "title": "Font size",
+      "description": "The base text size. Include the unit, for example \"10pt\" or \"12pt\". Leave empty to use the default.",
+      "type": "string",
+      "pattern": "^(\\d*\\.?\\d+(pt|mm|cm|in|em))?$",
+      "default": "10pt"
+    },
+    "lineSpacing": {
+      "title": "Line spacing",
+      "description": "The spacing between lines, as a multiple of the normal spacing.",
+      "type": "number",
+      "minimum": 0.5,
+      "default": 1
+    },
+    "linkColor": {
+      "title": "Link color",
+      "description": "The color used for links, shown as a color picker. In a configuration file, you can write a HEX value like \"#1a73e8\". Defaults to the classic link blue (#0000ee).",
+      "type": "string",
+      "format": "color",
+      "default": "#0000ee"
+    },
+    "tableOfContents": {
+      "title": "Table of contents",
+      "description": "Add a table of contents at the start of the document.",
+      "type": "boolean",
+      "default": false
+    },
+    "numberSections": {
+      "title": "Number sections",
+      "description": "Add numbers to section headings.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "if": {
+    "properties": {
+      "theme": {
+        "const": "notebook"
+      }
+    }
+  },
+  "else": {
+    "properties": {
+      "promptGutter": {
+        "readOnly": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

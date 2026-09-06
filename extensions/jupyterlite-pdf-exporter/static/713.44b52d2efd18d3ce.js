@@ -1,0 +1,1 @@
+"use strict";(self.rspackChunkjupyterlite_pdf_exporter=self.rspackChunkjupyterlite_pdf_exporter||[]).push([[713],{5464(e,t,r){var p=r(156),s=r(7180);class a extends p.BaseExporter{constructor(){super(...arguments),this.mimeType="application/pdf"}async export(e,t){await (0,s.L)(e.content,t)}}r.d(t,{PdfExporter:()=>a})}}]);
