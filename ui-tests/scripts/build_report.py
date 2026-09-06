@@ -305,28 +305,52 @@ def read_exports() -> dict[str, dict]:
     return exports
 
 
+def read_pages(slug: str) -> list[bytes]:
+    """The render of each page of an export, in page order"""
+    paths = OUTPUT_DIR.glob(f"{slug}-page-*.png")
+    return [
+        path.read_bytes()
+        for path in sorted(paths, key=lambda p: int(p.stem.rsplit("-", 1)[1]))
+    ]
+
+
 def build_preview(meta: dict) -> tuple[Markup, Markup]:
     """
-    The PDF page render, which opens in the lightbox, and a link to the full
-    PDF for the metadata line
+    The render of the first page, which opens in the lightbox, and a link to
+    the full PDF for the metadata line. The lightbox pages through the other
+    renders, which we keep in a template so the browser does not decode them
+    until they are shown.
     """
-
-    def read(ext: str) -> bytes | None:
-        path = OUTPUT_DIR / f"{meta['slug']}.{ext}"
-        return path.read_bytes() if path.exists() else None
-
-    pdf, png = read("pdf"), read("png")
-    if not (pdf and png):
+    pdf_path = OUTPUT_DIR / f"{meta['slug']}.pdf"
+    pdf = pdf_path.read_bytes() if pdf_path.exists() else None
+    pages = read_pages(meta["slug"])
+    if not (pdf and pages):
         return (
             Markup('<div class="pdf-card-no-preview">No page render captured.</div>'),
             Markup(""),
         )
     title = meta.get("title", meta["slug"])
+    first, *rest = pages
+    others = join(
+        [
+            markup(
+                t'<img src="{data_uri(png, "image/png")}" '
+                t'alt="Page {index} of the PDF exported for {title}" />'
+            )
+            for index, png in enumerate(rest, start=2)
+        ]
+    )
+    badge = (
+        markup(t'<span class="pdf-card-pages">{len(pages)} pages</span>')
+        if rest
+        else Markup("")
+    )
     preview = markup(
         t'<button type="button" class="pdf-card-preview" data-lightbox '
-        t'title="Enlarge the first page">'
-        t'<img loading="lazy" src="{data_uri(png, "image/png")}" '
-        t'alt="First page of the PDF exported for {title}" /></button>'
+        t'title="Enlarge the page renders">'
+        t'<img loading="lazy" src="{data_uri(first, "image/png")}" '
+        t'alt="Page 1 of the PDF exported for {title}" />{badge}</button>'
+        t'<template class="pdf-card-more-pages">{others}</template>'
     )
     link = markup(
         t'<a class="pdf-card-pdf" href="{data_uri(pdf, "application/pdf")}" '

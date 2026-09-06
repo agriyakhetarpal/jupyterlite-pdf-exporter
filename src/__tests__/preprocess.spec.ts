@@ -117,6 +117,33 @@ describe('preprocessNotebook', () => {
     expect(firstData(notebook)).toEqual({ 'text/plain': 'x' });
   });
 
+  it('turns text values that are not strings into JSON', () => {
+    const geojson = {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [125.6, 10.1] }
+    };
+    const notebook = notebookWith({
+      output_type: 'display_data',
+      data: { 'application/geo+json': geojson, 'text/plain': geojson },
+      metadata: {}
+    });
+    preprocessNotebook(notebook);
+    expect(firstData(notebook)['text/plain']).toBe(
+      JSON.stringify(geojson, null, 2)
+    );
+    expect(firstData(notebook)['application/geo+json']).toEqual(geojson);
+  });
+
+  it('turns JSON outputs without a text form into a string', () => {
+    const notebook = notebookWith({
+      output_type: 'display_data',
+      data: { 'application/json': { a: 1 } },
+      metadata: {}
+    });
+    preprocessNotebook(notebook);
+    expect(firstData(notebook)['application/json']).toBe('{\n  "a": 1\n}');
+  });
+
   it('adds a placeholder when nothing can be rendered', () => {
     const notebook = notebookWith({
       output_type: 'display_data',

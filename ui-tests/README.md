@@ -53,7 +53,7 @@ for configuring that behavior.
 ## Test report
 
 The export tests write the PDFs they produce into `pdf-output/`, along with a
-render of the first page and the text extracted from it. We use [scripts/build_report.py](./scripts/build_report.py)
+render of each page and the text extracted from it. We use [scripts/build_report.py](./scripts/build_report.py)
 to turn that folder into a single self-contained `report.html`.
 
 ```sh

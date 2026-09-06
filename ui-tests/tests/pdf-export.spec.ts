@@ -81,6 +81,19 @@ const FIXTURES: {
     }
   },
   {
+    file: 'renderers.ipynb',
+    title: 'JupyterLab renderer outputs',
+    check: r => {
+      // Sequences from the FASTA cell survive as text
+      expect(r.text).toContain('SEQUENCE_1');
+      // A raw display can put a dict under text/plain, which
+      // used to stop the export. It renders as JSON now
+      expect(r.text).toContain('Dinagat Islands');
+      expect(r.text).toContain('"coordinates"');
+      expect(r.text).toContain('<IPython.core.display.JSON object>');
+    }
+  },
+  {
     file: 'tags.ipynb',
     title: 'nbconvert cell tags',
     check: r => {

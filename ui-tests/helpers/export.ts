@@ -76,7 +76,12 @@ export async function exportNotebook(
 
   // Write the metadata for the test report
   fs.writeFileSync(path.join(OUTPUT_DIR, `${slug}.txt`), analysis.text);
-  fs.writeFileSync(path.join(OUTPUT_DIR, `${slug}.png`), analysis.pages[0]);
+  analysis.pages.forEach((png, index) => {
+    fs.writeFileSync(
+      path.join(OUTPUT_DIR, `${slug}-page-${index + 1}.png`),
+      png
+    );
+  });
   fs.writeFileSync(
     path.join(OUTPUT_DIR, `${slug}.json`),
     JSON.stringify(
