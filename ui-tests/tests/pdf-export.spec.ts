@@ -111,6 +111,15 @@ const FIXTURES: {
       expect(r.text).not.toContain('removed-markdown-text');
       expect(r.text).toContain('The last cell stays.');
     }
+  },
+  {
+    file: 'long-lines.ipynb',
+    title: 'Traceback and long output lines',
+    check: r => {
+      expect(r.text).toContain('Traceback (most recent call last)');
+      expect(r.text).toContain("name 'undefined_name' is not defined");
+      expect(r.text).toContain('https://example.com/');
+    }
   }
 ];
 
