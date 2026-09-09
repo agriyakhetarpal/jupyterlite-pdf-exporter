@@ -13,6 +13,8 @@ const TEST_CASES: {
   slug: string;
   title: string;
   settings: Record<string, unknown>;
+  /** A notebook other than the default */
+  notebook?: string;
   check?: (a: { text: string; width: number; height: number }) => void;
 }[] = [
   {
@@ -96,6 +98,16 @@ const TEST_CASES: {
     slug: 'opt-fontsize-14pt',
     title: 'fontSize: 14pt',
     settings: { fontSize: '14pt' }
+  },
+  {
+    slug: 'opt-long-lines-a5-14pt',
+    title: 'Long lines at a5, 14pt',
+    notebook: 'long-lines.ipynb',
+    settings: { pageSize: 'a5', fontSize: '14pt' },
+    check: a => {
+      expect(a.width).toBe(420);
+      expect(a.text).toContain('Traceback (most recent call last)');
+    }
   },
   {
     slug: 'opt-margin-wide',
@@ -198,14 +210,15 @@ for (const testCase of TEST_CASES) {
     test.setTimeout(240_000);
 
     await writeSettings(request, testCase.settings);
+    const notebook = testCase.notebook ?? NOTEBOOK;
 
     const analysis = await exportNotebook(
       page,
-      `${tmpPath}/${NOTEBOOK}`,
+      `${tmpPath}/${notebook}`,
       testCase.slug,
       {
         title: testCase.title,
-        notebook: NOTEBOOK,
+        notebook,
         group: 'Settings',
         settings: testCase.settings
       }

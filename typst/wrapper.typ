@@ -108,6 +108,61 @@
   code-cell-handler
 }
 
+// Typst only breaks lines at spaces and hyphens. This means that:
+// - a long run of characters such as the dashes above a traceback, or
+// - a long URL printed by a cell (where the output is not Markdown), etc.
+// runs past the right margin. See
+// https://github.com/agriyakhetarpal/jupyterlite-pdf-exporter/issues/80.
+//
+// What we do here is to put each character in its own box, in order to let
+// the line break anywhere, as the notebook interface does with its pre-wrap
+// text.
+// See https://github.com/typst/typst/issues/674 which links to a host of
+// related issues and discussions. Note that we cannot use ZWSes here because
+// they affect search and copying in the PDF.
+//
+// The line length is estimated from the page, the margins, the prompt gutter,
+// and the width of a character in the current font. We err on the short side,
+// since boxing a run that would have just fit does not cost anything.
+#let chars-per-line() = {
+  let default-margin = 2.5 / 21 * calc.min(page.width, page.height)
+  // A margin can be auto, a length, a ratio of the page width, or both combined
+  let margin(side) = {
+    let m = page.margin
+    if type(m) == dictionary { m = m.at(side, default: auto) }
+    if m == auto { default-margin } else if type(m) == ratio { m * page.width } else if type(m) == relative {
+      m.length.to-absolute() + m.ratio * page.width
+    } else { m.to-absolute() }
+  }
+  let gutter = if settings.theme == "notebook" { prompt-gutter() } else { 0pt }
+  let available = (page.width - margin("left") - margin("right") - gutter - 2em).to-absolute()
+  calc.max(calc.floor(available / measure(raw("x")).width), 8)
+}
+
+// N.B. Typst fails with "maximum grouping depth exceeded" once a paragraph
+// holds more than 512 regex matches, which a long output easily exceeds.
+// We walk the text ourselves as a result.
+#let break-anywhere(long-run, it) = {
+  let source = it.text
+  if not source.contains(long-run) { return it }
+  let pos = 0
+  for m in source.matches(long-run) {
+    source.slice(pos, m.start)
+    m.text.clusters().map(box).join()
+    pos = m.end
+  }
+  source.slice(pos)
+}
+
+// The line length is measured once per block, rather than once per text element
+#let wrap-long-runs(body) = context {
+  let long-run = regex("\\S{" + str(chars-per-line()) + ",}")
+  show text: break-anywhere.with(long-run)
+  body
+}
+// Block raw only: measuring inline raw above would otherwise trigger this rule
+#show raw.where(block: true): wrap-long-runs
+
 #if settings.tableOfContents { outline() }
 
 #let body = callisto.render(
@@ -116,7 +171,12 @@
   // auto keeps Callisto's support for "#| echo: false" types of cell headers
   input: if settings.hideInputs { false } else { auto },
   output: if settings.hideOutputs { false } else { auto },
-  console-text: if settings.ansiColors { auto } else { "strip" },
+  // Once Callisto renders ANSI colours, console text is not a raw element.
+  // So the long run rule is applied through the template it accepts.
+  console-text: (
+    render: if settings.ansiColors { auto } else { "strip" },
+    template: it => wrap-long-runs(callisto.ansi.console-block-template(it)),
+  ),
   ignore-wrong-format: true,
   // Markdown can carry Typst code in HTML comments; do not run it
   cmarker: (raw-typst: false),
