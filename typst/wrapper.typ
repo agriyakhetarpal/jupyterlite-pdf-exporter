@@ -9,6 +9,7 @@
 // - scripts/vendor_typst_packages.py
 // - src/typst-packages.ts
 #import "@preview/callisto:0.3.0"
+#import "notebook-grid.typ"
 
 #let settings = json("settings.json")
 
@@ -75,37 +76,57 @@
   (callisto.default-handlers.at("code-cell"))(cell, ctx: ctx, ..args)
 }
 
-// Callisto's notebook theme places the In/Out prompts 1.2em to the left of
-// each code cell, see https://github.com/sijow/callisto/blob/a402a27f5aa17d4b4e45ced1bf3dcd3a7227a6dc/themes/notebook.typ#L8-L12.
-// This puts them in the page margin, where they are clipped once the margin
-// is narrower than the prompt. See https://github.com/sijow/callisto/issues/22
+// Callisto's notebook theme places the In/Out prompts in the page margin,
+// where they are clipped once the margin is narrower than the prompt, see
+// https://github.com/sijow/callisto/issues/22. Its author proposed a derived
+// theme there that keeps the prompts inside the text area. It lives in
+// notebook-grid.typ until Callisto ships it. The width of the widest prompt
+// the notebook needs at the current font is still measured here, to indent
+// other cells to match and to estimate the line length.
 //
-// This is a workaround that reserves room inside the text area, measured from
-// the widest prompt the user's notebook needs at the current font. By default,
-// only code cells are indented to utilise the space available efficiently.
-//
-// The promptGutter setting allows indenting all cells, which may be a tad more
-// faithful to the notebook layout as seen in JupyterLab/nbconvert, but then
-// we don't have as wide margins like nbconvert does.
-#let prompt-gutter() = {
+// By default only code cells make room for the prompts, to utilise the space
+// available efficiently. The promptGutter setting can indent Markdown and raw
+// cells by the same amount, which is a tad more faithful to the notebook
+// layout as seen in JupyterLab/nbconvert.
+#let prompt-width() = {
   let counts = json("notebook.ipynb")
     .cells
     .filter(cell => cell.cell_type == "code")
     .map(cell => cell.at("execution_count", default: none))
     .filter(count => count != none)
   let widest = counts.fold(1, calc.max)
-  measure(raw("Out[" + str(widest) + "]:")).width + 1.2em
+  measure(raw("Out[" + str(widest) + "]:")).width
 }
 
-#let with-prompt-gutter(handler) = (cell, ctx: none, ..args) => context pad(
-  left: prompt-gutter(),
+#let theme = if settings.theme == "notebook" {
+  notebook-grid.theme
+} else {
+  settings.theme
+}
+
+// How far cell content sits from the left of the text area: the prompt column
+// of the grid theme, with its 0.5em inset on both sides, a 0.5em column
+// gutter, and the 0.5em inset of the content column
+#let content-offset() = if settings.theme == "notebook" {
+  prompt-width() + 2em
+} else {
+  0pt
+}
+
+#let with-content-offset(handler) = (cell, ctx: none, ..args) => context pad(
+  left: content-offset(),
   handler(cell, ctx: ctx, ..args),
 )
 
-#let code-cell = if settings.theme == "notebook" and settings.promptGutter == "code" {
-  with-prompt-gutter(code-cell-handler)
+// Markdown and raw cells are indented by the theme's own handlers when asked
+#let cell-handlers = if settings.theme == "notebook" and settings.promptGutter == "all" {
+  let themed(name) = theme.at(name, default: callisto.default-handlers.at(name))
+  (
+    "markdown-cell": with-content-offset(themed("markdown-cell")),
+    "raw-cell": with-content-offset(themed("raw-cell")),
+  )
 } else {
-  code-cell-handler
+  (:)
 }
 
 // Typst only breaks lines at spaces and hyphens. This means that:
@@ -134,7 +155,7 @@
       m.length.to-absolute() + m.ratio * page.width
     } else { m.to-absolute() }
   }
-  let gutter = if settings.theme == "notebook" { prompt-gutter() } else { 0pt }
+  let gutter = content-offset()
   let available = (page.width - margin("left") - margin("right") - gutter - 2em).to-absolute()
   calc.max(calc.floor(available / measure(raw("x")).width), 8)
 }
@@ -167,7 +188,7 @@
 
 #let body = callisto.render(
   nb: path("notebook.ipynb"),
-  theme: settings.theme,
+  theme: theme,
   // auto keeps Callisto's support for "#| echo: false" types of cell headers
   input: if settings.hideInputs { false } else { auto },
   output: if settings.hideOutputs { false } else { auto },
@@ -183,12 +204,8 @@
   handlers: (
     "image-markdown": image-markdown,
     "cell": cell-handler,
-    "code-cell": code-cell,
-  ),
+    "code-cell": code-cell-handler,
+  ) + cell-handlers,
 )
 
-#if settings.theme == "notebook" and settings.promptGutter == "all" {
-  context pad(left: prompt-gutter(), body)
-} else {
-  body
-}
+#body
