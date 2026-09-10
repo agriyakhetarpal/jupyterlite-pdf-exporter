@@ -85,7 +85,7 @@ jobs:
           fi
 
       - name: Base Setup
-        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@94b14ddfbdd1ed651e9f9343ae2409ab5c73a6a8 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/base-setup@21b1cac622018fd37ec13a1c8081da814e10d94e # v1
 
       - name: Build and install the extension
         run: |
@@ -98,7 +98,7 @@ jobs:
           jupyter labextension list 2>&1 | grep -ie "jupyterlite-pdf-exporter.*OK"
 
       - name: Update the snapshots and push them
-        uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@94b14ddfbdd1ed651e9f9343ae2409ab5c73a6a8 # v1
+        uses: jupyterlab/maintainer-tools/.github/actions/update-snapshots@21b1cac622018fd37ec13a1c8081da814e10d94e # v1
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: 0
         with:
