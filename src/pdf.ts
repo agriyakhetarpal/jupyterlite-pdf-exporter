@@ -15,6 +15,7 @@ import type { ICompileRequest, ICompileResponse } from './typst-worker';
 
 import { createTypstWorker } from './typst-worker-url';
 
+import gridThemeSource from '../typst/notebook-grid.typ';
 import wrapperSource from '../typst/wrapper.typ';
 
 /**
@@ -56,6 +57,7 @@ export async function exportNotebookToPdf(
     pdfExportProgress.update('Generating PDF…');
     const pdfData = await compileInWorker({
       '/main.typ': wrapperSource,
+      '/notebook-grid.typ': gridThemeSource,
       '/notebook.ipynb': JSON.stringify(working),
       '/settings.json': JSON.stringify(typstSettings)
     });
