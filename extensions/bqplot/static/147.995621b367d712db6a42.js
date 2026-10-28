@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkbqplot=self.webpackChunkbqplot||[]).push([[147],{4147:e=>{e.exports=JSON.parse('{"name":"bqplot","version":"0.6.1"}')}}]);
